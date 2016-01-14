@@ -87,4 +87,60 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $redirect = Mage::helper("adminhtml")->getUrl($url);
         Mage::app()->getResponse()->setRedirect($redirect);
     }
+
+    /**
+     * saving and registration data geting oxd_id
+     */
+    public function generalFunctionAction(){
+        $storeConfig = new Mage_Core_Model_Config();
+        $params = $this->getRequest()->getParams();
+        $datahelper = $this->getDataHelper();
+        $email = $params['loginemail'];
+        $oxd_port = $params['oxd_port'];
+        $illegal = "#$%^*()+=[]';,/{}|:<>?~";
+        $illegal = $illegal . '"';
+        if( $this->empty_or_null( $email )  ||  $this->empty_or_null( $oxd_port ) ) {
+            $datahelper->displayMessage('All the fields are required. Please enter valid entries.',"ERROR");
+            $this->redirect("*/*/index");
+            return;
+        }
+        if( $oxd_port  > 65535 && $oxd_port  < 0){
+            $datahelper->displayMessage('Enter your oxd host port (Min. number 0, Max. number 65535).',"ERROR");
+            $this->redirect("*/*/index");
+            return;
+        } else if(strpbrk($email,$illegal)) {
+            $datahelper->displayMessage('Please match the format of Email. No special characters are allowed.',"ERROR");
+            $this->redirect("*/*/index");
+            return;
+        }
+        $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
+        $config_option['oxd_host_port'] = $oxd_port;
+        $config_option['admin_email'] = $email;
+        $storeConfig ->saveConfig('gluu/oxd/oxd_config',serialize($config_option), 'default', 0);
+        $registerSite = $this->getOxdRegisterSiteHelper();
+        $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
+        $registerSite->setRequestAcrValues($config_option['acr_values']);
+        $registerSite->setRequestAuthorizationRedirectUri($config_option['authorization_redirect_uri']);
+        $registerSite->setRequestRedirectUris($config_option['redirect_uris']);
+        $registerSite->setRequestLogoutRedirectUri($config_option['logout_redirect_uri']);
+        $registerSite->setRequestContacts([$config_option['admin_email']]);
+        $registerSite->setRequestApplicationType('web');
+        $status = $registerSite->request();
+
+        if(!$status['status']){
+            $datahelper->displayMessage($status['message'],"ERROR");
+            $this->redirect("*/*/index");
+            return;
+        }
+        if($registerSite->getResponseOxdId()){
+            $storeConfig ->saveConfig('gluu/oxd/oxd_id',$registerSite->getResponseOxdId(), 'default', 0);
+            $datahelper->displayMessage('Site registered Successful. You can configure Gluu and Social Login now.',"SUCCESS");
+            $this->redirect("*/*/index");
+            return;
+        }else{
+            $datahelper->displayMessage('Invalid Credentials',"ERROR");
+            $this->redirect("*/*/index");
+            return;
+        }
+    }
 }
