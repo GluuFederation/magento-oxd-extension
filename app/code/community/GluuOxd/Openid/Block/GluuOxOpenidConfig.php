@@ -143,4 +143,12 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
         return Mage::getUrl($value,array('_secure'=>true));
     }
 
+    /**
+     * getting current url
+     * return @string
+     */
+    public function getcurrentUrl(){
+        return Mage::getBaseUrl();
+    }
+
 }
