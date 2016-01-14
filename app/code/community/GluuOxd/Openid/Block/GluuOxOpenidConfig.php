@@ -199,5 +199,17 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
         return $user->getConfig($config,$userid);
     }
 
+    /**
+     * getting session
+     * return @data
+     */
+    public function getSession(){
+        if( !Mage::getSingleton('customer/session')->isLoggedIn() ) {
+            $session = Mage::getSingleton('customer/session');
+        }else{
+            $session = Mage::getSingleton('admin/session');
+        }
+        return $session;
+    }
 
 }
