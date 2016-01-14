@@ -1,0 +1,555 @@
+<?php
+    $oxd_id = Mage::getStoreConfig('gluu/oxd/oxd_id');
+    $get_scopes = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_scops'));
+    $oxd_config = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_config'));
+    $custom_scripts = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_custom_scripts'));
+?>
+<html>
+<head>
+    <link href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/GluuOxd_Openid/css/telephone.css'; ?>" rel="stylesheet">
+    <link href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/GluuOxd_Openid/css/bootstrap-social.css'; ?>" rel="stylesheet"/>
+    <link href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/GluuOxd_Openid/css/gluuoxdcss.css'; ?>" rel="stylesheet"/>
+    <link href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/GluuOxd_Openid/css/font-awesome.min.css'; ?>" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/GluuOxd_Openid/js/gluuoxdjs.js'; ?>"></script>
+    <script src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/GluuOxd_Openid/js/oxdscopecustomscript.js'; ?>"></script>
+    <script>
+        var $m = jQuery.noConflict();
+        $m(document).ready(function () {
+            $m("#phone").intlTelInput();
+            $m("#query_phone").intlTelInput();
+            $m("#additional_phone").intlTelInput();
+            $oxd_id = "<?php echo $oxd_id; ?>";
+            $downloaded = "<?php echo $this->getConfig('downloaded'); ?>";
+            $twofactortype = "<?php echo $this->getConfig('twofactortype'); ?>"
+            $showsocialsharing = "<?php echo Mage::getSingleton('admin/session')->getshowsocialsharing(); ?>";
+            $showTwoFactorSettings = "<?php echo Mage::getSingleton('admin/session')->getShowTwoFactorSettings(); ?>";
+            if ($oxd_id) {
+                voiddisplay("#socialsharing");
+                setactive('social-sharing-setup');
+            } else {
+                setactive('account_setup');
+            }
+            if ($twofactortype != "") {
+                $m(".active_method>b").empty();
+                $selectedMethod = $twofactortype.toLowerCase().replace(/ /g, "_");
+                $m(".active_method>b").append($twofactortype);
+                $m(".mo2f_thumbnail").removeClass("method_active_box");
+                $m("input[name='mo2f_selected_2factor_method']").removeAttr("checked");
+                $m(".mo2f_click").removeClass("method_active");
+                $m('#' + $selectedMethod).addClass("method_active_box");
+                $m('#' + $selectedMethod).find(".mo2f_click").addClass("method_active");
+                $m('#' + $selectedMethod).find("input").prop("checked", true);
+                $m('#' + $selectedMethod).find("input").attr("disabled", true);
+            } else {
+                $m(".active_method>b").append("NONE");
+            }
+            if ($downloaded == "1") {
+                $m('#showDownload').prop('checked', true);
+                $m("#showDownload").val(1);
+            }
+            if ($m("#showDownload").is(":checked")) {
+                $m("#configureqr").css("display", "block");
+                $m("#downloadscreen").css("display", "none");
+            } else {
+                $m("#configureqr").css("display", "none");
+                $m("#downloadscreen").css("display", "block");
+            }
+            $m(".navbar a").click(function () {
+                $id = $m(this).parent().attr('id');
+                setactive($id);
+                $href = $m(this).data('method');
+                voiddisplay($href);
+            });
+            $m(".btn-link").click(function () {
+                $m(".collapse").slideUp("slow");
+                if (!$m(this).next("div").is(':visible')) {
+                    $m(this).next("div").slideDown("slow");
+                }
+            });
+            $m('#showDownload').change(function () {
+                if ($m(this).attr('checked')) {
+                    $m(this).val(0);
+                    $m(this).attr('checked', false);
+                } else {
+                    $m(this).val(1);
+                    $m(this).attr('checked', true);
+                    $m("#configmobilebutton").click();
+                }
+                $m("#downloadscreen").slideToggle();
+                $m("#configureqr").slideToggle();
+                document.location.href = "#displayQrCode";
+            });
+            $m('#preview1').click(function () {
+                $m("a[data-method='#pricing']").click();
+                $m("#offline-preview").click();
+                document.location.href = "#slider3";
+            });
+            $m('#preview2').click(function () {
+                $m("a[data-method='#pricing']").click();
+                $m("#phonelost-preview").click();
+                document.location.href = "#slider4";
+            });
+            $m('#preview3').click(function () {
+                $m("a[data-method='#pricing']").click();
+                $m("#reconfigure-preview").click();
+                document.location.href = "#slider5";
+            });
+            $m('.preview4').click(function () {
+                $m("a[data-method='#pricing']").click();
+                $m("#register-preview").click();
+                document.location.href = "#slider2";
+            });
+            $m('.preview5').click(function () {
+                $m("a[data-method='#pricing']").click();
+                $m("#reconfigure-preview-2").click();
+                document.location.href = "#slider7";
+            });
+            $m('#error-cancel').click(function () {
+                $error = "";
+                $m(".error-msg").css("display", "none");
+            });
+            $m('#success-cancel').click(function () {
+                $success = "";
+                $m(".success-msg").css("display", "none");
+            });
+            $m('#cURL').click(function () {
+                $m(".help_trouble").click();
+                $m("#cURLfaq").click();
+            });
+            $m(".mo2f_click").click(function () {
+                if (!$m(this).hasClass("method_active")) {
+                    $m(this).find("input").prop("checked", true);
+                    $m(".mo2f_thumbnail").hide();
+                    $m("#twofactorselect").show();
+                    $m("#mo2f_2factor_form").submit();
+                }
+            });
+            $m(".reconfigure").click(function () {
+                $m(".mo2f_thumbnail").hide();
+                $m("#twofactorselect").show();
+                if ($m(this).data("method") == "SMS" || $m(this).data("method") == "PHONE VERIFICATION") {
+                    $m("#phone_reconfigure").val($m(this).data("method"));
+                    $m("#mo2f_2factor_reconfigure_phone_form").submit();
+                } else {
+                    $m("#reconfigure_mobile").val(1);
+                    $m("#mo2f_2factor_reconfigure_mobile_form").submit();
+                }
+            });
+            $m(".test").click(function () {
+                $m(".mo2f_thumbnail").hide();
+                $m("#twofactorselect").show();
+                $m("#test_2factor").val($m(this).data("method"));
+                $m("#mo2f_2factor_test_form").submit();
+            });
+        });
+        function setactive($id) {
+            $m(".navbar-tabs>li").removeClass("active");
+            $m("#minisupport").show();
+            $id = '#' + $id;
+            $m($id).addClass("active");
+        }
+        function voiddisplay($href) {
+            $m(".page").css("display", "none");
+            $m($href).css("display", "block");
+        }
+        function mo2f_valid(f) {
+            !(/^[a-zA-Z?,.\(\)\/@ 0-9]*$/).test(f.value) ? f.value = f.value.replace(/[^a-zA-Z?,.\(\)\/@ 0-9]/, '') : null;
+        }
+
+        var $j = jQuery.noConflict();
+        var timeout;
+        var transId = "<?php echo $this->getTransactionId(); ?>";
+        var test = "<?php echo Mage::getSingleton('admin/session')->getTestValidationScreen(); ?>";
+        var testMobile = "<?php echo Mage::getSingleton('admin/session')->getShowTestMobileAuth(); ?>";
+        function pollMobileRegistration() {
+            if (test == "1") {
+                var postUrl = "<?php echo $this->getHostURl()  ?>" + "/moas/api/auth/auth-status";
+            } else {
+                var postUrl = "<?php echo $this->getHostURl()  ?>" + "/moas/api/auth/registration-status";
+            }
+            var jsonString = "{\"txId\":\"" + transId + "\"}";
+            $j.ajax({
+                url: postUrl,
+                type: "POST",
+                dataType: "json",
+                data: jsonString,
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    var status = JSON.parse(JSON.stringify(result)).status;
+                    if (status == 'SUCCESS') {
+                        var content = "<div id='success' style='margin-left: 1%; margin-top:2%;'><img src='" + "<?php echo $this->getImage('right') ?>" + "' /></div>";
+                        if (test != "1") {
+                            $j("#displayQrCode").empty();
+                            $j("#displayQrCode").append(content);
+                        } else if (testMobile == "1") {
+                            $j("#testQrCode").empty();
+                            $j("#testQrCode").append(content);
+                        }
+                        setTimeout(function () {
+                            $j("#mobile_register_form").submit();
+                        }, 1000);
+                    } else if (status == 'ERROR' || status == 'FAILED') {
+                        var content = "<div id='error' style='margin-left: 1%; margin-top:2%;'><img src='" + "<?php echo $this->getImage('wrong') ?>" + "' /></div>";
+                        if (test != "1") {
+                            $j("#displayQrCode").empty();
+                            $j("#displayQrCode").append(content);
+                        } else if (testMobile == "1") {
+                            $j("#testQrCode").empty();
+                            $j("#testQrCode").append(content);
+                        }
+                        setTimeout(function () {
+                            $j("#mobile_register_failed").submit();
+                        }, 1000);
+                    } else {
+                        timeout = setTimeout(pollMobileRegistration, 3000);
+                    }
+                }
+            });
+        }
+        if (transId != "") {
+            pollMobileRegistration();
+        }
+
+        var $j = jQuery.noConflict();
+        $j(document).ready(function ($j) {
+            for (var i = 1; i <= 8; i++) {
+                var slideCount = $j('#slider' + i + ' ul li').length;
+                var slideWidth = $j('#slider' + i + ' ul li').width();
+                var slideHeight = $j('#slider' + i + ' ul li').height();
+                var sliderUlWidth = slideCount * slideWidth;
+                var no = 1;
+                $j('.control_info[data-slider=' + i + ']').append(no);
+                $j('#slider' + i + '').css({width: slideWidth, height: slideHeight});
+                $j('#slider' + i + ' ul').css({width: sliderUlWidth, marginLeft: -slideWidth});
+                $j('#slider' + i + ' ul li:last-child').prependTo('#slider' + i + ' ul');
+            }
+            function moveLeft(id) {
+                $j('ul[data-slider=' + id + ']').fadeOut("slow", function () {
+                    $j('ul li[data-slider=' + id + ']:last-child').prependTo('ul[data-slider=' + id + ']');
+                    $j('ul[data-slider=' + id + ']').css('left', '');
+                    $j('ul[data-slider=' + id + ']').fadeIn("slow");
+                    no = $j('ul li[data-slider=' + id + ']').next().data('pos');
+                    $j('.control_info[data-slider=' + id + ']').empty();
+                    $j('.control_info[data-slider=' + id + ']').append(no);
+                });
+            };
+            function moveRight(id) {
+                $j('ul[data-slider=' + id + ']').fadeOut("slow", function () {
+                    $j('ul li[data-slider=' + id + ']:first-child').appendTo('ul[data-slider=' + id + ']').fadeIn("slow");
+                    $j('ul[data-slider=' + id + ']').css('left', '');
+                    $j('ul[data-slider=' + id + ']').fadeIn("slow");
+                    no = $j('ul li[data-slider=' + id + ']').next().data('pos');
+                    $j('.control_info[data-slider=' + id + ']').empty();
+                    $j('.control_info[data-slider=' + id + ']').append(no);
+                });
+            };
+            $j('.control_prev').click(function () {
+                moveLeft($j(this).data('slider'));
+            });
+            $j('.control_next').click(function () {
+                moveRight($j(this).data('slider'));
+            });
+        });
+
+        jQuery(document).ready(function () {
+
+            var tempHorSize = '<?php echo $iconCustomSize ?>';
+            var tempHorTheme = '<?php echo $loginTheme ?>';
+            var tempHorCustomTheme = '<?php echo $loginCustomTheme ?>';
+            var tempHorCustomColor = '<?php echo $iconCustomColor ?>';
+            var tempHorSpace = '<?php echo $iconSpace ?>';
+            var tempHorHeight = '<?php echo $iconCustomHeight ?>';
+            moLoginPreview(setSizeOfIcons(), tempHorTheme, tempHorCustomTheme, tempHorCustomColor, tempHorSpace, tempHorHeight);
+            checkLoginButton();
+            <?php if( $this->getConfig('email')){
+                        if(isset($_GET['q']) && $_GET['q']=='sharing'){ ?>
+            jQuery('#social-sharing-setup > a').click();
+            <?php } else{ ?>
+            jQuery('#social-login-setup > a').click();
+            <?php }
+                    } ?>
+        });
+        function setLoginTheme() {
+            return jQuery('input[name=gluuoxd_openid_login_theme]:checked', '#form-apps').val();
+        }
+        function setLoginCustomTheme() {
+            return jQuery('input[name=gluuoxd_openid_login_custom_theme]:checked', '#form-apps').val();
+        }
+        function setSizeOfIcons() {
+            if ((jQuery('input[name=gluuoxd_openid_login_theme]:checked', '#form-apps').val()) == 'longbutton') {
+                return document.getElementById('mo_login_icon_width').value;
+            } else {
+                return document.getElementById('mo_login_icon_size').value;
+            }
+        }
+        function moLoginPreview(t, r, l, p, n, h) {
+
+            if (l == 'default') {
+                if (r == 'longbutton') {
+                    var a = "btn-defaulttheme";
+                    jQuery("." + a).css("width", t + "px");
+                    if (h > 26) {
+                        jQuery("." + a).css("height", "26px");
+                        jQuery("." + a).css("padding-top", (h - 26) / 2 + "px");
+                        jQuery("." + a).css("padding-bottom", (h - 26) / 2 + "px");
+                    } else {
+                        jQuery("." + a).css("height", h + "px");
+                        jQuery("." + a).css("padding-top", (h - 26) / 2 + "px");
+                        jQuery("." + a).css("padding-bottom", (h - 26) / 2 + "px");
+                    }
+                    jQuery(".fa").css("padding-top", (h - 35) + "px");
+                    jQuery("." + a).css("margin-bottom", n + "px");
+                } else {
+                    var a = "mo_login_icon_preview";
+                    jQuery("." + a).css("margin-left", n + "px");
+                    if (r == "circle") {
+                        jQuery("." + a).css({height: t, width: t});
+                        jQuery("." + a).css("borderRadius", "999px");
+                    } else if (r == "oval") {
+                        jQuery("." + a).css("borderRadius", "5px");
+                        jQuery("." + a).css({height: t, width: t});
+                    } else if (r == "square") {
+                        jQuery("." + a).css("borderRadius", "0px");
+                        jQuery("." + a).css({height: t, width: t});
+                    }
+                }
+            }
+            else if (l == 'custom') {
+                if (r == 'longbutton') {
+                    var a = "btn-customtheme";
+                    jQuery("." + a).css("width", (t) + "px");
+                    if (h > 26) {
+                        jQuery("." + a).css("height", "26px");
+                        jQuery("." + a).css("padding-top", (h - 26) / 2 + "px");
+                        jQuery("." + a).css("padding-bottom", (h - 26) / 2 + "px");
+                    } else {
+                        jQuery("." + a).css("height", h + "px");
+                        jQuery("." + a).css("padding-top", (h - 26) / 2 + "px");
+                        jQuery("." + a).css("padding-bottom", (h - 26) / 2 + "px");
+                    }
+                    jQuery("." + a).css("margin-bottom", n + "px");
+                    jQuery("." + a).css("background", p);
+                } else {
+                    var a = "mo_custom_login_icon_preview";
+                    jQuery("." + a).css({height: t - 8, width: t});
+                    jQuery("." + a).css("padding-top", "8px");
+                    jQuery("." + a).css("margin-left", n + "px");
+                    jQuery("." + a).css("background", p);
+
+                    if (r == "circle") {
+                        jQuery("." + a).css("borderRadius", "999px");
+                    } else if (r == "oval") {
+                        jQuery("." + a).css("borderRadius", "5px");
+                    } else if (r == "square") {
+                        jQuery("." + a).css("borderRadius", "0px");
+                    }
+                    jQuery("." + a).css("font-size", (t - 16) + "px");
+                }
+            }
+            previewLoginIcons();
+        }
+        function checkLoginButton() {
+            if (document.getElementById('iconwithtext').checked) {
+                if (setLoginCustomTheme() == 'default') {
+                    jQuery(".mo_login_icon_preview").hide();
+                    jQuery(".mo_custom_login_icon_preview").hide();
+                    jQuery(".btn-customtheme").hide();
+                    jQuery(".btn-defaulttheme").show();
+                } else if (setLoginCustomTheme() == 'custom') {
+                    jQuery(".mo_login_icon_preview").hide();
+                    jQuery(".mo_custom_login_icon_preview").hide();
+                    jQuery(".btn-defaulttheme").hide();
+                    jQuery(".btn-customtheme").show();
+                }
+                jQuery("#commontheme").hide();
+                jQuery(".longbuttontheme").show();
+            }
+            else {
+                if (setLoginCustomTheme() == 'default') {
+                    jQuery(".mo_login_icon_preview").show();
+                    jQuery(".btn-defaulttheme").hide();
+                    jQuery(".btn-customtheme").hide();
+                    jQuery(".mo_custom_login_icon_preview").hide();
+                } else if (setLoginCustomTheme() == 'custom') {
+                    jQuery(".mo_login_icon_preview").hide();
+                    jQuery(".mo_custom_login_icon_preview").show();
+                    jQuery(".btn-defaulttheme").hide();
+                    jQuery(".btn-customtheme").hide();
+                }
+                jQuery("#commontheme").show();
+                jQuery(".longbuttontheme").hide();
+            }
+
+            previewLoginIcons();
+        }
+        function previewLoginIcons() {
+            var flag = 0;
+            <?php foreach($custom_scripts as $custom_script):?>
+            if (document.getElementById('<?php echo $custom_script['value'];?>_enable').checked) {
+                flag = 1;
+                if (document.getElementById('gluuoxd_openid_login_default_radio').checked && !document.getElementById('iconwithtext').checked)
+                    jQuery("#mo_login_icon_preview_<?php echo $custom_script['value'];?>").show();
+                if (document.getElementById('gluuoxd_openid_login_custom_radio').checked && !document.getElementById('iconwithtext').checked)
+                    jQuery("#mo_custom_login_icon_preview_<?php echo $custom_script['value'];?>").show();
+                if (document.getElementById('gluuoxd_openid_login_default_radio').checked && document.getElementById('iconwithtext').checked)
+                    jQuery("#mo_login_button_preview_<?php echo $custom_script['value'];?>").show();
+                if (document.getElementById('gluuoxd_openid_login_custom_radio').checked && document.getElementById('iconwithtext').checked)
+                    jQuery("#mo_custom_login_button_preview_<?php echo $custom_script['value'];?>").show();
+            }
+            else if (!document.getElementById('<?php echo $custom_script['value'];?>_enable').checked) {
+                jQuery("#mo_login_icon_preview_<?php echo $custom_script['value'];?>").hide();
+                jQuery("#mo_custom_login_icon_preview_<?php echo $custom_script['value'];?>").hide();
+                jQuery("#mo_login_button_preview_<?php echo $custom_script['value'];?>").hide();
+                jQuery("#mo_custom_login_button_preview_<?php echo $custom_script['value'];?>").hide();
+            }
+            <?php endforeach;?>
+
+            if (flag) {
+                jQuery("#no_apps_text").hide();
+            } else {
+                jQuery("#no_apps_text").show();
+            }
+        }
+
+        var selectedApps = [];
+        function setTheme() {
+            return jQuery('input[name=gluuoxd_openid_share_theme]:checked', '#settings_form').val();
+        }
+        function setCustomTheme() {
+            return jQuery('input[name=gluuoxd_openid_share_custom_theme]:checked', '#settings_form').val();
+        }
+        function moLoginSizeValidate(e) {
+            var t = parseInt(e.value.trim());
+            t > 60 ? e.value = 60 : 20 > t && (e.value = 20);
+            reloadLoginPreview();
+        }
+        function moLoginSpaceValidate(e) {
+            var t = parseInt(e.value.trim());
+            t > 60 ? e.value = 60 : 0 > t && (e.value = 0);
+            reloadLoginPreview();
+        }
+        function moLoginWidthValidate(e) {
+            var t = parseInt(e.value.trim());
+            t > 1000 ? e.value = 1000 : 140 > t && (e.value = 140)
+            reloadLoginPreview();
+        }
+        function moLoginHeightValidate(e) {
+            var t = parseInt(e.value.trim());
+            t > 100 ? e.value = 100 : 10 > t && (e.value = 10)
+            reloadLoginPreview();
+        }
+        function reloadLoginPreview() {
+            if (setLoginTheme() == 'longbutton')
+                moLoginPreview(document.getElementById('mo_login_icon_width').value, setLoginTheme(), setLoginCustomTheme(), document.getElementById('mo_login_icon_custom_color').value, document.getElementById('mo_login_icon_space').value,
+                    document.getElementById('mo_login_icon_height').value);
+            else
+                moLoginPreview(document.getElementById('mo_login_icon_size').value, setLoginTheme(), setLoginCustomTheme(), document.getElementById('mo_login_icon_custom_color').value, document.getElementById('mo_login_icon_space').value);
+        }
+
+    </script>
+</head>
+<body>
+<div class="heading"><h3>GLUU AND SOCIAL LOGIN</h3></div>
+<div class="mo2f_container">
+    <div class="container">
+        <ul class="navbar navbar-tabs">
+            <?php if (!$oxd_id) { ?>
+                <li id="account_setup"><a data-method="#accountsetup">General</a></li>
+            <?php } ?>
+            <li id="social-sharing-setup"><a data-method="#socialsharing">Scopes and custom scripts</a></li>
+            <li id="social-login-setup"><a data-method="#sociallogin">Gluu and social login config</a></li>
+            <li id="help_trouble"><a data-method="#helptrouble">Help & Troubleshooting</a></li>
+        </ul>
+        <div class="container-page">
+            <div id="messages">
+                <ul class="mini-messages">
+                    <?php if (Mage::getSingleton('core/session')->getErrorMessage()) { ?>
+                        <li class="error-msg">
+                            <ul>
+                                <li><span><?php echo Mage::getSingleton('core/session')->getErrorMessage(); ?></span><a id="error-cancel" href="#">&times;</a></li>
+                            </ul>
+                        </li>
+                    <?php } ?>
+                    <?php if (Mage::getSingleton('core/session')->getSuccessMessage()) { ?>
+                        <li class="success-msg">
+                            <ul>
+                                <li>
+                                    <span><?php echo Mage::getSingleton('core/session')->getSuccessMessage(); ?></span><a id="success-cancel" href="#">&times;</a></li>
+                            </ul>
+                        </li>
+                    <?php } ?>
+                </ul>
+            </div>
+            <!-- General -->
+            <?php if (!$oxd_id) { ?>
+                <!-- General tab-->
+                <div class="page" id="accountsetup">
+                    <div class="mo2f_table_layout">
+                        <form id="register_GluuOxd" name="f" method="post"
+                              action="<?php echo $this->getadminurl('*/*/existingUser') ?>">
+                            <input type="hidden" name="form_key"
+                                   value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
+
+                            <div class="login_GluuOxd">
+                                <div class="mess_red">
+                                    Please register your site in the gluu server.
+                                </div>
+                                <br/>
+
+                                <div><h3>REGISTER YOUR SITE IN THE GLUU SERVER</h3></div>
+                                <hr>
+                                <div><h3>Enter gluu and oxd configuration.</h3></div>
+                                <hr>
+                                <div class="mess_red">1. If You have not installed gluu server (<a target="_blank"
+                                                                                                   href="http://www.gluu.org/docs////admin-guide/deployment/ubuntu/">how
+                                        to install and run</a>) in Your web server, Please download, install and run
+                                    gluu server. For more information <a target="_blank" href="http://www.gluu.org/">click
+                                        me</a>.
+                                </div>
+                                <div class="mess_red">2. Please download, install and run OXD server (<a target="_blank"
+                                                                                                         href="http://ox.gluu.org/doku.php?id=oxd:home&s[]=mvn">how
+                                        to install and run</a>) in Your web server. For more information <a
+                                        target="_blank" href="http://ox.gluu.org/doku.php?id=oxd:rp">click me</a>.
+                                </div>
+                                <hr>
+                                <div>
+                                    <table class="table">
+                                        <tr>
+                                            <td><b><font color="#FF0000">*</font>Admin Email:</b></td>
+                                            <td><input class="" type="email" name="loginemail" id="loginemail"
+                                                       autofocus="true" required placeholder="person@example.com"
+                                                       style="width:400px;"
+                                                       value="<?php echo $oxd_config['admin_email']; ?>"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><b><font color="#FF0000">*</font>Oxd host port:</b></td>
+                                            <td>
+                                                <input class="" type="number" name="oxd_port" min="0" max="65535"
+                                                       value="<?php echo $oxd_config['oxd_host_port']; ?>"
+                                                       style="width:400px;" placeholder="Enter your oxd port."/>
+
+                                                <p style="color:red; font-weight: bold; font-style: italic">It must be
+                                                    the same with oxd server's in oxd-conf.json file's with parameter
+                                                    "port".</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div><input type="submit" name="submit" value="Next" style="width: 120px" class=""/>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            <?php } ?>
+            
+        </div>
+        <!-- END of Container Page -->
+    </div>
+    <!-- END of Container -->
+</div>
+</body>
+</html>
