@@ -188,4 +188,16 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
         }
     }
 
+    /**
+     * getting admmin config
+     * return @data
+     */
+    public function getConfigForAdmin($config){
+        $user = Mage::helper('GluuOxd_Openid');
+        $model = Mage::getModel("admin/user");
+        $userid = $model->getCollection()->getFirstItem()->getId();
+        return $user->getConfig($config,$userid);
+    }
+
+
 }
