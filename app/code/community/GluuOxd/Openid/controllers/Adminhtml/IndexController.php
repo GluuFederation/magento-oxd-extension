@@ -223,4 +223,14 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $this->redirect("*/*/index");
 
     }
+
+    /**
+     * checking $_POST data
+     */
+    public function empty_or_null( $value ) {
+        if( ! isset( $value ) || empty( $value ) ) {
+            return true;
+        }
+        return false;
+    }
 }
