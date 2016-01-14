@@ -151,4 +151,27 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
         return Mage::getBaseUrl();
     }
 
+    /**
+     * getting current user
+     * return @string
+     */
+    public function getCurrentUser(){
+        if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+            $customer = Mage::getSingleton('customer/session')->getCustomer();
+            return $customer->getEmail();
+        }
+        return;
+    }
+
+    /**
+     * showing email
+     * return @string
+     */
+    public function showEmail(){
+        $admin = Mage::getSingleton('admin/session')->getUser();
+        $customer = Mage::helper('GluuOxd_Openid');
+        $id = $admin->getUserId();
+        return $customer->showEmail($id);
+    }
+
 }
