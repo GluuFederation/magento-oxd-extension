@@ -127,5 +127,12 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
         }
     }
 
-    
+    /**
+     * getting admin url
+     * return @string
+     */
+    public function getadminurl($value){
+        return Mage::helper("adminhtml")->getUrl($value);
+    }
+
 }
