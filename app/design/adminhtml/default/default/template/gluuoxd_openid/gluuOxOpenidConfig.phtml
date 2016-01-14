@@ -545,6 +545,192 @@
                 </div>
 
             <?php } ?>
+            <!--Scopes and custom scripts tab-->
+            <div class="page" id="socialsharing">
+                <?php if (!$oxd_id): ?>
+                    <div class="mess_red">
+                        Please register your site in the gluu server.
+                    </div>
+                <?php endif; ?>
+
+                <div>
+                    <form action="<?php echo $this->getadminurl('*/*/scopeCustomScript') ?>" method="post"
+                          enctype="multipart/form-data">
+                        <input type="hidden" name="form_key"
+                               value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
+
+                        <div style="border: 2px solid #53cc6b; margin-bottom: 20px; margin-top: 20px;">
+                            <div>
+                                <div class="about">
+                                    <h3 style="color: #45a8ff" class="sc"><img style="width: 45px; height: 45px; margin-left: 20px;" src="<?php echo $this->getIconImage('ox'); ?>"/>&nbsp; server config</h3>
+                                </div>
+                            </div>
+                            <div class="entry-edit" style="width: 1000px !important; margin-left: 30px; ">
+                                <div class="entry-edit-head">
+                                    <h4 class="icon-head head-edit-form fieldset-legend">Your site oxd id</h4>
+                                </div>
+                                <div class="fieldset">
+                                    <div class="hor-scroll">
+                                        <table class="form-list container">
+                                            <tr class="wrapper-trr">
+                                                <td class="value">
+                                                    <input <?php echo 'disabled' ?> type="text" name="oxd_id" value="<?php echo $oxd_id; ?>"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="border: 2px solid #53cc6b;">
+                            <div>
+                                <div class="about">
+                                    <h3 style="color: #00aa00" class="sc"><img style="width: 65px; height: 45px; margin-left: 30px;" src="<?php echo $this->getIconImage('gl'); ?>"/> &nbsp; server config
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="entry-edit" style="width: 1000px !important; margin-left: 30px; ">
+                                <div class="entry-edit-head" style="background-color: #00aa00 !important;">
+                                    <h4 class="icon-head head-edit-form fieldset-legend">Scopes</h4>
+                                </div>
+                                <div class="fieldset">
+                                    <div class="hor-scroll">
+                                        <table class="form-list container">
+                                            <tr class="wrapper-trr">
+
+                                                <?php foreach ($get_scopes as $scop) : ?>
+                                                    <td class="value"><input <?php if (!$oxd_id) echo 'disabled' ?>
+                                                            type="checkbox"
+                                                            name="scope[]" <?php if ($oxd_config && in_array($scop, $oxd_config['scope'])) {
+                                                            echo "checked";
+                                                        } ?> id="<?php echo $scop; ?>" value="<?php echo $scop; ?>">
+                                                        <label for="<?php echo $scop; ?>"><?php echo $scop; ?></label>
+                                                    </td>
+                                                <?php endforeach; ?>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="entry-edit" style="width: 800px !important;">
+                                        <div class="entry-edit-head" style="background-color: #00aa00 !important;">
+                                            <h4 class="icon-head head-edit-form fieldset-legend">Add multiple Scope</h4>
+                                        </div>
+                                        <div class="fieldset">
+                                            <input type="button" class="button button-primary button-large add" style="width: 100px" value="Add Row"/>
+                                            <div class="hor-scroll">
+                                                <table class="form-list0 container">
+                                                    <tr class="wrapper-tr">
+                                                        <td class="value">
+                                                            <input type="text" placeholder="Input scope name" name="scope_name[]"/>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <div class="entry-edit" style="width: 1000px !important; margin-left: 30px">
+                                <div class="entry-edit-head" style="background-color: #00aa00 !important;">
+                                    <h4 class="icon-head head-edit-form fieldset-legend">All custom scripts</h4>
+                                </div>
+
+                                <div class="fieldset">
+                                    <div class="hor-scroll">
+                                        <table class="form-list container" style="text-align: center">
+                                            <tr class="wrapper-tr" style="text-align: center">
+                                                <th style="border: 1px solid blue;">N</th>
+                                                <th style="border: 1px solid blue;">Name</th>
+                                                <th style="border: 1px solid blue;">Name in gluu server</th>
+                                                <th style="border: 1px solid blue;">Image</th>
+                                                <th style="border: 1px solid blue;">Delete</th>
+                                            </tr>
+                                            <?php
+                                            $n = 0;
+                                            foreach ($custom_scripts as $custom_script) {
+                                                $n++;
+                                                ?>
+                                                <tr class="wrapper-trr">
+
+                                                    <td style="border: 1px solid blue; padding: 0px"><?php echo $n; ?></td>
+                                                    <td style="border: 1px solid blue; padding: 0px"><?php echo $custom_script['name']; ?></td>
+                                                    <td style="border: 1px solid blue; padding: 0px"><?php echo $custom_script['value']; ?></td>
+                                                    <td style="border: 1px solid blue; padding: 0px"><img
+                                                            src="<?php echo $custom_script['image']; ?>"
+                                                            width="40px" height="40px"/></td>
+                                                    <td style="border: 1px solid blue; padding: 0px">
+                                                        <?php if ($n == 1): ?>
+                                                            <form></form>
+                                                        <?php endif; ?>
+                                                        <form
+                                                            action="<?php echo $this->getadminurl('*/*/deleteCustomScript') ?>"
+                                                            method="post">
+                                                            <input type="hidden" name="form_key"
+                                                                   value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
+                                                            <input type="hidden"
+                                                                   value="<?php echo $custom_script['value']; ?>"
+                                                                   name="value_script"/>
+                                                            <input
+                                                                style="width: 100px; background-color: red !important; cursor: pointer"
+                                                                type="submit"
+                                                                class="button button-primary " <?php if (!$oxd_id) echo 'disabled' ?>
+                                                                value="Delete" name="delete_config"/>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                                <?php
+                                            }
+                                            ?>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="entry-edit-head" style="background-color: #00aa00 !important;">
+                                    <h4 class="icon-head head-edit-form fieldset-legend">Add multiple custom
+                                        scripts</h4>
+                                    <br/>
+                                    <hr/>
+                                    <p style="color:#cc0b07; font-style: italic; font-weight: bold;font-size: larger">
+                                        Necessary to fill the hole row</p>
+                                </div>
+                                <div class="fieldset">
+                                    <div class="hor-scroll">
+                                        <input type="hidden" name="count_scripts" value="1" id="count_scripts">
+                                        <input type="button" class="button button-primary button-large "
+                                               style="width: 100px" id="adder" value="Add Row"/>
+                                        <table class="form-list1 container">
+                                            <tr class="count_scripts wrapper-trr">
+                                                <td class="value">
+                                                    <input style='width: 200px !important;' type="text" placeholder="Input name (example Google+)" name="name_in_site_1"/>
+                                                </td>
+                                                <td class="value">
+                                                    <input style='width: 270px !important;' type="text" placeholder="Input name in gluu server (example gplus)" name="name_in_gluu_1"/>
+                                                </td>
+                                                <td class="value">
+                                                    <input type="file" accept="image/png" name="images_1"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div>
+                            <input style="width: 100px" type="submit" class="button button-primary button-large" <?php if (!$oxd_id) echo 'disabled' ?> value="Save" name="set_oxd_config"/>
+                            <br/>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="mo2f_table_layout">
+
+                </div>
+            </div>
             
         </div>
         <!-- END of Container Page -->
