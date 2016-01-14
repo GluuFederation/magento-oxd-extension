@@ -73,4 +73,18 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $this->renderLayout();
     }
 
+    /**
+     * @return getting session
+     */
+    private function getSession(){
+        return  Mage::getSingleton('admin/session');
+    }
+
+    /**
+     * redirecting function
+     */
+    private function redirect($url){
+        $redirect = Mage::helper("adminhtml")->getUrl($url);
+        Mage::app()->getResponse()->setRedirect($redirect);
+    }
 }
