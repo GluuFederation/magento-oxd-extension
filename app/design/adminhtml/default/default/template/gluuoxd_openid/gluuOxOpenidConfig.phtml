@@ -731,6 +731,228 @@
 
                 </div>
             </div>
+            <!--Gluu and social login config tab-->
+            <div class="page" id="sociallogin">
+                <?php if (!$oxd_id): ?>
+                    <div class="mess_red">
+                        Please register your site in the gluu server.
+                    </div>
+                <?php endif; ?>
+                <form id="form-apps" name="form-apps" method="post"
+                      action="<?php echo $this->getadminurl('*/*/saveSocialLoginConf') ?>">
+                    <input type="hidden" name="form_key"
+                           value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
+
+                    <div id="twofactor_list" class="mo2f_table_layout">
+                        <h3>Gluu login config </h3>
+                        <hr>
+                        <p style="font-size:14px">Select applications to enable login for your users. Customize your
+                            login icons using a range of shapes, themes and sizes. You can choose different places to
+                            display these icons and also customize redirect url after login.</p>
+                        <input <?php if (!$oxd_id) echo 'disabled'; ?> type="submit" name="submit" value="Save" style="width:100px;float:right;margin-right:2%" class="button button-primary button-large">
+                        <br>
+
+                        <h3>Select Apps</h3>
+
+                        <p>Select gluu applications to enable login</p>
+                        <table style="width:100%;display: table;">
+                            <tbody>
+                            <tr>
+                                <?php
+                                foreach ($custom_scripts as $custom_script) {
+                                    ?>
+                                    <td style="width:25%">
+
+                                        <input type="checkbox" <?php if (!$oxd_id) echo 'disabled'; ?> id="<?php echo $custom_script['value']; ?>_enable" class="app_enable"
+                                               name="gluuoxd_openid_<?php echo $custom_script['value']; ?>_enable"
+                                               value="1"
+                                               onchange="previewLoginIcons();" <?php if ($this->getConfig($custom_script['value'] . 'Enable')) echo "checked"; ?>><b><?php echo $custom_script['name']; ?></b>
+                                    </td>
+                                    <?php
+                                }
+                                ?>
+                            </tr>
+                            <tr style="display: none;">
+
+                            </tr>
+
+                            </tbody>
+                        </table>
+                        <br>
+                        <hr>
+                        <br>
+
+                        <h3>Customize Login Icons</h3>
+
+                        <p>Customize shape, theme and size of social login icons</p>
+
+                        <?php
+                        $iconSpace = $this->getConfig('iconSpace');
+                        if (!$iconSpace) $iconSpace = '10';
+                        $iconCustomSize = $this->getConfig('iconCustomSize');
+                        if (!$iconCustomSize) $iconCustomSize = '50';
+                        $iconCustomWidth = $this->getConfig('iconCustomWidth');
+                        if (!$iconCustomWidth) $iconCustomWidth = '200';
+                        $iconCustomHeight = $this->getConfig('iconCustomHeight');
+                        if (!$iconCustomHeight) $iconCustomHeight = '35';
+                        $loginCustomTheme = $this->getConfig('loginCustomTheme');
+                        $loginTheme = $this->getConfig('loginTheme');
+                        $iconCustomColor = $this->getConfig('iconCustomColor');
+                        if (!$iconCustomColor) $iconCustomColor = '#0000FF';
+                        ?>
+                        <table style="width:100%;display: table;">
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <b>Shape</b>
+                                    <b style="margin-left:130px; display: none">Theme</b>
+                                    <b style="margin-left:130px;">Space between Icons</b>
+                                    <b style="margin-left:86px;">Size of Icons</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="gluuoxd_openid_table_td_checkbox">
+                                    <input type="radio" <?php if (!$oxd_id) echo 'disabled'; ?>
+                                           name="gluuoxd_openid_login_theme" value="circle"
+                                           onclick="checkLoginButton();moLoginPreview(document.getElementById('mo_login_icon_size').value ,'circle',setLoginCustomTheme(),document.getElementById('mo_login_icon_custom_color').value,document.getElementById('mo_login_icon_space').value)"
+                                           style="width: auto;" checked>Round
+                                    <span style="margin-left:106px; display: none">
+                                        <input type="radio" <?php if (!$oxd_id) echo 'disabled'; ?>
+                                               id="gluuoxd_openid_login_default_radio" name="gluuoxd_openid_login_custom_theme"
+                                               value="default"
+                                               onclick="checkLoginButton();moLoginPreview(setSizeOfIcons(), setLoginTheme(),'default',document.getElementById('mo_login_icon_custom_color').value,document.getElementById('mo_login_icon_space').value,document.getElementById('mo_login_icon_height').value)"
+                                               checked>Default
+
+                                    </span>
+                                    <span style="margin-left:111px;">
+                                            <input style="width:50px" <?php if (!$oxd_id) echo 'disabled'; ?> onkeyup="moLoginSpaceValidate(this)" id="mo_login_icon_space" name="mo_login_icon_space" type="text" value="<?php echo $iconSpace; ?>">
+                                            <input
+                                                id="mo_login_space_plus" <?php if (!$oxd_id) echo 'disabled'; ?> <?php if (!$oxd_id) echo 'disabled'; ?> <?php if (!$oxd_id) echo 'disabled'; ?>
+                                                type="button" value="+"
+                                                onmouseup="document.getElementById('mo_login_icon_space').value=parseInt(document.getElementById('mo_login_icon_space').value)+1;moLoginPreview(setSizeOfIcons() ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('mo_login_icon_custom_color').value,document.getElementById('mo_login_icon_space').value)">
+                                            <input
+                                                id="mo_login_space_minus" <?php if (!$oxd_id) echo 'disabled'; ?> <?php if (!$oxd_id) echo 'disabled'; ?>
+                                                type="button" value="-"
+                                                onmouseup="document.getElementById('mo_login_icon_space').value=parseInt(document.getElementById('mo_login_icon_space').value)-1;moLoginPreview(setSizeOfIcons()  ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('mo_login_icon_custom_color').value,document.getElementById('mo_login_icon_space').value)">
+                                    </span>
+                                    <span id="commontheme" style="margin-left:95px">
+                                    <input style="width:50px " <?php if (!$oxd_id) echo 'disabled'; ?> id="mo_login_icon_size"
+                                           onkeyup="moLoginSizeValidate(this)" name="mo_login_icon_custom_size" type="text"
+                                           value="<?php if ($iconCustomSize) echo $iconCustomSize; else echo '35'; ?>">
+                                    <input id="mo_login_size_plus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="+"
+                                           onmouseup="document.getElementById('mo_login_icon_size').value=parseInt(document.getElementById('mo_login_icon_size').value)+1;moLoginPreview(document.getElementById('mo_login_icon_size').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('mo_login_icon_custom_color').value,document.getElementById('mo_login_icon_space').value)">
+                                    <input id="mo_login_size_minus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="-"
+                                           onmouseup="document.getElementById('mo_login_icon_size').value=parseInt(document.getElementById('mo_login_icon_size').value)-1;moLoginPreview(document.getElementById('mo_login_icon_size').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('mo_login_icon_custom_color').value,document.getElementById('mo_login_icon_space').value)">
+
+                                    </span>
+                                    <span style="margin-left: 95px; display: none;" class="longbuttontheme">Width:&nbsp;
+						<input style="width:50px" <?php if (!$oxd_id) echo 'disabled'; ?> id="mo_login_icon_width"
+                               onkeyup="moLoginWidthValidate(this)" name="mo_login_icon_custom_width" type="text"
+                               value="<?php echo $iconCustomWidth; ?>">
+						<input id="mo_login_width_plus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="+"
+                               onmouseup="document.getElementById('mo_login_icon_width').value=parseInt(document.getElementById('mo_login_icon_width').value)+1;moLoginPreview(document.getElementById('mo_login_icon_width').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('mo_login_icon_custom_color').value,document.getElementById('mo_login_icon_space').value,document.getElementById('mo_login_icon_height').value)">
+						<input id="mo_login_width_minus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="-"
+                               onmouseup="document.getElementById('mo_login_icon_width').value=parseInt(document.getElementById('mo_login_icon_width').value)-1;moLoginPreview(document.getElementById('mo_login_icon_width').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('mo_login_icon_custom_color').value,document.getElementById('mo_login_icon_space').value,document.getElementById('mo_login_icon_height').value)">
+
+						</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="gluuoxd_openid_table_td_checkbox">
+                                    <input type="radio"
+                                           name="gluuoxd_openid_login_theme" <?php if (!$oxd_id) echo 'disabled'; ?>
+                                           value="oval"
+                                           onclick="checkLoginButton();moLoginPreview(document.getElementById('mo_login_icon_size').value,'oval',setLoginCustomTheme(),document.getElementById('mo_login_icon_custom_color').value,document.getElementById('mo_login_icon_space').value,document.getElementById('mo_login_icon_size').value )"
+                                           style="width: auto;" <?php if ($loginTheme == 'oval') echo "checked"; ?>>Rounded Edges
+                                    <span style="margin-left:50px; display: none">
+                                            <input type="radio"
+                                                   <?php if (!$oxd_id) echo 'disabled'; ?>id="gluuoxd_openid_login_custom_radio"
+                                                   name="gluuoxd_openid_login_custom_theme" value="custom"
+                                                   onclick="checkLoginButton();moLoginPreview(setSizeOfIcons(), setLoginTheme(),'custom',document.getElementById('mo_login_icon_custom_color').value,document.getElementById('mo_login_icon_space').value,document.getElementById('mo_login_icon_height').value)"
+                                                <?php if ($loginCustomTheme == 'custom') echo "checked"; ?> >Custom Background*
+                                            </span>
+                                        <span style="margin-left: 256px; display: none;" class="longbuttontheme">Height:
+                                        <input style="width:50px" <?php if (!$oxd_id) echo 'disabled'; ?> id="mo_login_icon_height"
+                                               onkeyup="moLoginHeightValidate(this)" name="mo_login_icon_custom_height" type="text"
+                                               value="<?php if ($iconCustomHeight) echo $iconCustomHeight; else echo '35'; ?>">
+                                        <input id="mo_login_height_plus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="+"
+                                               onmouseup="document.getElementById('mo_login_icon_height').value=parseInt(document.getElementById('mo_login_icon_height').value)+1;moLoginPreview(document.getElementById('mo_login_icon_width').value,setLoginTheme(),setLoginCustomTheme(),document.getElementById('mo_login_icon_custom_color').value,document.getElementById('mo_login_icon_space').value,document.getElementById('mo_login_icon_height').value)">
+                                        <input id="mo_login_height_minus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="-"
+                                               onmouseup="document.getElementById('mo_login_icon_height').value=parseInt(document.getElementById('mo_login_icon_height').value)-1;moLoginPreview(document.getElementById('mo_login_icon_width').value,setLoginTheme(),setLoginCustomTheme(),document.getElementById('mo_login_icon_custom_color').value,document.getElementById('mo_login_icon_space').value,document.getElementById('mo_login_icon_height').value)">
+
+                                    </span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="gluuoxd_openid_table_td_checkbox">
+                                    <input type="radio" <?php if (!$oxd_id) echo 'disabled'; ?>
+                                           name="gluuoxd_openid_login_theme" value="square"
+                                           onclick="checkLoginButton();moLoginPreview(document.getElementById('mo_login_icon_size').value ,'square',setLoginCustomTheme(),document.getElementById('mo_login_icon_custom_color').value,document.getElementById('mo_login_icon_space').value,document.getElementById('mo_login_icon_size').value )"
+                                           style="width: auto;" <?php if ($loginTheme == 'square') echo "checked"; ?>>Square
+								<span style="margin-left:113px; display: none">
+									<input type="color" <?php if (!$oxd_id) echo 'disabled'; ?>
+                                           name="mo_login_icon_custom_color" id="mo_login_icon_custom_color"
+                                           value="<?php echo $iconCustomColor; ?>"
+                                           onchange="moLoginPreview(setSizeOfIcons(), setLoginTheme(),'custom',document.getElementById('mo_login_icon_custom_color').value,document.getElementById('mo_login_icon_space').value)">
+								</span>
+                                </td>
+                            </tr>
+                            <tr style="display: none">
+                                <td class="gluuoxd_openid_table_td_checkbox">
+                                    <input
+                                        type="radio" <?php if (!$oxd_id) echo 'disabled'; ?> <?php if (!$oxd_id) echo 'disabled'; ?>
+                                        id="iconwithtext" name="gluuoxd_openid_login_theme" value="longbutton"
+                                        onclick="checkLoginButton();moLoginPreview(document.getElementById('mo_login_icon_width').value ,'longbutton',setLoginCustomTheme(),document.getElementById('mo_login_icon_custom_color').value,document.getElementById('mo_login_icon_space').value,document.getElementById('mo_login_icon_height').value)"
+                                        style="width: auto;" <?php if ($loginTheme == 'longbutton') echo "checked"; ?>>Long
+                                    Button with Text
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                        <br>
+                        <h3>Preview : </h3>
+                        <span hidden id="no_apps_text">No apps selected</span>
+                        <div>
+                            <?php foreach ($custom_scripts as $custom_script): ?>
+                                <img class="mo_login_icon_preview"
+                                     id="mo_login_icon_preview_<?php echo $custom_script['value']; ?>"
+                                     src="<?php echo $custom_script['image']; ?>"/>
+                            <?php endforeach; ?>
+                        </div>
+                        <div>
+                            <?php foreach ($custom_scripts as $custom_script): ?>
+                                <a id="mo_login_button_preview_<?php echo $custom_script['value']; ?>"
+                                   class="btn btn-block btn-defaulttheme btn-social btn-<?php echo $custom_script['value']; ?> btn-custom-size"
+                                   style="width: <?php echo $iconCustomWidth; ?>px; height:<?php echo $iconCustomHeight; ?>px; padding-top: 6px; padding-bottom: 6px; margin-bottom: <?php echo $iconSpace . 'px'; ?>">
+                                    <i class="fa fa-<?php echo $custom_script['value']; ?>-plus"
+                                       style="padding-top: 0px;"></i>Login with <?php echo $custom_script['name']; ?>
+                                </a>
+                            <?php endforeach; ?>
+
+                        </div>
+                        <div>
+                            <?php foreach ($custom_scripts as $custom_script): ?>
+                                <i class="mo_custom_login_icon_preview fa fa-<?php echo $custom_script['value']; ?>-plus"
+                                   id="mo_custom_login_icon_preview_<?php echo $custom_script['value']; ?>"
+                                   style="color:#ffffff;text-align:center;margin-top:5px;"></i>
+                            <?php endforeach; ?>
+                        </div>
+                        <div>
+                            <?php foreach ($custom_scripts as $custom_script): ?>
+                                <a id="mo_custom_login_button_preview_<?php echo $custom_script['value']; ?>"
+                                   class="btn btn-block btn-customtheme btn-social   btn-custom-size"
+                                   style="width:<?php echo $iconCustomWidth; ?>px;height:<?php echo $iconCustomHeight; ?>px;padding-top: 6px;padding-bottom: 6px;margin-bottom:<?php echo $iconSpace; ?>px;background:<?php echo $iconCustomColor; ?>;">
+                                    <i class="fa fa-<?php echo $custom_script['value']; ?>-plus"></i>Login
+                                    with <?php echo $custom_script['name']; ?></a>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <br><br>
+                    </div>
+                </form>
+            </div>
             
         </div>
         <!-- END of Container Page -->
