@@ -174,4 +174,18 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
         return $customer->showEmail($id);
     }
 
+    /**
+     * checking is customer enabled
+     * return @string
+     */
+    public function isCustomerEnabled(){
+        $customer = Mage::helper('GluuOxd_Openid');
+        if($customer->getConfig('isCustomerEnabled','')==1){
+            return 'checked';
+        }
+        else{
+            return '';
+        }
+    }
+
 }
