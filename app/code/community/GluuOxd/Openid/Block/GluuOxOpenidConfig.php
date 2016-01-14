@@ -230,7 +230,7 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
 
             $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
             $oxd_id = Mage::getStoreConfig ( 'gluu/oxd/oxd_id' );
-            $get_tokens_by_code = Mage::helper("GluuOxd_Openid/getTokensByCode");
+            $get_tokens_by_code = $this->getGetTokensByCode();
             $get_tokens_by_code->setRequestOxdId($oxd_id);
             $get_tokens_by_code->setRequestCode($_REQUEST['code']);
             $get_tokens_by_code->setRequestState($_REQUEST['state']);
@@ -241,7 +241,7 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
             $_SESSION['user_oxd_id_token']  = $get_tokens_by_code->getResponseIdToken();
             $_SESSION['user_oxd_access_token']  = $get_tokens_by_code->getResponseAccessToken();
 
-            $get_user_info = Mage::helper("GluuOxd_Openid/getUserInfo");
+            $get_user_info = $this->getGetUserInfo();
             $get_user_info->setRequestOxdId($oxd_id);
             $get_user_info->setRequestAccessToken($_SESSION['user_oxd_access_token']);
             $get_user_info->request();
@@ -316,7 +316,7 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
         if( isset( $_REQUEST['option'] ) and strpos( $_REQUEST['option'], 'userGluuLogin' ) !== false ) {
 
             $oxd_id = Mage::getStoreConfig ( 'gluu/oxd/oxd_id' );
-            $get_authorization_url = Mage::helper("GluuOxd_Openid/getAuthorizationUrl");
+            $get_authorization_url = $this->getGetAuthorizationUrl();
 
             $get_authorization_url->setRequestOxdId($oxd_id);
             $get_authorization_url->setRequestAcrValues([$_REQUEST['app_name']]);
