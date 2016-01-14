@@ -233,4 +233,31 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         }
         return false;
     }
+
+    /**
+     * save social login page data
+     */
+    public function saveSocialLoginConfAction(){
+
+
+        $params = $this->getRequest()->getParams();
+
+        $storeConfig = new Mage_Core_Model_Config();
+        foreach(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' )) as $custom_script){
+            $storeConfig ->saveConfig('GluuOxd/Openid/'.$custom_script['value'].'Enable',$params['gluuoxd_openid_'.$custom_script['value'].'_enable'], 'default', 0);
+        }
+        $storeConfig ->saveConfig('GluuOxd/Openid/loginTheme',$params['gluuoxd_openid_login_theme'], 'default', 0);
+        $storeConfig ->saveConfig('GluuOxd/Openid/loginCustomTheme',$params['gluuoxd_openid_login_custom_theme'], 'default', 0);
+        $storeConfig ->saveConfig('GluuOxd/Openid/iconSpace',$params['mo_login_icon_space'], 'default', 0);
+        $storeConfig ->saveConfig('GluuOxd/Openid/iconCustomSize',$params['mo_login_icon_custom_size'], 'default', 0);
+        $storeConfig ->saveConfig('GluuOxd/Openid/iconCustomWidth',$params['mo_login_icon_custom_width'], 'default', 0);
+        $storeConfig ->saveConfig('GluuOxd/Openid/iconCustomHeight',$params['mo_login_icon_custom_height'], 'default', 0);
+        $storeConfig ->saveConfig('GluuOxd/Openid/iconCustomColor',$params['mo_login_icon_custom_color'], 'default', 0);
+
+        //print_r($params);
+        //exit();
+        $helper = $this->getDataHelper();
+        $helper->displayMessage('Your configuration has been saved.',"SUCCESS");
+        $this->redirect("*/*/index");
+    }
 }
