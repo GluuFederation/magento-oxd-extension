@@ -268,4 +268,24 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN);
         return $url.'adminhtml/default/default/GluuOxd_Openid/images/icons/'.$image;
     }
+
+    /**
+     * deleting custom scripts
+     */
+    public function deleteCustomScriptAction(){
+        $storeConfig = new Mage_Core_Model_Config();
+        $params = $this->getRequest()->getParams();
+        $datahelper = $this->getDataHelper();
+        $custom_scripts = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' ));
+        $up_cust_sc =  array();
+        foreach($custom_scripts as $custom_script){
+            if($custom_script['value'] !=$params['value_script']){
+                array_push($up_cust_sc,$custom_script);
+            }
+        }
+        $storeConfig ->saveConfig('gluu/oxd/oxd_openid_custom_scripts',serialize($up_cust_sc), 'default', 0);
+
+        $datahelper->displayMessage('Custom scripts deleted Successful.',"SUCCESS");
+        $this->redirect("*/*/index");
+    }
 }
