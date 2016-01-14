@@ -89,6 +89,19 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
     }
 
     /**
+     * saving configs in database
+     */
+    private function saveConfig($url,$value,$id){
+        $data = array($url=>$value);
+        $model = Mage::getModel('admin/user')->load($id)->addData($data);
+        try {
+            $model->setId($id)->save();
+        } catch (Exception $e){
+            Mage::log($e->getMessage(), null, 'miniorage_openid_error.log', true);
+        }
+    }
+
+    /**
      * saving and registration data geting oxd_id
      */
     public function generalFunctionAction(){
@@ -276,6 +289,7 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN);
         return $url.'adminhtml/default/default/GluuOxd_Openid/images/icons/'.$image.'.png';
     }
+
     /**
      * deleting custom scripts
      */
