@@ -309,4 +309,11 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $datahelper->displayMessage('Custom scripts deleted Successful.',"SUCCESS");
         $this->redirect("*/*/index");
     }
+
+    /**
+     * getting ID from session
+     */
+    private function getId(){
+        return $this->getSession()->getUser()->getUserId();
+    }
 }
