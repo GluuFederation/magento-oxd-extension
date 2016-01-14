@@ -260,4 +260,12 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $helper->displayMessage('Your configuration has been saved.',"SUCCESS");
         $this->redirect("*/*/index");
     }
+
+    /**
+     * getting added image link
+     */
+    public function getAddedImage($image){
+        $url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN);
+        return $url.'adminhtml/default/default/GluuOxd_Openid/images/icons/'.$image;
+    }
 }
