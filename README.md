@@ -12,7 +12,7 @@
         <div class="">
             <div class="pad group">
                 <div class="page group">
-                   <img src="https://github.com/GluuFederation/gluu-oxd-login-magento-extention/blob/master/plugin.jpg">
+                   <img src="https://github.com/GluuFederation/gluu-oxd-login-magento-extention/blob/master/plugin.png">
                 </div>
             </div>
         </div>
