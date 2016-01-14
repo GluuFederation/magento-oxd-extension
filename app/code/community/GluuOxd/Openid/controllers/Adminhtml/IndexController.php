@@ -143,4 +143,84 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
             return;
         }
     }
+
+    /**
+     * adding multiple custom scripts  and multiple scopes
+     */
+    public function scopeCustomScriptAction(){
+        $params = $this->getRequest()->getParams();
+        $storeConfig = new Mage_Core_Model_Config();
+        $datahelper = $this->getDataHelper();
+        $message = '';
+        if(isset($params['count_scripts'])){
+            $error_array = array();
+            $error = true;
+            for($i=1; $i<=$params['count_scripts']; $i++){
+                if(isset($params['name_in_site_'.$i]) && !empty($params['name_in_site_'.$i]) && isset($params['name_in_gluu_'.$i]) && !empty($params['name_in_gluu_'.$i]) && isset($_FILES['images_'.$i]) && !empty($_FILES['images_'.$i])){
+                    $custom_scripts = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_custom_scripts'));
+                    foreach($custom_scripts as $custom_script){
+                        if($custom_script['value'] == $params['name_in_gluu_'.$i] || $custom_script['name'] == $params['name_in_site_'.$i]){
+                            $error = false;
+                            array_push($error_array, $i);
+                        }
+                    }
+                    if($error){
+                        $uploader = new Varien_File_Uploader(array(
+                            'name' => $_FILES['images_'.$i]['name'],
+                            'type' => $_FILES['images_'.$i]['type'],
+                            'tmp_name' => $_FILES['images_'.$i]['tmp_name'],
+                            'error' => $_FILES['images_'.$i]['error'],
+                            'size' => $_FILES['images_'.$i]['size']
+                        ));
+                        $uploader->setAllowedExtensions(array('png'));
+                        $uploader->setAllowRenameFiles(true);
+
+                        $uploader->setFilesDispersion(false);
+                        $path = Mage::getBaseDir('skin') . DS . 'adminhtml' . DS. 'default' . DS. 'default' . DS. 'GluuOxd_Openid' . DS. 'images' . DS. 'icons' . DS;
+                        $img = $uploader->save($path, $_FILES['images']['name']);
+                        if($img['file']){
+                            array_push($custom_scripts, array('name'=>$params['name_in_site_'.$i],'image'=>$this->getAddedImage($img['file']),'value'=>$params['name_in_gluu_'.$i]));
+                            $storeConfig ->saveConfig('gluu/oxd/oxd_openid_custom_scripts',serialize($custom_scripts), 'default', 0);
+                            $message.= 'New custom scripts name = '.$params['name_in_site_'.$i].' and name in gluu = '.$params['name_in_gluu_'.$i].' added Successful!<br/>';
+                        }else{
+                            $datahelper->displayMessage('Name = '.$params['name_in_site_'.$i]. ' or value = '. $params['name_in_gluu_'.$i]. ' is exist.',"ERROR");
+                            $this->redirect("*/*/index");
+                        }
+
+
+                    }else{
+                        $datahelper->displayMessage('Name = '.$params['name_in_site_'.$i]. ' or value = '. $params['name_in_gluu_'.$i]. ' is exist.',"ERROR");
+                        $this->redirect("*/*/index");
+                    }
+                }else{
+
+                    $datahelper->displayMessage('Necessary to fill the hole row.',"ERROR");
+                    $this->redirect("*/*/index");
+                }
+            }
+        }
+
+        if(!empty($params['scope_name']) && isset($params['scope_name'])){
+            foreach($params['scope_name'] as $scope){
+                if($scope){
+                    $get_scopes = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_scops'));
+                    array_push($get_scopes, $scope);
+                    $storeConfig ->saveConfig('gluu/oxd/oxd_openid_scops',serialize($get_scopes), 'default', 0);
+                    $message.= 'New scopes name = '.$scope.' added Successful!<br/>';
+                }
+            }
+        }
+        $oxd_config = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_config'));
+        if(!empty($params['scope']) && isset($params['scope'])){
+            $oxd_config['scope'] = $params['scope'];
+            $message.= 'Scopes updated Successful!<br/>';
+        }else{
+            $oxd_config['scope'] =  unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
+        }
+
+        $storeConfig ->saveConfig('gluu/oxd/oxd_config',serialize($oxd_config), 'default', 0);
+        $datahelper->displayMessage($message,"SUCCESS");
+        $this->redirect("*/*/index");
+
+    }
 }
