@@ -220,4 +220,114 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
         return Mage::helper("adminhtml")->getUrl("*/index/index");
     }
 
+    /**
+     * getting login page validateing
+     * return @string
+     */
+    public function gluuoxd_openid_login_validate(){
+
+        if( isset( $_REQUEST['option'] ) and strpos( $_REQUEST['option'], 'getOxdSocialLogin' ) !== false ) {
+
+            $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
+            $oxd_id = Mage::getStoreConfig ( 'gluu/oxd/oxd_id' );
+            $get_tokens_by_code = Mage::helper("GluuOxd_Openid/getTokensByCode");
+            $get_tokens_by_code->setRequestOxdId($oxd_id);
+            $get_tokens_by_code->setRequestCode($_REQUEST['code']);
+            $get_tokens_by_code->setRequestState($_REQUEST['state']);
+            $get_tokens_by_code->setRequestScopes($config_option["scope"]);
+            $get_tokens_by_code->request();
+
+            $array_data = $get_tokens_by_code->getResponseObject();
+            $_SESSION['user_oxd_id_token']  = $get_tokens_by_code->getResponseIdToken();
+            $_SESSION['user_oxd_access_token']  = $get_tokens_by_code->getResponseAccessToken();
+
+            $get_user_info = Mage::helper("GluuOxd_Openid/getUserInfo");
+            $get_user_info->setRequestOxdId($oxd_id);
+            $get_user_info->setRequestAccessToken($_SESSION['user_oxd_access_token']);
+            $get_user_info->request();
+            $user_email = '';
+            //var_dump($get_user_info->getResponseObject());exit;
+            if($get_user_info->getResponseEmail() ) {
+                $user_email = $get_user_info->getResponseEmail();
+            }else{
+                if($array_data->id_token_claims->email){
+                    $user_email = $array_data->id_token_claims->email;
+                }
+            }
+
+            $user_name = '';
+            $user_picture = $get_user_info->getResponsePicture();
+            $first_name = '';
+            $last_name = '';
+            $user_full_name = '';
+            if($get_user_info->getResponseGivenName() && $get_user_info->getResponseFamilyName()){
+                $user_full_name = $get_user_info->getResponseGivenName().' '.$get_user_info->getResponseFamilyName();
+                $first_name = $get_user_info->getResponseGivenName();
+                $last_name = $get_user_info->getResponseFamilyName();
+            }elseif($array_data->id_token_claims->family_name && $array_data->id_token_claims->given_name){
+                $first_name = $array_data->id_token_claims->given_name;
+                $last_name = $array_data->id_token_claims->family_name;
+                if($array_data->id_token_claims->name){
+                    $user_full_name = $array_data->id_token_claims->name;
+                }else{
+                    $user_full_name = $array_data->id_token_claims->family_name.' '.$array_data->id_token_claims->given_name;
+                }
+
+            }
+
+            if($get_user_info->getResponsePreferredUsername()){
+                $user_name = $get_user_info->getResponsePreferredUsername();
+            }
+            elseif(strcmp($user_name, $user_full_name)){
+                $email_split = explode("@", $user_email);
+                $user_name = $email_split[0];
+            } else {
+                $user_name = $user_name;
+            }
+
+            if( $user_email ) {
+
+                $user_name= Mage::getModel('admin/user')->getCollection()->addFieldToFilter('email',$user_email)->getFirstItem()->getUsername();
+
+                $user = Mage::getModel('admin/user')->loadByUsername($user_name);
+                if (Mage::getSingleton('adminhtml/url')->useSecretKey()) {
+                    Mage::getSingleton('adminhtml/url')->renewSecretUrls();
+                }
+
+                $session = Mage::getSingleton('admin/session');
+                $session->setIsFirstVisit(true);
+                $session->setUser($user);
+                $session->setAcl(Mage::getResourceModel('admin/acl')->loadAcl());
+
+                Mage::dispatchEvent('admin_session_user_login_success',array('user'=>$user));
+
+                if ($session->isLoggedIn()) {
+                    $redirectUrl = Mage::getSingleton('adminhtml/url')->getUrl(Mage::getModel('admin/user')->getStartupPageUrl(), array('_current' => false));
+                    header('Location: ' . $redirectUrl);
+                    exit;
+                }else{
+                    $datahelper = Mage::helper("GluuOxd_Openid"); //GluuOxd_Openid_Helper_Data
+                    $datahelper->displayMessage('User does not exist in our system. Please check your Email ID.',"ERROR");
+                    $this->redirect("*/index/index");
+                }
+
+            }
+        }
+        if( isset( $_REQUEST['option'] ) and strpos( $_REQUEST['option'], 'userGluuLogin' ) !== false ) {
+
+            $oxd_id = Mage::getStoreConfig ( 'gluu/oxd/oxd_id' );
+            $get_authorization_url = Mage::helper("GluuOxd_Openid/getAuthorizationUrl");
+
+            $get_authorization_url->setRequestOxdId($oxd_id);
+            $get_authorization_url->setRequestAcrValues([$_REQUEST['app_name']]);
+            $get_authorization_url->request();
+            if($get_authorization_url->getResponseAuthorizationUrl()){
+                header("Location: ".$get_authorization_url->getResponseAuthorizationUrl());
+                exit;
+            }else{
+                echo '<p style="color: red">Sorry, but oxd server is not swatched on!</p>';
+            }
+
+        }
+    }
 }
