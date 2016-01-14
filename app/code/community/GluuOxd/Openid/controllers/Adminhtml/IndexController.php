@@ -270,6 +270,13 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
     }
 
     /**
+     * getting icon image link
+     */
+    public function getIconImage($image){
+        $url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN);
+        return $url.'adminhtml/default/default/GluuOxd_Openid/images/icons/'.$image.'.png';
+    }
+    /**
      * deleting custom scripts
      */
     public function deleteCustomScriptAction(){
