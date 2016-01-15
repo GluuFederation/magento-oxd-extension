@@ -7,7 +7,7 @@
 class GluuOxd_Openid_Helper_Data extends Mage_Core_Helper_Abstract
 {
     /**
-     * displaying message
+     * Displaying message
      * @return string
      */
     public function displayMessage($message, $type) {

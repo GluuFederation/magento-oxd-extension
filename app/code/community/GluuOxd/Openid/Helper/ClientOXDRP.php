@@ -145,4 +145,5 @@ abstract class GluuOxd_Openid_Helper_ClientOXDRP extends Mage_Core_Helper_Abstra
         return $this->params;
     }
 
+
 }
