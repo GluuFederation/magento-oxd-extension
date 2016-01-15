@@ -26,7 +26,7 @@ class GluuOxd_Openid_Helper_Data extends Mage_Core_Helper_Abstract
      * checking config and getting result
      * @return array or string
      */
-    function getConfig($config, $id) {
+    public function getConfig($config, $id) {
         foreach(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' )) as $custom_script){
             if ($config == $custom_script['value'].'Enable') {
                 return Mage::getStoreConfig ( 'GluuOxd/Openid/'.$custom_script['value'].'Enable' );
