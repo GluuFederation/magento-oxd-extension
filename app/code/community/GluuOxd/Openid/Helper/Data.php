@@ -7,7 +7,7 @@
 class GluuOxd_Openid_Helper_Data extends Mage_Core_Helper_Abstract
 {
     /**
-     * Displaying message
+     * displaying message
      * @return string
      */
     public function displayMessage($message, $type) {
@@ -22,4 +22,43 @@ class GluuOxd_Openid_Helper_Data extends Mage_Core_Helper_Abstract
             Mage::getSingleton ( 'core/session' )->addWarning ( $message );
     }
 
+    /**
+     * checking config and getting result
+     * @return array or string
+     */
+    function getConfig($config, $id) {
+        foreach(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' )) as $custom_script){
+            if ($config == $custom_script['value'].'Enable') {
+                return Mage::getStoreConfig ( 'GluuOxd/Openid/'.$custom_script['value'].'Enable' );
+
+            }
+        }
+        switch ($config) {
+            case 'loginTheme' :
+                $result = Mage::getStoreConfig ( 'GluuOxd/Openid/loginTheme' );
+                break;
+            case 'loginCustomTheme' :
+                $result = Mage::getStoreConfig ( 'GluuOxd/Openid/loginCustomTheme' );
+                break;
+            case 'iconSpace' :
+                $result = Mage::getStoreConfig ( 'GluuOxd/Openid/iconSpace' );
+                break;
+            case 'iconCustomSize' :
+                $result = Mage::getStoreConfig ( 'GluuOxd/Openid/iconCustomSize' );
+                break;
+            case 'iconCustomWidth' :
+                $result = Mage::getStoreConfig ( 'GluuOxd/Openid/iconCustomWidth' );
+                break;
+            case 'iconCustomHeight' :
+                $result = Mage::getStoreConfig ( 'GluuOxd/Openid/iconCustomHeight' );
+                break;
+            case 'iconCustomColor' :
+                $result = Mage::getStoreConfig ( 'GluuOxd/Openid/iconCustomColor' );
+                break;
+            default :
+                return;
+                break;
+        }
+        return $result;
+    }
 }
