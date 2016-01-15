@@ -7,24 +7,7 @@
 class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller_Action
 {
     private $dataHelper = "GluuOxd_Openid";
-    private $gluuOxOpenidUtilityHelper = "GluuOxd_Openid/gluuOxOpenidUtility";
     private $oxdRegisterSite = "GluuOxd_Openid/registerSite";
-
-    /**
-     * @return string
-     */
-    public function getDataHelper()
-    {
-        return Mage::helper($this->dataHelper);
-    }
-
-    /**
-     * @return string
-     */
-    public function getGluuOxOpenidUtilityHelper()
-    {
-        return Mage::helper($this->gluuOxOpenidUtilityHelper);
-    }
 
     /**
      * @return string
@@ -316,4 +299,5 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
     private function getId(){
         return $this->getSession()->getUser()->getUserId();
     }
+
 }
