@@ -1,9 +1,21 @@
 <?php
-$oxd_id = Mage::getStoreConfig('gluu/oxd/oxd_id');
-$get_scopes = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_scops'));
-$oxd_config = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_config'));
-$custom_scripts = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_custom_scripts'));
+    $oxd_id = Mage::getStoreConfig('gluu/oxd/oxd_id');
+    $get_scopes = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_scops'));
+    $oxd_config = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_config'));
+    $custom_scripts = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_custom_scripts'));
 
+    $iconSpace = $this->getConfig('iconSpace');
+    if (!$iconSpace) $iconSpace = '10';
+    $iconCustomSize = $this->getConfig('iconCustomSize');
+    if (!$iconCustomSize) $iconCustomSize = '50';
+    $iconCustomWidth = $this->getConfig('iconCustomWidth');
+    if (!$iconCustomWidth) $iconCustomWidth = '200';
+    $iconCustomHeight = $this->getConfig('iconCustomHeight');
+    if (!$iconCustomHeight) $iconCustomHeight = '35';
+    $loginCustomTheme = $this->getConfig('loginCustomTheme');
+    $loginTheme = $this->getConfig('loginTheme');
+    $iconCustomColor = $this->getConfig('iconCustomColor');
+    if (!$iconCustomColor) $iconCustomColor = '#0000FF';
 ?>
 <html>
 <head>
@@ -162,54 +174,6 @@ $custom_scripts = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_custom_s
         var transId = "<?php echo $this->getTransactionId(); ?>";
         var test = "<?php echo Mage::getSingleton('admin/session')->getTestValidationScreen(); ?>";
         var testMobile = "<?php echo Mage::getSingleton('admin/session')->getShowTestMobileAuth(); ?>";
-        function pollMobileRegistration() {
-            if (test == "1") {
-                var postUrl = "<?php echo $this->getHostURl()  ?>" + "/moas/api/auth/auth-status";
-            } else {
-                var postUrl = "<?php echo $this->getHostURl()  ?>" + "/moas/api/auth/registration-status";
-            }
-            var jsonString = "{\"txId\":\"" + transId + "\"}";
-            $j.ajax({
-                url: postUrl,
-                type: "POST",
-                dataType: "json",
-                data: jsonString,
-                contentType: "application/json; charset=utf-8",
-                success: function (result) {
-                    var status = JSON.parse(JSON.stringify(result)).status;
-                    if (status == 'SUCCESS') {
-                        var content = "<div id='success' style='margin-left: 1%; margin-top:2%;'><img src='" + "<?php echo $this->getImage('right') ?>" + "' /></div>";
-                        if (test != "1") {
-                            $j("#displayQrCode").empty();
-                            $j("#displayQrCode").append(content);
-                        } else if (testMobile == "1") {
-                            $j("#testQrCode").empty();
-                            $j("#testQrCode").append(content);
-                        }
-                        setTimeout(function () {
-                            $j("#mobile_register_form").submit();
-                        }, 1000);
-                    } else if (status == 'ERROR' || status == 'FAILED') {
-                        var content = "<div id='error' style='margin-left: 1%; margin-top:2%;'><img src='" + "<?php echo $this->getImage('wrong') ?>" + "' /></div>";
-                        if (test != "1") {
-                            $j("#displayQrCode").empty();
-                            $j("#displayQrCode").append(content);
-                        } else if (testMobile == "1") {
-                            $j("#testQrCode").empty();
-                            $j("#testQrCode").append(content);
-                        }
-                        setTimeout(function () {
-                            $j("#mobile_register_failed").submit();
-                        }, 1000);
-                    } else {
-                        timeout = setTimeout(pollMobileRegistration, 3000);
-                    }
-                }
-            });
-        }
-        if (transId != "") {
-            pollMobileRegistration();
-        }
         var $j = jQuery.noConflict();
         $j(document).ready(function ($j) {
             for (var i = 1; i <= 8; i++) {
@@ -297,9 +261,6 @@ $custom_scripts = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_custom_s
                         jQuery("." + a).css("padding-top", (h - 26) / 2 + "px");
                         jQuery("." + a).css("padding-bottom", (h - 26) / 2 + "px");
                     }
-                    //jQuery("."+a).css("height","26px");
-                    //jQuery("."+a).css("padding-top",(h-26)/2+"px");
-                    //jQuery("."+a).css("padding-bottom",(h-26)/2+"px");
                     jQuery(".fa").css("padding-top", (h - 35) + "px");
                     jQuery("." + a).css("margin-bottom", n + "px");
                 } else {
@@ -333,7 +294,7 @@ $custom_scripts = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_custom_s
                     jQuery("." + a).css("margin-bottom", n + "px");
                     jQuery("." + a).css("background", p);
                 } else {
-                    var a = "mo_custom_login_icon_preview";
+                    var a = "gluuOx_custom_login_icon_preview";
                     jQuery("." + a).css({height: t - 8, width: t});
                     jQuery("." + a).css("padding-top", "8px");
                     jQuery("." + a).css("margin-left", n + "px");
@@ -355,12 +316,12 @@ $custom_scripts = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_custom_s
             if (document.getElementById('iconwithtext').checked) {
                 if (setLoginCustomTheme() == 'default') {
                     jQuery(".gluuox_login_icon_preview").hide();
-                    jQuery(".mo_custom_login_icon_preview").hide();
+                    jQuery(".gluuOx_custom_login_icon_preview").hide();
                     jQuery(".btn-customtheme").hide();
                     jQuery(".btn-defaulttheme").show();
                 } else if (setLoginCustomTheme() == 'custom') {
                     jQuery(".gluuox_login_icon_preview").hide();
-                    jQuery(".mo_custom_login_icon_preview").hide();
+                    jQuery(".gluuOx_custom_login_icon_preview").hide();
                     jQuery(".btn-defaulttheme").hide();
                     jQuery(".btn-customtheme").show();
                 }
@@ -372,10 +333,10 @@ $custom_scripts = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_custom_s
                     jQuery(".gluuox_login_icon_preview").show();
                     jQuery(".btn-defaulttheme").hide();
                     jQuery(".btn-customtheme").hide();
-                    jQuery(".mo_custom_login_icon_preview").hide();
+                    jQuery(".gluuOx_custom_login_icon_preview").hide();
                 } else if (setLoginCustomTheme() == 'custom') {
                     jQuery(".gluuox_login_icon_preview").hide();
-                    jQuery(".mo_custom_login_icon_preview").show();
+                    jQuery(".gluuOx_custom_login_icon_preview").show();
                     jQuery(".btn-defaulttheme").hide();
                     jQuery(".btn-customtheme").hide();
                 }
@@ -393,25 +354,26 @@ $custom_scripts = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_custom_s
                 if (document.getElementById('gluuoxd_openid_login_default_radio').checked && !document.getElementById('iconwithtext').checked)
                     jQuery("#gluuox_login_icon_preview_<?php echo $custom_script['value'];?>").show();
                 if (document.getElementById('gluuoxd_openid_login_custom_radio').checked && !document.getElementById('iconwithtext').checked)
-                    jQuery("#mo_custom_login_icon_preview_<?php echo $custom_script['value'];?>").show();
+                    jQuery("#gluuOx_custom_login_icon_preview_<?php echo $custom_script['value'];?>").show();
                 if (document.getElementById('gluuoxd_openid_login_default_radio').checked && document.getElementById('iconwithtext').checked)
                     jQuery("#gluuox_login_button_preview_<?php echo $custom_script['value'];?>").show();
                 if (document.getElementById('gluuoxd_openid_login_custom_radio').checked && document.getElementById('iconwithtext').checked)
-                    jQuery("#mo_custom_login_button_preview_<?php echo $custom_script['value'];?>").show();
+                    jQuery("#gluuOx_custom_login_button_preview_<?php echo $custom_script['value'];?>").show();
             }
             else if (!document.getElementById('<?php echo $custom_script['value'];?>_enable').checked) {
                 jQuery("#gluuox_login_icon_preview_<?php echo $custom_script['value'];?>").hide();
-                jQuery("#mo_custom_login_icon_preview_<?php echo $custom_script['value'];?>").hide();
+                jQuery("#gluuOx_custom_login_icon_preview_<?php echo $custom_script['value'];?>").hide();
                 jQuery("#gluuox_login_button_preview_<?php echo $custom_script['value'];?>").hide();
-                jQuery("#mo_custom_login_button_preview_<?php echo $custom_script['value'];?>").hide();
+                jQuery("#gluuOx_custom_login_button_preview_<?php echo $custom_script['value'];?>").hide();
             }
-            <?php endforeach;?>
-
             if (flag) {
                 jQuery("#no_apps_text").hide();
             } else {
                 jQuery("#no_apps_text").show();
             }
+            <?php endforeach;?>
+
+
         }
         var selectedApps = [];
         function setTheme() {
@@ -810,20 +772,7 @@ $custom_scripts = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_custom_s
 
                             <p>Customize shape, theme and size of social login icons</p>
 
-                            <?php
-                            $iconSpace = $this->getConfig('iconSpace');
-                            if (!$iconSpace) $iconSpace = '10';
-                            $iconCustomSize = $this->getConfig('iconCustomSize');
-                            if (!$iconCustomSize) $iconCustomSize = '50';
-                            $iconCustomWidth = $this->getConfig('iconCustomWidth');
-                            if (!$iconCustomWidth) $iconCustomWidth = '200';
-                            $iconCustomHeight = $this->getConfig('iconCustomHeight');
-                            if (!$iconCustomHeight) $iconCustomHeight = '35';
-                            $loginCustomTheme = $this->getConfig('loginCustomTheme');
-                            $loginTheme = $this->getConfig('loginTheme');
-                            $iconCustomColor = $this->getConfig('iconCustomColor');
-                            if (!$iconCustomColor) $iconCustomColor = '#0000FF';
-                            ?>
+
                             <table style="width:100%;display: table;">
                                 <tbody>
                                 <tr>
@@ -979,15 +928,15 @@ $custom_scripts = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_custom_s
 
                             <div>
                                 <?php foreach ($custom_scripts as $custom_script): ?>
-                                    <i class="mo_custom_login_icon_preview fa fa-<?php echo $custom_script['value']; ?>-plus"
-                                       id="mo_custom_login_icon_preview_<?php echo $custom_script['value']; ?>"
+                                    <i class="gluuOx_custom_login_icon_preview fa fa-<?php echo $custom_script['value']; ?>-plus"
+                                       id="gluuOx_custom_login_icon_preview_<?php echo $custom_script['value']; ?>"
                                        style="color:#ffffff;text-align:center;margin-top:5px;"></i>
                                 <?php endforeach; ?>
                             </div>
 
                             <div>
                                 <?php foreach ($custom_scripts as $custom_script): ?>
-                                    <a id="mo_custom_login_button_preview_<?php echo $custom_script['value']; ?>"
+                                    <a id="gluuOx_custom_login_button_preview_<?php echo $custom_script['value']; ?>"
                                        class="btn btn-block btn-customtheme btn-social   btn-custom-size"
                                        style="width:<?php echo $iconCustomWidth; ?>px;height:<?php echo $iconCustomHeight; ?>px;padding-top: 6px;padding-bottom: 6px;margin-bottom:<?php echo $iconSpace; ?>px;background:<?php echo $iconCustomColor; ?>;">
                                         <i class="fa fa-<?php echo $custom_script['value']; ?>-plus"></i>Login

@@ -49,7 +49,7 @@
                 foreach($enableds as $enabled){
                     if($enabled['enable']){
                         ?>
-                        <a id="mo_custom_login_button_preview_<?php echo $enabled['value'];?>" class="btn btn-block btn-customtheme btn-social   btn-custom-size" style="width:<?php echo $iconCustomWidth;?>px;height:<?php echo $iconCustomHeight;?>px;padding-top: 6px;padding-bottom: 6px;margin-bottom:<?php echo $iconSpace;?>px;background:<?php echo $iconCustomColor;?>" onclick="socialLogin('<?php echo $enabled['value'];?>')" >
+                        <a id="gluuOx_custom_login_button_preview_<?php echo $enabled['value'];?>" class="btn btn-block btn-customtheme btn-social   btn-custom-size" style="width:<?php echo $iconCustomWidth;?>px;height:<?php echo $iconCustomHeight;?>px;padding-top: 6px;padding-bottom: 6px;margin-bottom:<?php echo $iconSpace;?>px;background:<?php echo $iconCustomColor;?>" onclick="socialLogin('<?php echo $enabled['value'];?>')" >
                             <i class="fa fa-<?php echo $enabled['value'];?>-plus"></i>Login with <?php echo $enabled['name'];?>
                         </a>
                     <?php }
@@ -76,12 +76,12 @@
 
 <?php } else {
     ?>
-    <style>.mo_custom_login_icon_preview{cursor:pointer;}</style>
+    <style>.gluuOx_custom_login_icon_preview{cursor:pointer;}</style>
     <?php
     if($loginTheme=='circle'){ ?>
-        <style> .gluuox_login_icon_preview, .mo_custom_login_icon_preview{border-radius: 999px !important;}</style>
+        <style> .gluuox_login_icon_preview, .gluuOx_custom_login_icon_preview{border-radius: 999px !important;}</style>
     <?php } else if($loginTheme=='oval'){ ?>
-        <style> .gluuox_login_icon_preview, .mo_custom_login_icon_preview{border-radius: 5px !important;}</style>
+        <style> .gluuox_login_icon_preview, .gluuOx_custom_login_icon_preview{border-radius: 5px !important;}</style>
     <?php }
 
     if($loginCustomTheme=='custom') { ?>
@@ -90,7 +90,7 @@
             foreach($enableds as $enabled){
                 if($enabled['enable']){
                     ?>
-                    <i class="mo_custom_login_icon_preview fa fa-<?php echo $enabled['value'];?>-plus" id="mo_custom_login_icon_preview_<?php echo $enabled['value'];?>"  style="color: rgb(255, 255, 255); text-align: center; margin-top: 5px; height: <?php echo $iconCustomSize-8;?>px; width: <?php echo $iconCustomSize;?>px; padding-top: 8px; margin-left: <?php echo $iconSpace.'px'; ?>; font-size: <?php echo $iconCustomSize-16;?>px; background: <?php echo $iconCustomColor;?>"  onclick="socialLogin('<?php echo $enabled['value'];?>')" ></i>
+                    <i class="gluuOx_custom_login_icon_preview fa fa-<?php echo $enabled['value'];?>-plus" id="gluuOx_custom_login_icon_preview_<?php echo $enabled['value'];?>"  style="color: rgb(255, 255, 255); text-align: center; margin-top: 5px; height: <?php echo $iconCustomSize-8;?>px; width: <?php echo $iconCustomSize;?>px; padding-top: 8px; margin-left: <?php echo $iconSpace.'px'; ?>; font-size: <?php echo $iconCustomSize-16;?>px; background: <?php echo $iconCustomColor;?>"  onclick="socialLogin('<?php echo $enabled['value'];?>')" ></i>
 
                 <?php }
             }
@@ -105,7 +105,7 @@
                     ?>
                     <img class="gluuox_login_icon_preview" id="gluuox_login_icon_preview_<?php echo $enabled['value'];?>" src="<?php echo $enabled['image']; ?>"
                          style="margin-left: <?php echo $iconSpace.'px'; ?>; height:<?php echo $iconCustomSize;?>px; width:<?php echo $iconCustomSize;?>px;" onclick="socialLogin('<?php echo $enabled['value'];?>')"  />
-                    <i class="mo_custom_login_icon_preview fa fa-<?php echo $enabled['value'];?>-plus" id="mo_custom_login_icon_preview_<?php echo $enabled['value'];?>"  style="color: rgb(255, 255, 255); text-align: center; margin-top: 5px; height: <?php echo $iconCustomSize-8;?>px; width: <?php echo $iconCustomSize;?>px; padding-top: 8px; margin-left: <?php echo $iconSpace.'px'; ?>; font-size: <?php echo $iconCustomSize-16;?>px; background: <?php echo $iconCustomColor;?>"  onclick="socialLogin('<?php echo $enabled['value'];?>')" ></i>
+                    <i class="gluuOx_custom_login_icon_preview fa fa-<?php echo $enabled['value'];?>-plus" id="gluuOx_custom_login_icon_preview_<?php echo $enabled['value'];?>"  style="color: rgb(255, 255, 255); text-align: center; margin-top: 5px; height: <?php echo $iconCustomSize-8;?>px; width: <?php echo $iconCustomSize;?>px; padding-top: 8px; margin-left: <?php echo $iconSpace.'px'; ?>; font-size: <?php echo $iconCustomSize-16;?>px; background: <?php echo $iconCustomColor;?>"  onclick="socialLogin('<?php echo $enabled['value'];?>')" ></i>
 
                 <?php }
             }

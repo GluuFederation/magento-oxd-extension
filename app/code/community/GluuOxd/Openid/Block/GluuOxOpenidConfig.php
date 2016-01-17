@@ -90,13 +90,6 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
     }
 
     /**
-     * getting host url
-     */
-    public function getHostURl(){
-        return  Mage::helper('GluuOxd_Openid')->getHostURl();
-    }
-
-    /**
      * getting openId config from database
      */
     public function getOpendIdConfig($data){

@@ -244,11 +244,11 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         }
         $storeConfig ->saveConfig('GluuOxd/Openid/loginTheme',$params['gluuoxd_openid_login_theme'], 'default', 0);
         $storeConfig ->saveConfig('GluuOxd/Openid/loginCustomTheme',$params['gluuoxd_openid_login_custom_theme'], 'default', 0);
-        $storeConfig ->saveConfig('GluuOxd/Openid/iconSpace',$params['mo_login_icon_space'], 'default', 0);
-        $storeConfig ->saveConfig('GluuOxd/Openid/iconCustomSize',$params['mo_login_icon_custom_size'], 'default', 0);
-        $storeConfig ->saveConfig('GluuOxd/Openid/iconCustomWidth',$params['mo_login_icon_custom_width'], 'default', 0);
-        $storeConfig ->saveConfig('GluuOxd/Openid/iconCustomHeight',$params['mo_login_icon_custom_height'], 'default', 0);
-        $storeConfig ->saveConfig('GluuOxd/Openid/iconCustomColor',$params['mo_login_icon_custom_color'], 'default', 0);
+        $storeConfig ->saveConfig('GluuOxd/Openid/iconSpace',$params['gluuOxLogin_icon_space'], 'default', 0);
+        $storeConfig ->saveConfig('GluuOxd/Openid/iconCustomSize',$params['gluuOxLogin_icon_custom_size'], 'default', 0);
+        $storeConfig ->saveConfig('GluuOxd/Openid/iconCustomWidth',$params['gluuOxLogin_icon_custom_width'], 'default', 0);
+        $storeConfig ->saveConfig('GluuOxd/Openid/iconCustomHeight',$params['gluuOxLogin_icon_custom_height'], 'default', 0);
+        $storeConfig ->saveConfig('GluuOxd/Openid/iconCustomColor',$params['gluuOxLogin_icon_custom_color'], 'default', 0);
 
         //print_r($params);
         //exit();
