@@ -10,7 +10,7 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
     private $getUserInfo = "GluuOxd_Openid/getUserInfo";
     private $logout = "GluuOxd_Openid/logout";
     /**
-     * Administrator logout action
+     * Customer logout action
      */
     public function logout_validation()
     {
