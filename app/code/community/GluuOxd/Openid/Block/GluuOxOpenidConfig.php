@@ -9,6 +9,7 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
     private $getTokensByCode = "GluuOxd_Openid/getTokensByCode";
     private $getUserInfo = "GluuOxd_Openid/getUserInfo";
     private $logout = "GluuOxd_Openid/logout";
+
     /**
      * Customer logout action
      */
@@ -22,6 +23,7 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
         $logout->setRequestIdToken($_SESSION['user_oxd_access_token']);
         $logout->request();
     }
+
     /**
      * @return string
      */
@@ -232,7 +234,9 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
     public function gluuoxd_openid_login_validate(){
 
         if( isset( $_REQUEST['option'] ) and strpos( $_REQUEST['option'], 'getOxdSocialLogin' ) !== false ) {
-
+            if(Mage::getSingleton('customer/session')->isLoggedIn()) {
+                header("Location: /customer/account/login");
+            }
             $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
             $oxd_id = Mage::getStoreConfig ( 'gluu/oxd/oxd_id' );
             $get_tokens_by_code = $this->getGetTokensByCode();
@@ -241,8 +245,8 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
             $get_tokens_by_code->setRequestState($_REQUEST['state']);
             $get_tokens_by_code->setRequestScopes($config_option["scope"]);
             $get_tokens_by_code->request();
+            $get_tokens_by_code_array = $get_tokens_by_code->getResponseObject()->data->id_token_claims;
 
-            $array_data = $get_tokens_by_code->getResponseObject();
             $_SESSION['user_oxd_id_token']  = $get_tokens_by_code->getResponseIdToken();
             $_SESSION['user_oxd_access_token']  = $get_tokens_by_code->getResponseAccessToken();
 
@@ -250,72 +254,164 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
             $get_user_info->setRequestOxdId($oxd_id);
             $get_user_info->setRequestAccessToken($_SESSION['user_oxd_access_token']);
             $get_user_info->request();
-            $user_email = '';
-            //var_dump($get_user_info->getResponseObject());exit;
-            if($get_user_info->getResponseEmail() ) {
-                $user_email = $get_user_info->getResponseEmail();
+            $get_user_info_array = $get_user_info->getResponseObject()->data->claims;
+            /*echo '<pre>';
+var_dump($get_user_info_array->middle_name[0]);exit;*/
+            $reg_first_name = '';
+            $reg_last_name = '';
+            $reg_middle_name = '';
+            $reg_email = '';
+            $reg_country = '';
+            $reg_city = '';
+            $reg_gender = '';
+            $reg_postal_code = '';
+            $reg_home_phone_number = '';
+            $reg_phone_mobile_number = '';
+            $reg_avatar = '';
+            $reg_street_address = '';
+            if($get_user_info_array->given_name[0]){
+                $reg_first_name = $get_user_info_array->given_name[0];
+            }elseif($get_tokens_by_code_array->given_name[0]){
+                $reg_first_name = $get_tokens_by_code_array->given_name[0];
+            }
+            if($get_user_info_array->family_name[0]){
+                $reg_last_name = $get_user_info_array->family_name[0];
+            }elseif($get_tokens_by_code_array->family_name[0]){
+                $reg_last_name = $get_tokens_by_code_array->family_name[0];
+            }
+            if($get_user_info_array->middle_name[0]){
+                $reg_middle_name = $get_user_info_array->middle_name[0];
+            }elseif($get_tokens_by_code_array->middle_name[0]){
+                $reg_middle_name = $get_tokens_by_code_array->middle_name[0];
+            }
+            if($get_user_info_array->email[0]){
+                $reg_email = $get_user_info_array->email[0];
+            }elseif($get_tokens_by_code_array->email[0]){
+                $reg_email = $get_tokens_by_code_array->email[0];
+            }
+            if($get_user_info_array->country[0]){
+                $reg_country = $get_user_info_array->country[0];
+            }elseif($get_tokens_by_code_array->country[0]){
+                $reg_country = $get_tokens_by_code_array->country[0];
+            }
+            if($get_user_info_array->gender[0]){
+                $reg_gender = $get_user_info_array->gender[0];
+            }elseif($get_tokens_by_code_array->gender[0]){
+                $reg_gender = $get_tokens_by_code_array->gender[0];
+            }
+            if($get_user_info_array->locality[0]){
+                $reg_city = $get_user_info_array->locality[0];
+            }elseif($get_tokens_by_code_array->locality[0]){
+                $reg_city = $get_tokens_by_code_array->locality[0];
+            }
+            if($get_user_info_array->postal_code[0]){
+                $reg_postal_code = $get_user_info_array->postal_code[0];
+            }elseif($get_tokens_by_code_array->postal_code[0]){
+                $reg_postal_code = $get_tokens_by_code_array->postal_code[0];
+            }
+            if($get_user_info_array->phone_number[0]){
+                $reg_home_phone_number = $get_user_info_array->phone_number[0];
+            }elseif($get_tokens_by_code_array->phone_number[0]){
+                $reg_home_phone_number = $get_tokens_by_code_array->phone_number[0];
+            }
+            if($get_user_info_array->phone_mobile_number[0]){
+                $reg_phone_mobile_number = $get_user_info_array->phone_mobile_number[0];
+            }elseif($get_tokens_by_code_array->phone_mobile_number[0]){
+                $reg_phone_mobile_number = $get_tokens_by_code_array->phone_mobile_number[0];
+            }
+            if($get_user_info_array->picture[0]){
+                $reg_avatar = $get_user_info_array->picture[0];
+            }elseif($get_tokens_by_code_array->picture[0]){
+                $reg_avatar = $get_tokens_by_code_array->picture[0];
+            }
+            if($get_user_info_array->street_address[0]){
+                $reg_street_address = $get_user_info_array->street_address[0];
+            }elseif($get_tokens_by_code_array->street_address[0]){
+                $reg_street_address = $get_tokens_by_code_array->street_address[0];
+            }
+            if( $reg_email ) {
+
+                $customer = Mage::getModel('customer/customer');
+                $customer->setWebsiteId(Mage::app()->getWebsite()->getId());
+                $customer->loadByEmail($reg_email);
+                if($customer->getId()>1){
+
+                    $customer->setFirstname($reg_first_name);
+                    $customer->setLastname ($reg_last_name);
+                    $customer->setMiddleName($reg_middle_name);
+                    $customer->save();
+                    $dataShipping = array(
+                        'firstname'  => $reg_first_name,
+                        'lastname'   => $reg_last_name,
+                        'middlename' => $reg_middle_name,
+                        'street'     => array($reg_street_address),
+                        'city'       => $reg_city,
+                        'postcode'   => $reg_postal_code,
+                        'country_id' => $reg_country,
+                        'telephone'  => $reg_phone_mobile_number.' '. $reg_home_phone_number,
+                    );
+
+                    $customerAddress = Mage::getModel('customer/address');
+
+                    if ($defaultShippingId = $customer->getDefaultShipping()){
+                        $customerAddress->load($defaultShippingId);
+                    } else {
+                        $customerAddress->setCustomerId($customer->getId())->setIsDefaultShipping('1')->setSaveInAddressBook('1');
+
+                        $customer->addAddress($customerAddress);
+                    }
+                    $customerAddress->addData($dataShipping)->save();
+
+                    $session = Mage::getSingleton("customer/session");
+                    $session->loginById($customer->getId());
+                    $session->setCustomerAsLoggedIn($customer);
+
+                    header("Refresh:0");
+                }
+                else{
+                    $websiteId = Mage::app()->getWebsite()->getId();
+                    $store = Mage::app()->getStore();
+                    $password = md5(Mage::helper('core')->getRandomString($length = 7));
+                    $customer = Mage::getModel("customer/customer");
+                    $customer->setWebsiteId($websiteId)
+                        ->setStore($store)
+                        ->setFirstname($reg_first_name)
+                        ->setLastname($reg_last_name)
+                        ->setMiddleName($reg_middle_name)
+                        ->setLogo($reg_avatar)
+                        ->setEmail($reg_email)
+                        ->setPassword($password);
+                    try{
+                        $customer->save();
+
+                        $address = Mage::getModel("customer/address");
+                        $address->setCustomerId($customer->getId())
+                            ->setFirstname($customer->getFirstname())
+                            ->setMiddleName($customer->getMiddlename())
+                            ->setLastname($customer->getLastname())
+                            ->setCountryId($reg_country)
+                            ->setPostcode($reg_postal_code)
+                            ->setCity($reg_city)
+                            ->setTelephone($reg_phone_mobile_number.' '. $reg_home_phone_number)
+                            ->setStreet($reg_street_address)
+                            ->setIsDefaultBilling('1')
+                            ->setIsDefaultShipping('1')
+                            ->setSaveInAddressBook('1');
+
+                        $address->save();
+                        $session = Mage::getSingleton("customer/session");
+                        $session->loginById($customer->getId());
+                        $session->setCustomerAsLoggedIn($customer);
+
+                        header("Refresh:0");
+                    }
+                    catch (Exception $e) {
+                        Zend_Debug::dump($e->getMessage());
+                    }
+                }
+
             }else{
-                if($array_data->id_token_claims->email){
-                    $user_email = $array_data->id_token_claims->email;
-                }
-            }
-
-            $user_name = '';
-            $user_picture = $get_user_info->getResponsePicture();
-            $first_name = '';
-            $last_name = '';
-            $user_full_name = '';
-            if($get_user_info->getResponseGivenName() && $get_user_info->getResponseFamilyName()){
-                $user_full_name = $get_user_info->getResponseGivenName().' '.$get_user_info->getResponseFamilyName();
-                $first_name = $get_user_info->getResponseGivenName();
-                $last_name = $get_user_info->getResponseFamilyName();
-            }elseif($array_data->id_token_claims->family_name && $array_data->id_token_claims->given_name){
-                $first_name = $array_data->id_token_claims->given_name;
-                $last_name = $array_data->id_token_claims->family_name;
-                if($array_data->id_token_claims->name){
-                    $user_full_name = $array_data->id_token_claims->name;
-                }else{
-                    $user_full_name = $array_data->id_token_claims->family_name.' '.$array_data->id_token_claims->given_name;
-                }
-
-            }
-
-            if($get_user_info->getResponsePreferredUsername()){
-                $user_name = $get_user_info->getResponsePreferredUsername();
-            }
-            elseif(strcmp($user_name, $user_full_name)){
-                $email_split = explode("@", $user_email);
-                $user_name = $email_split[0];
-            } else {
-                $user_name = $user_name;
-            }
-
-            if( $user_email ) {
-
-                $user_name= Mage::getModel('admin/user')->getCollection()->addFieldToFilter('email',$user_email)->getFirstItem()->getUsername();
-
-                $user = Mage::getModel('admin/user')->loadByUsername($user_name);
-                if (Mage::getSingleton('adminhtml/url')->useSecretKey()) {
-                    Mage::getSingleton('adminhtml/url')->renewSecretUrls();
-                }
-
-                $session = Mage::getSingleton('admin/session');
-                $session->setIsFirstVisit(true);
-                $session->setUser($user);
-                $session->setAcl(Mage::getResourceModel('admin/acl')->loadAcl());
-
-                Mage::dispatchEvent('admin_session_user_login_success',array('user'=>$user));
-
-                if ($session->isLoggedIn()) {
-                    $redirectUrl = Mage::getSingleton('adminhtml/url')->getUrl(Mage::getModel('admin/user')->getStartupPageUrl(), array('_current' => false));
-                    header('Location: ' . $redirectUrl);
-                    exit;
-                }else{
-                    $datahelper = Mage::helper("GluuOxd_Openid"); //GluuOxd_Openid_Helper_Data
-                    $datahelper->displayMessage('User does not exist in our system. Please check your Email ID.',"ERROR");
-                    $this->redirect("*/index/index");
-                }
-
+                echo '<p style="color: red">Sorry, but gluu server cannot find email address!</p>';
             }
         }
         if( isset( $_REQUEST['option'] ) and strpos( $_REQUEST['option'], 'userGluuLogin' ) !== false ) {
@@ -330,7 +426,7 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
                 header("Location: ".$get_authorization_url->getResponseAuthorizationUrl());
                 exit;
             }else{
-                echo '<p style="color: red">Sorry, but oxd server is not swatched on!</p>';
+                echo '<p style="color: red">Sorry, but oxd server is not switched on!</p>';
             }
 
         }
