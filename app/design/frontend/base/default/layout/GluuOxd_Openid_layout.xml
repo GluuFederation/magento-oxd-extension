@@ -16,4 +16,13 @@
             <block type="GluuOxd_Openid/gluuOxOpenidConfig" before="-" name="openid_login_home" template="GluuOxd_Openid/homepage.phtml" />
         </reference>
     </customer_account_create>
+    <!--
+        Layout for customer log out page
+    -->
+
+    <customer_account_logoutsuccess translate="label">
+        <reference name="content">
+            <block type="GluuOxd_Openid/gluuOxOpenidConfig" before="-" name="openid_logout_home" template="GluuOxd_Openid/logout.phtml"/>
+        </reference>
+    </customer_account_logoutsuccess>
 </layout>
