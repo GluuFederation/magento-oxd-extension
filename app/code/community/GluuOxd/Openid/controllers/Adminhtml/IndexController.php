@@ -18,6 +18,14 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
     }
 
     /**
+     * @return string
+     */
+    public function getOxdRegisterSiteHelper()
+    {
+        return Mage::helper($this->oxdRegisterSiteHelper);
+    }
+
+    /**
      * @return gluuOxd admin index page
      */
     public function indexAction(){
