@@ -15,9 +15,27 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
      */
     public function logout_validation()
     {
-        $logout = $this->getLogout();
         $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
         $oxd_id = Mage::getStoreConfig ( 'gluu/oxd/oxd_id' );
+        if($oxd_id){
+
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                if(!exec('netstat -aon |find/i "listening" |find "'.$config_option['oxd_host_port'].'"')){
+                    $startDir = Mage::getBaseDir('skin').'/adminhtml/default/default/GluuOxd_Openid/oxd-server/bin';
+                    chdir($startDir);
+                    $fileName = 'oxd-start.bat';
+                    exec($fileName);
+                }
+            } else {
+                if(!exec('netstat -tulpn | grep :'.$config_option['oxd_host_port'])){
+                    $startDir = Mage::getBaseDir('skin').'/adminhtml/default/default/GluuOxd_Openid/oxd-server/bin';
+                    chdir($startDir);
+                    $fileName = './oxd-start.sh';
+                    exec($fileName);
+                }
+            }
+        }
+        $logout = $this->getLogout();
         $logout->setRequestOxdId($oxd_id);
         $logout->setRequestPostLogoutRedirectUri($config_option['logout_redirect_uri']);
         $logout->setRequestIdToken($_SESSION['user_oxd_access_token']);
