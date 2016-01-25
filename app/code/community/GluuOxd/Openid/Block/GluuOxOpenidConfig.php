@@ -252,11 +252,29 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
     public function gluuoxd_openid_login_validate(){
 
         if( isset( $_REQUEST['option'] ) and strpos( $_REQUEST['option'], 'getOxdSocialLogin' ) !== false ) {
-            if(Mage::getSingleton('customer/session')->isLoggedIn()) {
-                header("Location: /customer/account/login");
-            }
+
             $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
             $oxd_id = Mage::getStoreConfig ( 'gluu/oxd/oxd_id' );
+            if($oxd_id){
+
+                if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                    if(!exec('netstat -aon |find/i "listening" |find "'.$config_option['oxd_host_port'].'"')){
+                        $startDir = Mage::getBaseDir('skin').'/adminhtml/default/default/GluuOxd_Openid/oxd-server/bin';
+                        chdir($startDir);
+                        $fileName = 'oxd-start.bat';
+                        exec($fileName);
+                    }
+                } else {
+                    if(!exec('netstat -tulpn | grep :'.$config_option['oxd_host_port'])){
+                        $startDir = Mage::getBaseDir('skin').'/adminhtml/default/default/GluuOxd_Openid/oxd-server/bin';
+                        chdir($startDir);
+                        $fileName = './oxd-start.sh';
+                        exec($fileName);
+                    }
+                }
+            }
+
+
             $get_tokens_by_code = $this->getGetTokensByCode();
             $get_tokens_by_code->setRequestOxdId($oxd_id);
             $get_tokens_by_code->setRequestCode($_REQUEST['code']);
@@ -273,20 +291,22 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
             $get_user_info->setRequestAccessToken($_SESSION['user_oxd_access_token']);
             $get_user_info->request();
             $get_user_info_array = $get_user_info->getResponseObject()->data->claims;
-            /*echo '<pre>';
-var_dump($get_user_info_array->middle_name[0]);exit;*/
+
             $reg_first_name = '';
             $reg_last_name = '';
             $reg_middle_name = '';
             $reg_email = '';
             $reg_country = '';
             $reg_city = '';
+            $reg_region = '';
             $reg_gender = '';
             $reg_postal_code = '';
+            $reg_fax = '';
             $reg_home_phone_number = '';
             $reg_phone_mobile_number = '';
             $reg_avatar = '';
             $reg_street_address = '';
+            $reg_birthdate = '';
             if($get_user_info_array->given_name[0]){
                 $reg_first_name = $get_user_info_array->given_name[0];
             }elseif($get_tokens_by_code_array->given_name[0]){
@@ -313,9 +333,18 @@ var_dump($get_user_info_array->middle_name[0]);exit;*/
                 $reg_country = $get_tokens_by_code_array->country[0];
             }
             if($get_user_info_array->gender[0]){
-                $reg_gender = $get_user_info_array->gender[0];
+                if($get_user_info_array->gender[0] == 'male'){
+                    $reg_gender = '1';
+                }else{
+                    $reg_gender = '2';
+                }
+
             }elseif($get_tokens_by_code_array->gender[0]){
-                $reg_gender = $get_tokens_by_code_array->gender[0];
+                if($get_tokens_by_code_array->gender[0] == 'male'){
+                    $reg_gender = '1';
+                }else{
+                    $reg_gender = '2';
+                }
             }
             if($get_user_info_array->locality[0]){
                 $reg_city = $get_user_info_array->locality[0];
@@ -347,6 +376,16 @@ var_dump($get_user_info_array->middle_name[0]);exit;*/
             }elseif($get_tokens_by_code_array->street_address[0]){
                 $reg_street_address = $get_tokens_by_code_array->street_address[0];
             }
+            if($get_user_info_array->birthdate[0]){
+                $reg_birthdate = $get_user_info_array->birthdate[0];
+            }elseif($get_tokens_by_code_array->birthdate[0]){
+                $reg_birthdate = $get_tokens_by_code_array->birthdate[0];
+            }
+            if($get_user_info_array->region[0]){
+                $reg_region = $get_user_info_array->region[0];
+            }elseif($get_tokens_by_code_array->region[0]){
+                $reg_region = $get_tokens_by_code_array->region[0];
+            }
             if( $reg_email ) {
 
                 $customer = Mage::getModel('customer/customer');
@@ -357,12 +396,14 @@ var_dump($get_user_info_array->middle_name[0]);exit;*/
                     $customer->setFirstname($reg_first_name);
                     $customer->setLastname ($reg_last_name);
                     $customer->setMiddleName($reg_middle_name);
+                    $customer->setGender($reg_gender);
+                    $customer->setDob($reg_birthdate);
                     $customer->save();
                     $dataShipping = array(
                         'firstname'  => $reg_first_name,
                         'lastname'   => $reg_last_name,
-                        'middlename' => $reg_middle_name,
                         'street'     => array($reg_street_address),
+                        'region'     => $reg_region,
                         'city'       => $reg_city,
                         'postcode'   => $reg_postal_code,
                         'country_id' => $reg_country,
@@ -396,7 +437,8 @@ var_dump($get_user_info_array->middle_name[0]);exit;*/
                         ->setFirstname($reg_first_name)
                         ->setLastname($reg_last_name)
                         ->setMiddleName($reg_middle_name)
-                        ->setLogo($reg_avatar)
+                        ->setDob($reg_birthdate)
+                        ->setGender($reg_gender)
                         ->setEmail($reg_email)
                         ->setPassword($password);
                     try{
@@ -405,11 +447,13 @@ var_dump($get_user_info_array->middle_name[0]);exit;*/
                         $address = Mage::getModel("customer/address");
                         $address->setCustomerId($customer->getId())
                             ->setFirstname($customer->getFirstname())
-                            ->setMiddleName($customer->getMiddlename())
+                            ->setMiddleName($reg_middle_name)
                             ->setLastname($customer->getLastname())
                             ->setCountryId($reg_country)
                             ->setPostcode($reg_postal_code)
+                            ->setFax($reg_postal_code)
                             ->setCity($reg_city)
+                            ->setRegion($reg_region)
                             ->setTelephone($reg_phone_mobile_number.' '. $reg_home_phone_number)
                             ->setStreet($reg_street_address)
                             ->setIsDefaultBilling('1')
@@ -434,7 +478,28 @@ var_dump($get_user_info_array->middle_name[0]);exit;*/
         }
         if( isset( $_REQUEST['option'] ) and strpos( $_REQUEST['option'], 'userGluuLogin' ) !== false ) {
 
+            $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
             $oxd_id = Mage::getStoreConfig ( 'gluu/oxd/oxd_id' );
+            if($oxd_id){
+                if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                    if(!exec('netstat -aon |find/i "listening" |find "'.$config_option['oxd_host_port'].'"')){
+
+                        $startDir = Mage::getBaseDir('skin').'/adminhtml/default/default/GluuOxd_Openid/oxd-server/bin';
+                        chdir($startDir);
+                        $fileName = 'oxd-start.bat';
+                        exec($fileName);
+                    }else{
+
+                    }
+                } else {
+                    if(!exec('netstat -tulpn | grep :'.$config_option['oxd_host_port'])){
+                        $startDir = Mage::getBaseDir('skin').'/adminhtml/default/default/GluuOxd_Openid/oxd-server/bin';
+                        chdir($startDir);
+                        $fileName = './oxd-start.sh';
+                        exec($fileName);
+                    }
+                }
+            }
             $get_authorization_url = $this->getGetAuthorizationUrl();
 
             $get_authorization_url->setRequestOxdId($oxd_id);
@@ -449,4 +514,5 @@ var_dump($get_user_info_array->middle_name[0]);exit;*/
 
         }
     }
+
 }
