@@ -12,14 +12,6 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
     /**
      * @return string
      */
-    public function getOxdRegisterSite()
-    {
-        return Mage::helper($this->oxdRegisterSite);
-    }
-
-    /**
-     * @return string
-     */
     public function getOxdRegisterSiteHelper()
     {
         return Mage::helper($this->oxdRegisterSiteHelper);
@@ -35,10 +27,10 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
             $config_option = array(
                 "oxd_host_ip" => '127.0.0.1',
                 "oxd_host_port" =>8099,
-                "admin_email" => Mage::getSingleton('admin/session')->getEnteredEmail(),
+                "admin_email" => Mage::getSingleton('admin/session')->getUser()->getEmail(),
                 "authorization_redirect_uri" => Mage::helper('customer')->getLoginUrl().'?option=getOxdSocialLogin',
                 "logout_redirect_uri" => Mage::helper('customer')->getLogoutUrl(),
-                "scope" => [ "openid", "profile"],
+                "scope" => ["openid","profile","email","address","mobile_phone","phone"],
                 "application_type" => "web",
                 "redirect_uris" => [ Mage::helper('customer')->getLoginUrl().'?option=getOxdSocialLogin' ],
                 "acr_values" => [],
@@ -48,15 +40,15 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
             }
         }
         if(empty(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_scops' )))){
-            $storeConfig ->saveConfig('gluu/oxd/oxd_openid_scops',serialize(array('openid','profile','email')), 'default', 0);
+            $storeConfig ->saveConfig('gluu/oxd/oxd_openid_scops',serialize(array("openid","profile","email","address","mobile_phone","phone")), 'default', 0);
         }
         if(empty(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' )))){
             $storeConfig ->saveConfig('gluu/oxd/oxd_openid_custom_scripts',
                 serialize(array(
-                    array('name'=>'Google','image'=>$this->getIconImage('google'),'value'=>'gplus'),
-                    array('name'=>'Basic','image'=>$this->getIconImage('basic'),'value'=>'basic'),
-                    array('name'=>'Duo','image'=>$this->getIconImage('duo'),'value'=>'duo'),
-                    array('name'=>'U2F token','image'=>$this->getIconImage('u2f'),'value'=>'u2f')
+                    array('name'=>'Google','image'=>$this->getAddedImage('google.png'),'value'=>'gplus'),
+                    array('name'=>'Basic','image'=>$this->getAddedImage('basic.png'),'value'=>'basic'),
+                    array('name'=>'Duo','image'=>$this->getAddedImage('duo.png'),'value'=>'duo'),
+                    array('name'=>'U2F token','image'=>$this->getAddedImage('u2f.png'),'value'=>'u2f')
                 )), 'default', 0);
         }
         $this->loadLayout();
