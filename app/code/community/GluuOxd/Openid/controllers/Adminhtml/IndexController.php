@@ -71,6 +71,9 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         Mage::app()->getResponse()->setRedirect($redirect);
     }
 
+    public function getDataHelper(){
+        return Mage::helper($this->dataHelper);
+    }
     /**
      * saving configs in database
      */
