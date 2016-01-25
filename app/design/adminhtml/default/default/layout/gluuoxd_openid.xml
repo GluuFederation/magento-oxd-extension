@@ -1,16 +1,13 @@
 <?xml version="1.0" ?>
 <layout>
-
     <gluuoxd_openid_adminhtml_index_index>
         <reference name="content">
             <block type="GluuOxd_Openid/gluuOxOpenidConfig" name="test" template="GluuOxd_Openid/gluuOxOpenidConfig.phtml" />
         </reference>
     </gluuoxd_openid_adminhtml_index_index>
-
     <adminhtml_index_login>
         <reference name="form.additional.info">
             <block type="GluuOxd_Openid/gluuOxOpenidConfig"  name="test" template="GluuOxd_Openid/login.phtml" />
         </reference>
     </adminhtml_index_login>
-
 </layout>
