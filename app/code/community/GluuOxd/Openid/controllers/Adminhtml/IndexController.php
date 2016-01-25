@@ -314,6 +314,24 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
     }
 
     /**
+     * deleting custom scopes
+     */
+    public function deleteCustomScopesAction(){
+        $storeConfig = new Mage_Core_Model_Config();
+        $params = $this->getRequest()->getParams();
+        $datahelper = $this->getDataHelper();
+        $custom_scope = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_scops'));
+        $up_cust_sc =  array();
+        foreach($custom_scope as $custom_scop){
+            if($custom_scop !=$params['value_scope']){
+                array_push($up_cust_sc,$custom_scop);
+            }
+        }
+        $storeConfig ->saveConfig('gluu/oxd/oxd_openid_scops',serialize($up_cust_sc), 'default', 0);
+        $datahelper->displayMessage('Scope deleted Successful.',"SUCCESS");
+        $this->redirect("*/*/index");
+    }
+    /**
      * getting ID from session
      */
     private function getId(){
