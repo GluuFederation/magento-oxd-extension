@@ -17,8 +17,8 @@
         </reference>
     </customer_account_create>
     <!--
-        Layout for customer log out page
-    -->
+Layout for customer log out page
+-->
 
     <customer_account_logoutsuccess translate="label">
         <reference name="content">
