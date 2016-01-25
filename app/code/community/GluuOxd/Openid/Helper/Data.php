@@ -27,12 +27,7 @@ class GluuOxd_Openid_Helper_Data extends Mage_Core_Helper_Abstract
      * @return array or string
      */
     public function getConfig($config, $id) {
-        foreach(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' )) as $custom_script){
-            if ($config == $custom_script['value'].'Enable') {
-                return Mage::getStoreConfig ( 'GluuOxd/Openid/'.$custom_script['value'].'Enable' );
 
-            }
-        }
         switch ($config) {
             case 'loginTheme' :
                 $result = Mage::getStoreConfig ( 'GluuOxd/Openid/loginTheme' );
@@ -55,9 +50,12 @@ class GluuOxd_Openid_Helper_Data extends Mage_Core_Helper_Abstract
             case 'iconCustomColor' :
                 $result = Mage::getStoreConfig ( 'GluuOxd/Openid/iconCustomColor' );
                 break;
-            default :
-                return;
-                break;
+        }
+        foreach(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' )) as $custom_script){
+            if ($config == $custom_script['value'].'Enable') {
+                return  Mage::getStoreConfig ( 'GluuOxd/Openid/'.$custom_script['value'].'Enable' );
+
+            }
         }
         return $result;
     }
