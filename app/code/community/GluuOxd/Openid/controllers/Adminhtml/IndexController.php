@@ -18,6 +18,13 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
     }
 
     /**
+     * @return string
+     */
+    public function getDataHelper(){
+        return Mage::helper($this->dataHelper);
+    }
+
+    /**
      * @return gluuOxd admin index page
      */
     public function indexAction(){
@@ -71,9 +78,6 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         Mage::app()->getResponse()->setRedirect($redirect);
     }
 
-    public function getDataHelper(){
-        return Mage::helper($this->dataHelper);
-    }
     /**
      * saving configs in database
      */
@@ -83,7 +87,7 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         try {
             $model->setId($id)->save();
         } catch (Exception $e){
-            Mage::log($e->getMessage(), null, 'miniorage_openid_error.log', true);
+            Mage::log($e->getMessage(), null, 'gluuoxd_error.log', true);
         }
     }
 
@@ -113,9 +117,40 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
             return;
         }
         $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
-        $config_option['oxd_host_port'] = $oxd_port;
+        $config_option['oxd_host_port'] = $params['oxd_port'];
         $config_option['admin_email'] = $email;
         $storeConfig ->saveConfig('gluu/oxd/oxd_config',serialize($config_option), 'default', 0);
+        $jsonString = file_get_contents(Mage::getBaseDir('skin').'/adminhtml/default/default/GluuOxd_Openid/oxd-server/conf/oxd-conf.json');
+        $data = json_decode($jsonString, true);
+        $data['op_host'] = $params['gluu_server_host'];
+        $data['port'] = $params['oxd_port'];
+        $newJsonString = json_encode($data);
+        file_put_contents(Mage::getBaseDir('skin').'/adminhtml/default/default/GluuOxd_Openid/oxd-server/conf/oxd-conf.json', $newJsonString);
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            if(!exec('netstat -aon |find/i "listening" |find "'.$oxd_port.'"')){
+                $startDir = Mage::getBaseDir('skin').'/adminhtml/default/default/GluuOxd_Openid/oxd-server/bin';
+                chdir($startDir);
+                $fileName = 'oxd-start.bat';
+                exec($fileName);
+            }else{
+                $datahelper->displayMessage('Port is using, please use port which is not using.',"ERROR");
+                $this->redirect("*/*/index");
+                return;
+            }
+        } else {
+            if(!exec('netstat -tulpn | grep :'.$oxd_port)){
+                $startDir = Mage::getBaseDir('skin').'/adminhtml/default/default/GluuOxd_Openid/oxd-server/bin';
+                chdir($startDir);
+                $fileName = './oxd-start.sh';
+                exec($fileName);
+            }else{
+                $datahelper->displayMessage('Port is using, please use port which is not using.',"ERROR");
+                $this->redirect("*/*/index");
+                return;
+            }
+        }
+
+
         $registerSite = $this->getOxdRegisterSiteHelper();
         $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
         $registerSite->setRequestAcrValues($config_option['acr_values']);
@@ -141,6 +176,7 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
             $this->redirect("*/*/index");
             return;
         }
+
     }
 
     /**
