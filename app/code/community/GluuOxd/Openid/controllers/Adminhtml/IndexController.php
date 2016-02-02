@@ -7,7 +7,7 @@
 class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller_Action
 {
     private $dataHelper = "GluuOxd_Openid";
-    private $oxdRegisterSite = "GluuOxd_Openid/registerSite";
+    private $oxdRegisterSiteHelper = "GluuOxd_Openid/registerSite";
 
     /**
      * @return string
@@ -37,7 +37,7 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
                 "admin_email" => Mage::getSingleton('admin/session')->getUser()->getEmail(),
                 "authorization_redirect_uri" => Mage::helper('customer')->getLoginUrl().'?option=getOxdSocialLogin',
                 "logout_redirect_uri" => Mage::helper('customer')->getLogoutUrl(),
-                "scope" => ["openid","profile","email","address","mobile_phone","phone"],
+                "scope" => ["openid","profile","mobile","address","email","mobile_phone","phone"],
                 "application_type" => "web",
                 "redirect_uris" => [ Mage::helper('customer')->getLoginUrl().'?option=getOxdSocialLogin' ],
                 "acr_values" => [],
@@ -47,7 +47,7 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
             }
         }
         if(empty(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_scops' )))){
-            $storeConfig ->saveConfig('gluu/oxd/oxd_openid_scops',serialize(array("openid","profile","email","address","mobile_phone","phone")), 'default', 0);
+            $storeConfig ->saveConfig('gluu/oxd/oxd_openid_scops',serialize(array("openid","profile","mobile","address","email","mobile_phone","phone")), 'default', 0);
         }
         if(empty(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' )))){
             $storeConfig ->saveConfig('gluu/oxd/oxd_openid_custom_scripts',
@@ -57,6 +57,8 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
                     array('name'=>'Duo','image'=>$this->getAddedImage('duo.png'),'value'=>'duo'),
                     array('name'=>'U2F token','image'=>$this->getAddedImage('u2f.png'),'value'=>'u2f')
                 )), 'default', 0);
+
+            header("Refresh:0");
         }
         $this->loadLayout();
         $this->_addContent($this->getLayout()->createBlock('core/template'));
@@ -149,8 +151,6 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
                 return;
             }
         }
-
-
         $registerSite = $this->getOxdRegisterSiteHelper();
         $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
         $registerSite->setRequestAcrValues($config_option['acr_values']);
@@ -160,7 +160,6 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $registerSite->setRequestContacts([$config_option['admin_email']]);
         $registerSite->setRequestApplicationType('web');
         $status = $registerSite->request();
-
         if(!$status['status']){
             $datahelper->displayMessage($status['message'],"ERROR");
             $this->redirect("*/*/index");
@@ -176,7 +175,6 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
             $this->redirect("*/*/index");
             return;
         }
-
     }
 
     /**
@@ -209,7 +207,6 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
                         ));
                         $uploader->setAllowedExtensions(array('png'));
                         $uploader->setAllowRenameFiles(true);
-
                         $uploader->setFilesDispersion(false);
                         $path = Mage::getBaseDir('skin') . DS . 'adminhtml' . DS. 'default' . DS. 'default' . DS. 'GluuOxd_Openid' . DS. 'images' . DS. 'icons' . DS;
                         $img = $uploader->save($path, $_FILES['images']['name']);
@@ -293,8 +290,8 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         return $url.'adminhtml/default/default/GluuOxd_Openid/images/icons/'.$image;
     }
 
-    /**
-     * deleting custom scripts
+    /*
+    * deleting custom scripts
      */
     public function deleteCustomScriptAction(){
         $storeConfig = new Mage_Core_Model_Config();
@@ -308,13 +305,11 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
             }
         }
         $storeConfig ->saveConfig('gluu/oxd/oxd_openid_custom_scripts',serialize($up_cust_sc), 'default', 0);
-
         $datahelper->displayMessage('Custom scripts deleted Successful.',"SUCCESS");
         $this->redirect("*/*/index");
     }
-
-    /**
-     * deleting custom scopes
+    /*
+    * deleting custom scopes
      */
     public function deleteCustomScopesAction(){
         $storeConfig = new Mage_Core_Model_Config();
