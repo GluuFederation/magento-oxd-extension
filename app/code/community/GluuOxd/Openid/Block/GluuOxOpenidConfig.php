@@ -274,7 +274,6 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
                 }
             }
 
-
             $get_tokens_by_code = $this->getGetTokensByCode();
             $get_tokens_by_code->setRequestOxdId($oxd_id);
             $get_tokens_by_code->setRequestCode($_REQUEST['code']);
@@ -282,7 +281,6 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
             $get_tokens_by_code->setRequestScopes($config_option["scope"]);
             $get_tokens_by_code->request();
             $get_tokens_by_code_array = $get_tokens_by_code->getResponseObject()->data->id_token_claims;
-
             $_SESSION['user_oxd_id_token']  = $get_tokens_by_code->getResponseIdToken();
             $_SESSION['user_oxd_access_token']  = $get_tokens_by_code->getResponseAccessToken();
 
@@ -392,7 +390,6 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
                 $customer->setWebsiteId(Mage::app()->getWebsite()->getId());
                 $customer->loadByEmail($reg_email);
                 if($customer->getId()>1){
-
                     $customer->setFirstname($reg_first_name);
                     $customer->setLastname ($reg_last_name);
                     $customer->setMiddleName($reg_middle_name);
@@ -420,11 +417,9 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
                         $customer->addAddress($customerAddress);
                     }
                     $customerAddress->addData($dataShipping)->save();
-
                     $session = Mage::getSingleton("customer/session");
                     $session->loginById($customer->getId());
                     $session->setCustomerAsLoggedIn($customer);
-
                     header("Refresh:0");
                 }
                 else{
@@ -443,7 +438,6 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
                         ->setPassword($password);
                     try{
                         $customer->save();
-
                         $address = Mage::getModel("customer/address");
                         $address->setCustomerId($customer->getId())
                             ->setFirstname($customer->getFirstname())
@@ -459,12 +453,10 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
                             ->setIsDefaultBilling('1')
                             ->setIsDefaultShipping('1')
                             ->setSaveInAddressBook('1');
-
                         $address->save();
                         $session = Mage::getSingleton("customer/session");
                         $session->loginById($customer->getId());
                         $session->setCustomerAsLoggedIn($customer);
-
                         header("Refresh:0");
                     }
                     catch (Exception $e) {
@@ -477,13 +469,11 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
             }
         }
         if( isset( $_REQUEST['option'] ) and strpos( $_REQUEST['option'], 'userGluuLogin' ) !== false ) {
-
             $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
             $oxd_id = Mage::getStoreConfig ( 'gluu/oxd/oxd_id' );
             if($oxd_id){
                 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                     if(!exec('netstat -aon |find/i "listening" |find "'.$config_option['oxd_host_port'].'"')){
-
                         $startDir = Mage::getBaseDir('skin').'/adminhtml/default/default/GluuOxd_Openid/oxd-server/bin';
                         chdir($startDir);
                         $fileName = 'oxd-start.bat';
@@ -501,7 +491,6 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
                 }
             }
             $get_authorization_url = $this->getGetAuthorizationUrl();
-
             $get_authorization_url->setRequestOxdId($oxd_id);
             $get_authorization_url->setRequestAcrValues([$_REQUEST['app_name']]);
             $get_authorization_url->request();
@@ -511,7 +500,6 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
             }else{
                 echo '<p style="color: red">Sorry, but oxd server is not switched on!</p>';
             }
-
         }
     }
 
