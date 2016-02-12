@@ -1,6 +1,5 @@
 <_>
-   <form_key>AiQ6Bn6GYvGyVRSK</form_key>
-   <_create/>
+   <form_key>d1CQcnSV08SRgE3Z</form_key>
    <name>Gluu_SSO</name>
    <channel>community</channel>
    <version_ids>
@@ -41,7 +40,7 @@
             <max/>
          </max>
          <files>
-            <files>                                     </files>
+            <files>                                            </files>
          </files>
       </package>
       <extension>
@@ -59,16 +58,8 @@
    <contents>
       <target>
          <target>magelocal</target>
-         <target>magelocal</target>
+         <target>magecommunity</target>
          <target>mageetc</target>
-         <target>mageskin</target>
-         <target>mageskin</target>
-         <target>mageskin</target>
-         <target>mageskin</target>
-         <target>mageskin</target>
-         <target>mageskin</target>
-         <target>mageskin</target>
-         <target>mageskin</target>
          <target>mageskin</target>
          <target>mageskin</target>
          <target>mageskin</target>
@@ -95,7 +86,7 @@
       </target>
       <path>
          <path/>
-         <path>GluuOxd/OpenId</path>
+         <path>GluuOxd/Openid</path>
          <path>modules/GluuOxd_Openid.xml</path>
          <path>adminhtml/default/default/GluuOxd_Openid/css/font-awesome.min.css</path>
          <path>adminhtml/default/default/GluuOxd_Openid/css/gluu-oxd-css.css</path>
@@ -109,37 +100,21 @@
          <path>adminhtml/default/default/GluuOxd_Openid/images/plugin.png</path>
          <path>adminhtml/default/default/GluuOxd_Openid/images/icons/basic.png</path>
          <path>adminhtml/default/default/GluuOxd_Openid/images/icons/duo.png</path>
-         <path>adminhtml/default/default/GluuOxd_Openid/images/icons/U2F.png</path>
+         <path>adminhtml/default/default/GluuOxd_Openid/images/icons/u2f.png</path>
          <path>adminhtml/default/default/GluuOxd_Openid/images/icons/gl.png</path>
          <path>adminhtml/default/default/GluuOxd_Openid/images/icons/ox.png</path>
          <path>adminhtml/default/default/GluuOxd_Openid/images/icons/google.png</path>
-         <path>adminhtml/default/default/GluuOxd_Openid/oxd-server/bin/oxd-start.bat</path>
-         <path>adminhtml/default/default/GluuOxd_Openid/oxd-server/bin/oxd-start.sh</path>
-         <path>adminhtml/default/default/GluuOxd_Openid/oxd-server/bin/oxd-start-console.bat</path>
-         <path>adminhtml/default/default/GluuOxd_Openid/oxd-server/conf/oxd-conf.json</path>
-         <path>adminhtml/default/default/GluuOxd_Openid/oxd-server/conf/oxd-default-site-config.json</path>
-         <path>adminhtml/default/default/GluuOxd_Openid/oxd-server/lib/bcprov-jdk16-1.46.jar</path>
-         <path>adminhtml/default/default/GluuOxd_Openid/oxd-server/lib/oxd-server-jar-with-dependencies.jar</path>
-         <path>adminhtml/default/default/GluuOxd_Openid/oxd-server/lib/resteasy-jaxrs-2.3.4.Final.jar</path>
          <path>frontend/base/default/layout/GluuOxd_Openid_layout.xml</path>
          <path>frontend/base/default/template/gluuoxd_openid</path>
          <path>frontend/base/default/template/gluuoxd_openid/homepage.phtml</path>
          <path>frontend/base/default/template/gluuoxd_openid/logout.phtml</path>
          <path>adminhtml/default/default/template/gluuoxd_openid/gluuOxOpenidConfig.phtml</path>
          <path>adminhtml/default/default/template/gluuoxd_openid/login.phtml</path>
-         <path>adminhtml/default/default/layout/gluuoxd_openid.xml</path>
+         <path>adminhtml/default/default/layout/GluuOxd_Openid.xml</path>
       </path>
       <type>
          <type>file</type>
          <type>dir</type>
-         <type>file</type>
-         <type>file</type>
-         <type>file</type>
-         <type>file</type>
-         <type>file</type>
-         <type>file</type>
-         <type>file</type>
-         <type>file</type>
          <type>file</type>
          <type>file</type>
          <type>file</type>
@@ -192,24 +167,8 @@
          <include/>
          <include/>
          <include/>
-         <include/>
-         <include/>
-         <include/>
-         <include/>
-         <include/>
-         <include/>
-         <include/>
-         <include/>
       </include>
       <ignore>
-         <ignore/>
-         <ignore/>
-         <ignore/>
-         <ignore/>
-         <ignore/>
-         <ignore/>
-         <ignore/>
-         <ignore/>
          <ignore/>
          <ignore/>
          <ignore/>
