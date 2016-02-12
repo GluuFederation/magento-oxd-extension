@@ -18,16 +18,10 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
     }
 
     /**
-     * @return string
-     */
-    public function getDataHelper(){
-        return Mage::helper($this->dataHelper);
-    }
-
-    /**
      * @return gluuOxd admin index page
      */
     public function indexAction(){
+
         $storeConfig = new Mage_Core_Model_Config();
         if(empty(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' )))){
 
@@ -37,7 +31,9 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
                 "admin_email" => Mage::getSingleton('admin/session')->getUser()->getEmail(),
                 "authorization_redirect_uri" => Mage::helper('customer')->getLoginUrl().'?option=getOxdSocialLogin',
                 "logout_redirect_uri" => Mage::helper('customer')->getLogoutUrl(),
-                "scope" => ["openid","profile","mobile","address","email","mobile_phone","phone"],
+                "scope" => ["openid","profile","email"],
+                "grant_types" =>["authorization_code"],
+                "response_types" => ["code"],
                 "application_type" => "web",
                 "redirect_uris" => [ Mage::helper('customer')->getLoginUrl().'?option=getOxdSocialLogin' ],
                 "acr_values" => [],
@@ -47,7 +43,7 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
             }
         }
         if(empty(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_scops' )))){
-            $storeConfig ->saveConfig('gluu/oxd/oxd_openid_scops',serialize(array("openid","profile","mobile","address","email","mobile_phone","phone")), 'default', 0);
+            $storeConfig ->saveConfig('gluu/oxd/oxd_openid_scops',serialize(array("openid","profile","email")), 'default', 0);
         }
         if(empty(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' )))){
             $storeConfig ->saveConfig('gluu/oxd/oxd_openid_custom_scripts',
@@ -89,10 +85,12 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         try {
             $model->setId($id)->save();
         } catch (Exception $e){
-            Mage::log($e->getMessage(), null, 'gluuoxd_error.log', true);
+            Mage::log($e->getMessage(), null, 'gluuoxd_openid_error.log', true);
         }
     }
-
+    public function getDataHelper(){
+        return Mage::helper($this->dataHelper);
+    }
     /**
      * saving and registration data geting oxd_id
      */
@@ -121,36 +119,7 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
         $config_option['oxd_host_port'] = $params['oxd_port'];
         $config_option['admin_email'] = $email;
-        $storeConfig ->saveConfig('gluu/oxd/oxd_config',serialize($config_option), 'default', 0);
-        $jsonString = file_get_contents(Mage::getBaseDir('skin').'/adminhtml/default/default/GluuOxd_Openid/oxd-server/conf/oxd-conf.json');
-        $data = json_decode($jsonString, true);
-        $data['op_host'] = $params['gluu_server_host'];
-        $data['port'] = $params['oxd_port'];
-        $newJsonString = json_encode($data);
-        file_put_contents(Mage::getBaseDir('skin').'/adminhtml/default/default/GluuOxd_Openid/oxd-server/conf/oxd-conf.json', $newJsonString);
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            if(!exec('netstat -aon |find/i "listening" |find "'.$oxd_port.'"')){
-                $startDir = Mage::getBaseDir('skin').'/adminhtml/default/default/GluuOxd_Openid/oxd-server/bin';
-                chdir($startDir);
-                $fileName = 'oxd-start.bat';
-                exec($fileName);
-            }else{
-                $datahelper->displayMessage('Port is using, please use port which is not using.',"ERROR");
-                $this->redirect("*/*/index");
-                return;
-            }
-        } else {
-            if(!exec('netstat -tulpn | grep :'.$oxd_port)){
-                $startDir = Mage::getBaseDir('skin').'/adminhtml/default/default/GluuOxd_Openid/oxd-server/bin';
-                chdir($startDir);
-                $fileName = './oxd-start.sh';
-                exec($fileName);
-            }else{
-                $datahelper->displayMessage('Port is using, please use port which is not using.',"ERROR");
-                $this->redirect("*/*/index");
-                return;
-            }
-        }
+
         $registerSite = $this->getOxdRegisterSiteHelper();
         $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
         $registerSite->setRequestAcrValues($config_option['acr_values']);
@@ -159,6 +128,10 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $registerSite->setRequestLogoutRedirectUri($config_option['logout_redirect_uri']);
         $registerSite->setRequestContacts([$config_option['admin_email']]);
         $registerSite->setRequestApplicationType('web');
+        $registerSite->setRequestScope($config_option['scope']);
+        $registerSite->setRequestGrantTypes($config_option['grant_types']);
+        $registerSite->setRequestResponseTypes($config_option['response_types']);
+        $registerSite->setRequestClientLogoutUri($config_option['logout_redirect_uri']);
         $status = $registerSite->request();
         if(!$status['status']){
             $datahelper->displayMessage($status['message'],"ERROR");
@@ -282,9 +255,9 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $this->redirect("*/*/index");
     }
 
-    /**
-     * getting added image link
-     */
+    /*
+    * getting added image link
+    */
     public function getAddedImage($image){
         $url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN);
         return $url.'adminhtml/default/default/GluuOxd_Openid/images/icons/'.$image;
@@ -326,9 +299,9 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $datahelper->displayMessage('Scope deleted Successful.',"SUCCESS");
         $this->redirect("*/*/index");
     }
-    /**
+    /*
      * getting ID from session
-     */
+    */
     private function getId(){
         return $this->getSession()->getUser()->getUserId();
     }

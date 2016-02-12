@@ -8,12 +8,12 @@ require_once 'ClientOXDRP.php';
 class GluuOxd_Openid_Helper_GetAuthorizationUrl extends GluuOxd_Openid_Helper_ClientOXDRP
 {
     /**start parameter for request!**/
-        private $request_oxd_id = null;
-        private $request_acr_values = null;
+    private $request_oxd_id = null;
+    private $request_acr_values = null;
     /**end request parameter**/
 
     /**start parameter for response!**/
-        private $response_authorization_url;
+    private $response_authorization_url;
     /**end response parameter**/
 
     public function __construct()

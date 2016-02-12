@@ -125,7 +125,7 @@ class GluuOxd_Openid_Helper_GetTokensByCode extends GluuOxd_Openid_Helper_Client
     /**
      * @param null $request_state
      */
-    public function setRequestState($request_state)
+       public function setRequestState($request_state)
     {
         $this->request_state = $request_state;
     }

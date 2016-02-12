@@ -9,7 +9,7 @@
                         <sort_order>81</sort_order>
                         <children>
                             <configure_extension translate="title" module="GluuOxd_Openid">
-                                <title>Gluu and Social login</title>
+                                <title>Social Login and Sharing</title>
                                 <sort_order>1</sort_order>
                             </configure_extension>
                         </children>
