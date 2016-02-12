@@ -1,12 +1,12 @@
 <?php
-if(Mage::getSingleton('customer/session')->isLoggedIn()) {
-    $customer = Mage::getSingleton('customer/session')->getCustomer();
-    ?>
-    <script>
-        location.reload();
-    </script>
-    <?php
-}
+    if(Mage::getSingleton('customer/session')->isLoggedIn()) {
+        $customer = Mage::getSingleton('customer/session')->getCustomer();
+        ?>
+        <script>
+            location.reload();
+        </script>
+        <?php
+    }
 $this->gluuoxd_openid_login_validate();
 $oxd_id = Mage::getStoreConfig('gluu/oxd/oxd_id');
 
@@ -44,24 +44,24 @@ if($oxd_id){
     </div>
 
     <?php
-    $iconSpace = $this->getConfigForAdmin('iconSpace');
-    if(!$iconSpace) $iconSpace = '4';
-    $iconCustomSize = $this->getConfigForAdmin('iconCustomSize');
-    if(!$iconCustomSize) $iconCustomSize = '35';
-    $iconCustomWidth = $this->getConfigForAdmin('iconCustomWidth');
-    if(!$iconCustomWidth) $iconCustomWidth = '200';
-    $iconCustomHeight = $this->getConfigForAdmin('iconCustomHeight');
-    if(!$iconCustomHeight) $iconCustomHeight = '35';
-    $loginCustomTheme = $this->getConfigForAdmin('loginCustomTheme');
-    $loginTheme = $this->getConfigForAdmin('loginTheme');
-    $iconCustomColor = $this->getConfigForAdmin('iconCustomColor');
-    if(!$iconCustomColor) $iconCustomColor = '#0000FF';
+        $iconSpace = $this->getConfigForAdmin('iconSpace');
+        if(!$iconSpace) $iconSpace = '4';
+        $iconCustomSize = $this->getConfigForAdmin('iconCustomSize');
+        if(!$iconCustomSize) $iconCustomSize = '35';
+        $iconCustomWidth = $this->getConfigForAdmin('iconCustomWidth');
+        if(!$iconCustomWidth) $iconCustomWidth = '200';
+        $iconCustomHeight = $this->getConfigForAdmin('iconCustomHeight');
+        if(!$iconCustomHeight) $iconCustomHeight = '35';
+        $loginCustomTheme = $this->getConfigForAdmin('loginCustomTheme');
+        $loginTheme = $this->getConfigForAdmin('loginTheme');
+        $iconCustomColor = $this->getConfigForAdmin('iconCustomColor');
+        if(!$iconCustomColor) $iconCustomColor = '#0000FF';
 
-    $enableds = array();
-    $custom_scripts = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' ));
-    foreach($custom_scripts as $custom_script){
-        $enableds[] = array('enable'=>$this->getOpendIdConfig($custom_script['value'].'Enable'), 'value'=>$custom_script['value'], 'name'=>$custom_script['name'], 'image'=>$custom_script['image']);
-    }
+        $enableds = array();
+        $custom_scripts = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' ));
+        foreach($custom_scripts as $custom_script){
+            $enableds[] = array('enable'=>$this->getOpendIdConfig($custom_script['value'].'Enable'), 'value'=>$custom_script['value'], 'name'=>$custom_script['name'], 'image'=>$custom_script['image']);
+        }
     ?>
     <?php
     if(Mage::getSingleton('customer/session')->isLoggedIn()){
