@@ -1,5 +1,5 @@
 <_>
-   <form_key>d1CQcnSV08SRgE3Z</form_key>
+   <form_key>AJcoSEkhyQplJtmz</form_key>
    <name>Gluu_SSO</name>
    <channel>community</channel>
    <version_ids>
@@ -9,7 +9,7 @@
    <description>Gluu and Social login extension for magento</description>
    <license>GNU General Public License (GPL)</license>
    <license_uri>http://www.gnu.org/licenses/gpl-3.0.en.html</license_uri>
-   <version>1.9.1.1</version>
+   <version>1.9.2</version>
    <stability>stable</stability>
    <notes>Gluu and Social login extension with icon customization options</notes>
    <authors>
@@ -40,7 +40,7 @@
             <max/>
          </max>
          <files>
-            <files>                                            </files>
+            <files>                                                   </files>
          </files>
       </package>
       <extension>
