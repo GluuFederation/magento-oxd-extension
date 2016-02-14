@@ -15,17 +15,21 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
      */
     public function logout_validation()
     {
-        $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
-        $oxd_id = Mage::getStoreConfig ( 'gluu/oxd/oxd_id' );
-        $logout = $this->getLogout();
-        $logout->setRequestOxdId($oxd_id);
-        $logout->setRequestIdToken($_SESSION['user_oxd_id_token']);
-        $logout->setRequestPostLogoutRedirectUri($config_option['logout_redirect_uri']);
-        $logout->setRequestSessionState($_SESSION['session_state']);
-        $logout->setRequestState($_SESSION['state']);
-        $logout->request();
-        echo "<a href='".$logout->getResponseObject()->data->uri."'>Logout from all sites.</a>";
-        exit;
+
+        if($_SESSION['state']){
+            $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
+            $oxd_id = Mage::getStoreConfig ( 'gluu/oxd/oxd_id' );
+            $logout = $this->getLogout();
+            $logout->setRequestOxdId($oxd_id);
+            $logout->setRequestIdToken($_SESSION['user_oxd_id_token']);
+            $logout->setRequestPostLogoutRedirectUri($config_option['logout_redirect_uri']);
+            $logout->setRequestSessionState($_SESSION['session_state']);
+            $logout->setRequestState($_SESSION['state']);
+            $logout->request();
+            echo "<a href='".$logout->getResponseObject()->data->uri."'>Logout from all sites.</a>";
+
+        }
+
     }
 
     /**
@@ -362,6 +366,7 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
                     $customer->setMiddleName($reg_middle_name);
                     $customer->setGender($reg_gender);
                     $customer->setDob($reg_birthdate);
+
                     $customer->save();
                     $dataShipping = array(
                         'firstname'  => $reg_first_name,

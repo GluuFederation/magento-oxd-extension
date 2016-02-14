@@ -22,7 +22,9 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
      */
     public function indexAction(){
 
+
         $storeConfig = new Mage_Core_Model_Config();
+
         if(empty(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' )))){
 
             $config_option = array(
@@ -149,7 +151,27 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
             return;
         }
     }
+    public function resetConfigAction(){
+        $setup = new Mage_Core_Model_Config();
 
+        foreach(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' )) as $custom_script){
+            $setup ->deleteConfig('GluuOxd/Openid/'.$custom_script['value'].'Enable');
+        }
+        $setup->deleteConfig('gluu/oxd/oxd_id');
+        $setup->deleteConfig('gluu/oxd/oxd_openid_scops');
+        $setup->deleteConfig('gluu/oxd/oxd_config');
+        $setup->deleteConfig('gluu/oxd/oxd_openid_scops');
+        $setup->deleteConfig('gluu/oxd/oxd_openid_custom_scripts');
+
+        $setup->deleteConfig('GluuOxd/Openid/loginTheme');
+        $setup->deleteConfig('GluuOxd/Openid/loginCustomTheme');
+        $setup->deleteConfig('GluuOxd/Openid/iconSpace');
+        $setup->deleteConfig('GluuOxd/Openid/iconCustomSize');
+        $setup->deleteConfig('GluuOxd/Openid/iconCustomWidth');
+        $setup->deleteConfig('GluuOxd/Openid/iconCustomHeight');
+        $setup->deleteConfig('GluuOxd/Openid/iconCustomColor');
+        $this->redirect("*/*/index");
+    }
     /**
      * adding multiple custom scripts  and multiple scopes
      */

@@ -2,7 +2,7 @@
 <config>
     <modules>
         <GluuOxd_Openid>
-            <version>1.0.3</version>    <!-- Version number of your module -->
+            <version>1.9.3</version>
             <active>true</active>
             <codePool>community</codePool>
         </GluuOxd_Openid>
@@ -59,17 +59,22 @@
         </menu>
     </adminhtml>
     <global>
-        <!-- Definition of our blocks -->
         <blocks>
             <GluuOxd_Openid>
                 <class>GluuOxd_Openid_Block</class>
             </GluuOxd_Openid>
         </blocks>
-        <!-- Declaration for the helper class-->
         <helpers>
             <GluuOxd_Openid>
                 <class>GluuOxd_Openid_Helper</class>
             </GluuOxd_Openid>
         </helpers>
+        <resources>
+            <GluuOxd_Openid_setup>
+                <setup>
+                    <module>GluuOxd_Openid</module>
+                </setup>
+            </GluuOxd_Openid_setup>
+        </resources>
     </global>
 </config>

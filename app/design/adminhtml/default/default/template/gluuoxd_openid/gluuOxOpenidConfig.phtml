@@ -367,11 +367,25 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                 <?php } ?>
                 <!--Scopes and custom scripts tab-->
                 <div class="page" id="socialsharing">
-                    <?php if (!$oxd_id): ?>
+                    <?php if (!$oxd_id){ ?>
                         <div class="mess_red">
                             Please register your site in the gluu server.
                         </div>
-                    <?php endif; ?>
+                    <?php }else{ ?>
+                        <div class="mess_red">
+
+                            <form
+                                action="<?php echo $this->getadminurl('*/*/resetConfig') ?>"
+                                method="post">
+                                <input type="hidden" name="form_key"
+                                       value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
+                                <input type="hidden"
+                                       value="resetConfig"
+                                       name="resetConfig"/>
+                                <p>Reset extension configurations. <input style="width: 100px; background-color: red !important; cursor: pointer" type="submit" class="button button-primary " value="Reset" name="resetButton"/></p>
+                            </form>
+                        </div>
+                    <?php } ?>
                     <div>
                         <form action="<?php echo $this->getadminurl('*/*/scopeCustomScript') ?>" method="post"
                               enctype="multipart/form-data">
@@ -424,43 +438,43 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                                                 </tr>
                                             </table>
                                             <table class="form-list" style="text-align: center">
-                                                            <tr class="wrapper-tr" style="text-align: center">
-                                                                <th style="border: 1px solid #43ffdf; width: 70px;text-align: center"><h3>N</h3></th>
-                                                                <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>Name</h3></th>
-                                                                <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>Delete</h3></th>
-                                                            </tr>
-                                                            <?php
-                                                            $n = 0;
-                                                            foreach ($get_scopes as $scop) {
-                                                                $n++;
-                                                                ?>
-                                                                <tr class="wrapper-trr">
-                                                                    <td style="border: 1px solid #43ffdf; padding: 0px; width: 70px"><h3><?php echo $n; ?></h3></td>
-                                                                    <td style="border: 1px solid #43ffdf; padding: 0px; width: 200px"><h3><label for="<?php echo $scop; ?>"><?php echo $scop; ?></label></h3></td>
-                                                                    <td style="border: 1px solid #43ffdf; padding: 0px; width: 200px">
-                                                                        <?php if ($n == 1): ?>
-                                                                            <form></form>
-                                                                        <?php endif; ?>
-                                                                        <form
-                                                                            action="<?php echo $this->getadminurl('*/*/deleteCustomScopes') ?>"
-                                                                            method="post">
-                                                                            <input type="hidden" name="form_key"
-                                                                                   value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
-                                                                            <input type="hidden"
-                                                                                   value="<?php echo $scop; ?>"
-                                                                                   name="value_scope"/>
-                                                                            <input
-                                                                                style="width: 100px; background-color: red !important; cursor: pointer"
-                                                                                type="submit"
-                                                                                class="button button-primary " <?php if (!$oxd_id) echo 'disabled' ?>
-                                                                                value="Delete" name="delete_scop"/>
-                                                                        </form>
-                                                                    </td>
-                                                                </tr>
-                                                                <?php
-                                                            }
-                                                            ?>
-                                                        </table>
+                                                <tr class="wrapper-tr" style="text-align: center">
+                                                    <th style="border: 1px solid #43ffdf; width: 70px;text-align: center"><h3>N</h3></th>
+                                                    <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>Name</h3></th>
+                                                    <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>Delete</h3></th>
+                                                </tr>
+                                                <?php
+                                                $n = 0;
+                                                foreach ($get_scopes as $scop) {
+                                                    $n++;
+                                                    ?>
+                                                    <tr class="wrapper-trr">
+                                                        <td style="border: 1px solid #43ffdf; padding: 0px; width: 70px"><h3><?php echo $n; ?></h3></td>
+                                                        <td style="border: 1px solid #43ffdf; padding: 0px; width: 200px"><h3><label for="<?php echo $scop; ?>"><?php echo $scop; ?></label></h3></td>
+                                                        <td style="border: 1px solid #43ffdf; padding: 0px; width: 200px">
+                                                            <?php if ($n == 1): ?>
+                                                                <form></form>
+                                                            <?php endif; ?>
+                                                            <form
+                                                                action="<?php echo $this->getadminurl('*/*/deleteCustomScopes') ?>"
+                                                                method="post">
+                                                                <input type="hidden" name="form_key"
+                                                                       value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
+                                                                <input type="hidden"
+                                                                       value="<?php echo $scop; ?>"
+                                                                       name="value_scope"/>
+                                                                <input
+                                                                    style="width: 100px; background-color: red !important; cursor: pointer"
+                                                                    type="submit"
+                                                                    class="button button-primary " <?php if (!$oxd_id) echo 'disabled' ?>
+                                                                    value="Delete" name="delete_scop"/>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
@@ -568,11 +582,25 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                 </div>
                 <!--Gluu and social login config tab-->
                 <div class="page" id="sociallogin">
-                    <?php if (!$oxd_id): ?>
+                    <?php if (!$oxd_id){ ?>
                         <div class="mess_red">
                             Please register your site in the gluu server.
                         </div>
-                    <?php endif; ?>
+                    <?php }else{ ?>
+                        <div class="mess_red">
+
+                            <form
+                                action="<?php echo $this->getadminurl('*/*/resetConfig') ?>"
+                                method="post">
+                                <input type="hidden" name="form_key"
+                                       value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
+                                <input type="hidden"
+                                       value="resetConfig"
+                                       name="resetConfig"/>
+                                <p>Reset extension configurations. <input style="width: 100px; background-color: red !important; cursor: pointer" type="submit" class="button button-primary " value="Reset" name="resetButton"/></p>
+                            </form>
+                        </div>
+                    <?php } ?>
                     <form id="form-apps" name="form-apps" method="post"
                           action="<?php echo $this->getadminurl('*/*/saveSocialLoginConf') ?>">
                         <input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>

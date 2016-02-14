@@ -2,9 +2,7 @@
 <config>
     <modules>
         <GluuOxd_Openid>
-            <version>1.0.0</version>    <!-- Version number of your module -->
-            <active>true</active>
-            <codePool>community</codePool>
+            <version>1.9.3</version>
         </GluuOxd_Openid>
     </modules>
     <frontend>
@@ -36,7 +34,6 @@
             </GluuOxd_Openid>
         </routers>
     </admin>
-
     <adminhtml>
         <layout>
             <updates>
@@ -48,7 +45,7 @@
         <menu>
             <GluuOxdOpenid translate="title" module="GluuOxd_Openid">
                 <title>Gluu SSO</title>
-                <sort_order>82</sort_order>
+                <sort_order>81</sort_order>
                 <children>
                     <configure_extension translate="title" module="GluuOxd_Openid">
                         <title>Gluu and Social Login </title>
@@ -60,17 +57,22 @@
         </menu>
     </adminhtml>
     <global>
-        <!-- Definition of our blocks -->
         <blocks>
             <GluuOxd_Openid>
                 <class>GluuOxd_Openid_Block</class>
             </GluuOxd_Openid>
         </blocks>
-        <!-- Declaration for the helper class-->
         <helpers>
             <GluuOxd_Openid>
                 <class>GluuOxd_Openid_Helper</class>
             </GluuOxd_Openid>
         </helpers>
+        <resources>
+            <GluuOxd_Openid_setup>
+                <setup>
+                    <module>GluuOxd_Openid</module>
+                </setup>
+            </GluuOxd_Openid_setup>
+        </resources>
     </global>
 </config>

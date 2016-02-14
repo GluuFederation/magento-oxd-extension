@@ -18,6 +18,9 @@ if($oxd_id){
             cursor:pointer;
             display:inline;
         }
+        .customer-account-login .page-title{
+            margin-top: -100px !important;
+        }
     </style>
     <link  href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN).'adminhtml/default/default/GluuOxd_Openid/css/bootstrap-social.css'; ?>" rel="stylesheet">
     <link  href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN).'adminhtml/default/default/GluuOxd_Openid/css/font-awesome.min.css'; ?>" rel="stylesheet">
@@ -75,7 +78,8 @@ if($oxd_id){
             $paddingLong = ($iconCustomHeight-26)/2;
         if($loginCustomTheme=='custom') { ?>
 
-            <div><center>
+            <div>
+                <center>
                     <?php
                     foreach($enableds as $enabled){
                         if($enabled['enable']){
@@ -86,7 +90,7 @@ if($oxd_id){
                         <?php }
                     }
                     ?>
-            </div>
+                </center></div>
 
         <?php } else { ?>
             <div><center>
@@ -126,7 +130,7 @@ if($oxd_id){
                 ?>
             </div>
         <?php } else { ?>
-            <div >
+            <div style="margin-bottom: 60px; margin-top: 60px">
                 <?php
                 foreach($enableds as $enabled){
                     if($enabled['enable']){
@@ -138,6 +142,7 @@ if($oxd_id){
                 }
                 ?>
             </div>
+            <br/>
         <?php }
     } ?>
     <br>
