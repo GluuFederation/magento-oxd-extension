@@ -24,8 +24,8 @@ jQuery(document).ready(function() {
     var d = jQuery('.count_scripts').length + 1;
     jQuery('#adder').click(function() {
         var wrapperer = "<tr class='count_scopes wrapper-trr'>" +
-            "<td  class='value'><input style='width: 200px !important;' placeholder='Input name (example Google+)' type='text' name='name_in_site_"+j+"'></td>" +
-            "<td  class='value'><input style='width: 270px !important;' placeholder='Input name in gluu server (example gplus)' type='text' name='name_in_gluu_"+j+"'></td>" +
+            "<td  class='value'><input style='width: 200px !important;' placeholder='Display name (example Google+)' type='text' name='name_in_site_"+j+"'></td>" +
+            "<td  class='value'><input style='width: 270px !important;' placeholder='ACR Value (script name in the Gluu Server)' type='text' name='name_in_gluu_"+j+"'></td>" +
             "<td class='value'><input type='file' accept='image/png' name='images_"+j+"'></td>" +
             "<td class='label'><button class='removeer'>Remove</button></td>" +
             "</tr>";
