@@ -180,6 +180,7 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $storeConfig = new Mage_Core_Model_Config();
         $datahelper = $this->getDataHelper();
         $message = '';
+
         if(isset($params['count_scripts'])){
             $error_array = array();
             $error = true;
@@ -238,8 +239,12 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         if(!empty($params['scope']) && isset($params['scope'])){
             $oxd_config['scope'] = $params['scope'];
             $message.= 'Scopes updated Successful!<br/>';
-        }else{
+        }
+        else{
             $oxd_config['scope'] =  unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
+        }
+        foreach(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' )) as $custom_script){
+            $storeConfig ->saveConfig('GluuOxd/Openid/'.$custom_script['value'].'Enable',$params['gluuoxd_openid_'.$custom_script['value'].'_enable']);
         }
         $storeConfig ->saveConfig('gluu/oxd/oxd_config',serialize($oxd_config), 'default', 0);
         $datahelper->displayMessage($message,"SUCCESS");
@@ -269,9 +274,6 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $storeConfig ->saveConfig('GluuOxd/Openid/iconCustomWidth',$params['gluuox_login_icon_custom_width']);
         $storeConfig ->saveConfig('GluuOxd/Openid/iconCustomHeight',$params['gluuox_login_icon_custom_height']);
         $storeConfig ->saveConfig('GluuOxd/Openid/iconCustomColor',$params['gluuox_login_icon_custom_color']);
-        foreach(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' )) as $custom_script){
-            $storeConfig ->saveConfig('GluuOxd/Openid/'.$custom_script['value'].'Enable',$params['gluuoxd_openid_'.$custom_script['value'].'_enable']);
-        }
         $helper = $this->getDataHelper();
         $helper->displayMessage('Your configuration has been saved.',"SUCCESS");
         $this->redirect("*/*/index");

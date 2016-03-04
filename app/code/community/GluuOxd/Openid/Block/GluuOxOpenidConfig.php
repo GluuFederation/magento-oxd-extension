@@ -26,7 +26,9 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
             $logout->setRequestSessionState($_SESSION['session_state']);
             $logout->setRequestState($_SESSION['state']);
             $logout->request();
-            echo "<a href='".$logout->getResponseObject()->data->uri."'>Logout from all sites.</a>";
+            header("Location: ".$logout->getResponseObject()->data->uri);
+            exit;
+            //echo "<a href='".$logout->getResponseObject()->data->uri."'>Logout from all sites.</a>";
 
         }
 
