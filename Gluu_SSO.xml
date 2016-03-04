@@ -1,26 +1,26 @@
 <_>
-   <form_key>AJcoSEkhyQplJtmz</form_key>
+   <form_key>1Cqru0UPMPjJ44cP</form_key>
    <name>Gluu_SSO</name>
    <channel>community</channel>
    <version_ids>
       <version_ids>2</version_ids>
    </version_ids>
    <summary>Gluu and Social login extension for magento</summary>
-   <description>Gluu and Social login extension for magento</description>
-   <license>GNU General Public License (GPL)</license>
-   <license_uri>http://www.gnu.org/licenses/gpl-3.0.en.html</license_uri>
-   <version>1.9.2</version>
+   <description>Use OpenID Connect to login by leveraging the oxd client service demon.</description>
+   <license>Gluu inc.</license>
+   <license_uri>https://github.com/GluuFederation/gluu-sso-login-magento-extension/blob/master/LICENSE</license_uri>
+   <version>2.4.2</version>
    <stability>stable</stability>
-   <notes>Gluu and Social login extension with icon customization options</notes>
+   <notes>Use OpenID Connect to login by leveraging the oxd client service demon.</notes>
    <authors>
       <name>
-         <name>GluuOxd</name>
+         <name>GluuSSO</name>
       </name>
       <user>
          <user>admin</user>
       </user>
       <email>
-         <email>vlad@gluu.org</email>
+         <email>vlad.karapetyan.1988@mail.ru</email>
       </email>
    </authors>
    <depends_php_min>5.3.10</depends_php_min>
@@ -40,7 +40,7 @@
             <max/>
          </max>
          <files>
-            <files>                                                   </files>
+            <files>                                                           </files>
          </files>
       </package>
       <extension>
