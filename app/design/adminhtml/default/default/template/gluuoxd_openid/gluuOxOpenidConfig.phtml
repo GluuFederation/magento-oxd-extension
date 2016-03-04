@@ -272,11 +272,9 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
         <div class="mo2f_container">
         <div class="container">
             <ul class="navbar navbar-tabs">
-                <?php if (!$oxd_id) { ?>
-                    <li id="account_setup"><a data-method="#accountsetup">General</a></li>
-                <?php } ?>
-                <li id="social-sharing-setup"><a data-method="#socialsharing">Scopes and custom scripts</a></li>
-                <li id="social-login-setup"><a data-method="#sociallogin">Gluu and social login config</a></li>
+                <li id="account_setup"><a data-method="#accountsetup">General</a></li>
+                <li id="social-sharing-setup"><a data-method="#socialsharing">OpenID Connect Configuration</a></li>
+                <li id="social-login-setup"><a data-method="#sociallogin">Magento Configuration</a></li>
                 <li id="help_trouble"><a data-method="#helptrouble">Help & Troubleshooting</a></li>
             </ul>
             <div class="container-page">
@@ -313,31 +311,31 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                                 <input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
                                 <div class="login_GluuOxd">
                                     <div class="mess_red">
-                                        Please register your site in the gluu server.
+                                        Please enter the details of your OpenID Connect Provider.
                                     </div>
                                     <br/>
-                                    <div><h3>REGISTER YOUR SITE IN THE GLUU SERVER</h3></div>
+                                    <div><h3>Register your site with an OpenID Connect Provider</h3></div>
                                     <hr>
-                                    <div class="mess_red">If You have not installed gluu server (<a target="_blank" href="http://www.gluu.org/docs////admin-guide/deployment/ubuntu/">how
-                                            to install and run</a>) in Your web server, Please download, install and run
-                                        gluu server. For more information <a target="_blank" href="http://www.gluu.org/">click me</a>.
+                                    <div class="mess_red">If you do not have an OpenID Connect provider, you may want to look at the Gluu Server (
+                                        <a target="_blank" href="http://www.gluu.org/docs">Like Magento, there is a free open source Community Edition. For more information about Gluu Server support please visit <a target="_blank" href="http://www.gluu.org">our website.</a></a>)
                                     </div>
                                     <div class="mess_red">
-                                    <h3>Instructions to Install oxd server</h3>
-                                    <br><b>NOTE:</b> The oxd server needs to be installed on your DMZ Server
-                                    that has access to your Gluu server. It needs to be publicly accessible.
-                                    <ol style="list-style:decimal !important; margin: 30px">
-                                        <li>Download the oxd-server by clicking this '
-                                        <a href="http://ox.gluu.org/maven/org/xdi/oxd-server/3.0.7-SNAPSHOT/oxd-server-3.0.7-SNAPSHOT-distribution.zip">link</a>.</li>
-                                        <li>Extract and copy in your DMZ Server.</li>
-                                        <li>If You have not installed java in your server, please open command line install java in Your server</li>
-                                        <li>Edit the <b>oxd-conf.json</b> in the <b>conf</b> directory to specify port on which Gateway will run, and specify oh_host on which Gluu server will use.</li>
-                                        <li>Open command line and navigate to the extracted folder in the <b>bin</b> directory.</li>
-                                        <li>For Linux environment, run <b>sh oxd-start.sh &</b></li>
-                                        <li>For Windows environment, run <b>oxd-start.bat</b></li>
-                                        <li>After the server starts, set port number and your email in this page and click Next.</li>
-                                    </ol>
+                                        <h3>Instructions to Install oxd server</h3>
+                                        <br><b>NOTE:</b> The oxd server should be installed on the same server as your Magento site. It is recommended that the oxd server listen only on the localhost interface, so only your local applications can reach its API's.
+                                        <ol style="list-style:decimal !important; margin: 30px">
+                                            <li>Extract and copy in your DMZ Server.</li>
+                                            <li>Download the latest oxd-server package for Centos or Ubuntu. See
+                                                <a target="_blank" href="http://gluu.org/docs-oxd">oxd docs</a> for more info.
+                                            </li><li>If you are installing an .rpm or .deb, make sure you have Java in your server.
+                                            </li><li>Edit <b>oxd-conf.json</b> in the <b>conf</b> directory to specify the port on which
+                                                it will run, and specify the hostname of the OpenID Connect provider.</li>
+                                            <li>Open the command line and navigate to the extracted folder in the <b>bin</b> directory.</li>
+                                            <li>For Linux environment, run <b>sh oxd-start.sh &amp;</b></li>
+                                            <li>For Windows environment, run <b>oxd-start.bat</b></li>
+                                            <li>After the server starts, set the port number and your email in this page and click Next.</li>
+                                        </ol>
                                     </div>
+                                    <hr>
                                     <div>
                                         <table class="table">
                                             <tr>
@@ -364,59 +362,55 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                             </form>
                         </div>
                     </div>
-                <?php } ?>
+                <?php } else{?>
+                    <div class="page" id="accountsetup">
+                        <div style="border: 2px solid #53cc6b; margin-bottom: 20px; margin-top: 20px;">
+                            <div>
+                                <div class="about">
+                                    <h3 style="color: #45a8ff" class="sc"><img style=" height: 45px; margin-left: 20px;" src="<?php echo $this->getIconImage('ox'); ?>"/>&nbsp; server config</h3>
+                                </div>
+                            </div>
+                            <div class="entry-edit" style="width: 1000px !important; margin-left: 30px; ">
+                                <div class="entry-edit-head">
+                                    <h4 class="icon-head head-edit-form fieldset-legend">OXD id</h4>
+                                </div>
+                                <div class="fieldset">
+                                    <div class="hor-scroll">
+                                        <table class="form-list container">
+                                            <tr class="wrapper-trr">
+                                                <td class="value">
+                                                    <input <?php echo 'disabled' ?> type="text" name="oxd_id" value="<?php echo $oxd_id; ?>"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <form action="<?php echo $this->getadminurl('*/*/resetConfig') ?>" method="post">
+                            <input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
+                            <input type="hidden" value="resetConfig" name="resetConfig"/>
+                            <p><input style="width: 200px; background-color: red !important; cursor: pointer" type="submit" class="button button-primary " value="Reset configurations" name="resetButton"/></p>
+                        </form>
+                    </div>
+                <?php }?>
                 <!--Scopes and custom scripts tab-->
                 <div class="page" id="socialsharing">
                     <?php if (!$oxd_id){ ?>
                         <div class="mess_red">
-                            Please register your site in the gluu server.
-                        </div>
-                    <?php }else{ ?>
-                        <div class="mess_red">
-
-                            <form
-                                action="<?php echo $this->getadminurl('*/*/resetConfig') ?>"
-                                method="post">
-                                <input type="hidden" name="form_key"
-                                       value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
-                                <input type="hidden"
-                                       value="resetConfig"
-                                       name="resetConfig"/>
-                                <p>Reset extension configurations. <input style="width: 100px; background-color: red !important; cursor: pointer" type="submit" class="button button-primary " value="Reset" name="resetButton"/></p>
-                            </form>
-                        </div>
+                            Please enter OXD configuration to continue.
+                        </div><br/>
                     <?php } ?>
                     <div>
                         <form action="<?php echo $this->getadminurl('*/*/scopeCustomScript') ?>" method="post"
                               enctype="multipart/form-data">
                             <input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
-                            <div style="border: 2px solid #53cc6b; margin-bottom: 20px; margin-top: 20px;">
-                                <div>
-                                    <div class="about">
-                                        <h3 style="color: #45a8ff" class="sc"><img style="width: 45px; height: 45px; margin-left: 20px;" src="<?php echo $this->getIconImage('ox'); ?>"/>&nbsp; server config</h3>
-                                    </div>
-                                </div>
-                                <div class="entry-edit" style="width: 1000px !important; margin-left: 30px; ">
-                                    <div class="entry-edit-head">
-                                        <h4 class="icon-head head-edit-form fieldset-legend">Your site oxd id</h4>
-                                    </div>
-                                    <div class="fieldset">
-                                        <div class="hor-scroll">
-                                            <table class="form-list container">
-                                                <tr class="wrapper-trr">
-                                                    <td class="value">
-                                                        <input <?php echo 'disabled' ?> type="text" name="oxd_id" value="<?php echo $oxd_id; ?>"/>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+
                             <div style="border: 2px solid #53cc6b;">
                                 <div>
                                     <div class="about">
-                                        <h3 style="color: #00aa00" class="sc"><img style="width: 65px; height: 45px; margin-left: 30px;" src="<?php echo $this->getIconImage('gl'); ?>"/> &nbsp; server config
+                                        <br/>
+                                        <h3 style="color: #00aa00" class="sc"><img style="height: 45px; margin-left: 30px;" src="<?php echo $this->getIconImage('gl'); ?>"/> &nbsp; server config
                                         </h3>
                                     </div>
                                 </div>
@@ -430,7 +424,7 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                                                 <tr class="wrapper-trr">
                                                     <?php foreach ($get_scopes as $scop) : ?>
                                                         <td class="value">
-                                                            <input <?php if (!$oxd_id) echo 'disabled' ?> type="checkbox" name="scope[]" <?php if ($oxd_config && in_array($scop, $oxd_config['scope'])) {
+                                                            <input <?php if (!$oxd_id) echo 'disabled' ?> type="checkbox" <?php if ($scop == 'openid') echo 'disabled' ?> name="scope[]" <?php if ($oxd_config && in_array($scop, $oxd_config['scope'])) {
                                                                 echo "checked"; } ?> id="<?php echo $scop; ?>" value="<?php echo $scop; ?>"/>
                                                             <label for="<?php echo $scop; ?>"><?php echo $scop; ?></label>
                                                         </td>
@@ -463,11 +457,12 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                                                                 <input type="hidden"
                                                                        value="<?php echo $scop; ?>"
                                                                        name="value_scope"/>
-                                                                <input
-                                                                    style="width: 100px; background-color: red !important; cursor: pointer"
+                                                                 <?php if ($scop != 'openid'){ ?>
+                                                                     <input  style="width: 100px; background-color: red !important; cursor: pointer"
                                                                     type="submit"
                                                                     class="button button-primary " <?php if (!$oxd_id) echo 'disabled' ?>
                                                                     value="Delete" name="delete_scop"/>
+                                                                <?php } ?>
                                                             </form>
                                                         </td>
                                                     </tr>
@@ -480,10 +475,10 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                                 </div>
                                 <div class="entry-edit" style="width: 1000px !important; margin-left: 30px">
                                     <div class="entry-edit-head" style="background-color: #00aa00 !important;">
-                                        <h4 class="icon-head head-edit-form fieldset-legend">Add multiple Scope</h4>
+                                        <h4 class="icon-head head-edit-form fieldset-legend">Add scopes</h4>
                                     </div>
                                     <div class="fieldset">
-                                        <input type="button" class="button button-primary button-large add" style="width: 100px" value="Add Row"/>
+                                        <input type="button" class="button button-primary button-large add" style="width: 100px" value="Add scopes"/>
                                         <div class="hor-scroll">
                                             <table class="form-list0 container">
                                                 <tr class="wrapper-tr">
@@ -502,11 +497,61 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                                     </div>
                                     <div class="fieldset">
                                         <div class="hor-scroll">
+                                            <h3>Manage Authentication</h3>
+                                            <p>An OpenID Connect Provider (OP) like the Gluu Server may provide many different work flows for
+                                                authentication. For example, an OP may offer password authentication, token authentication, social
+                                                authentication, biometric authentication, and other different mechanisms. Offering a lot of different
+                                                types of authentication enables an OP to offer the most convenient, secure, and affordable option to
+                                                identify a person, depending on the need to mitigate risk, and the sensors and inputs available on the
+                                                device that the person is using.
+                                            </p>
+                                            <p>
+                                                The OP enables a client (like a Magento site), to signal which type of authentication should be
+                                                used. The client can register a
+                                                <a target="_blank" href="http://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata">default_acr_value</a>
+                                                or during the authentication process, a client may request a specific type of authentication using the
+                                                <a target="_blank" href="http://openid.net/specs/openid-connect-core-1_0.html#AuthRequest">acr_values</a> parameter.
+                                                This is the mechanism that the Gluu SSO Plugin uses: each login icon corresponds to a acr request value.
+                                                For example, and acr may tell the OpenID Connect to use Facebook, Google or even plain old password authentication.
+                                                The nice thing about this approach is that your applications (like Magento) don't have
+                                                to implement the business logic for social login--it's handled by the OpenID Connect Provider.
+                                            </p>
+                                            <p>
+                                                If you are using the Gluu Server as your OP, you'll notice that in the Manage Custom Scripts
+                                                tab of oxTrust (the Gluu Server admin interface), each authentication script has a name.
+                                                This name corresponds to the acr value.  The default acr for password authentication is set in
+                                                the
+                                                <a target="_blank" href="https://www.gluu.org/docs/admin-guide/configuration/#manage-authentication">LDAP Authentication</a>,
+                                                section--look for the "Name" field. Likewise, each custom script has a "Name", for example see the
+                                                <a target="_blank" href="https://www.gluu.org/docs/admin-guide/configuration/#manage-custom-scripts">Manage Custom Scripts</a> section.
+                                            </p>
+                                            <table style="width:100%;display: table;">
+                                                <tbody>
+                                                <tr>
+                                                    <?php
+                                                    foreach ($custom_scripts as $custom_script) {
+                                                        ?>
+                                                        <td style="width:25%">
+                                                            <input type="checkbox" <?php if (!$oxd_id) echo 'disabled'; ?>
+                                                                   id="<?php echo $custom_script['value']; ?>_enable"
+                                                                   class="app_enable"
+                                                                   name="gluuoxd_openid_<?php echo $custom_script['value']; ?>_enable"
+                                                                   value="1"
+                                                                   onchange="previewLoginIcons();" <?php if ($this->getConfig($custom_script['value'] . 'Enable')) echo "checked"; ?> /><b><?php echo $custom_script['name']; ?></b>
+                                                        </td>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                </tr>
+                                                <tr style="display: none;">
+                                                </tr>
+                                                </tbody>
+                                            </table>
                                             <table class="form-list" style="text-align: center">
                                                 <tr class="wrapper-tr" style="text-align: center">
                                                     <th style="border: 1px solid #43ffdf; width: 70px;text-align: center"><h3>N</h3></th>
-                                                    <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>Name</h3></th>
-                                                    <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>Name in gluu server</h3></th>
+                                                    <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>Display Name</h3></th>
+                                                    <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>ACR Value</h3></th>
                                                     <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>Image</h3></th>
                                                     <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>Delete</h3></th>
                                                 </tr>
@@ -550,19 +595,19 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                                         <h4 class="icon-head head-edit-form fieldset-legend">Add multiple custom scripts</h4>
                                         <br/>
                                         <hr/>
-                                        <p style="color:#cc0b07; font-style: italic; font-weight: bold;font-size: larger"> Necessary to fill the hole row</p>
+                                        <p style="color:#cc0b07; font-style: italic; font-weight: bold;font-size: larger"> Both fields are required</p>
                                     </div>
                                     <div class="fieldset">
                                         <div class="hor-scroll">
                                             <input type="hidden" name="count_scripts" value="1" id="count_scripts">
-                                            <input type="button" class="button button-primary button-large " style="width: 100px" id="adder" value="Add Row"/>
+                                            <input type="button" class="button button-primary button-large " style="width: 100px" id="adder" value="Add acr"/>
                                             <table class="form-list1 container">
                                                 <tr class="count_scripts wrapper-trr">
                                                     <td class="value">
-                                                        <input style='width: 200px !important;' type="text" placeholder="Input name (example Google+)" name="name_in_site_1"/>
+                                                        <input style='width: 200px !important;' type="text" placeholder="Display name (example Google+)" name="name_in_site_1"/>
                                                     </td>
                                                     <td class="value">
-                                                        <input style='width: 270px !important;' type="text" placeholder="Input name in gluu server (example gplus)" name="name_in_gluu_1"/>
+                                                        <input style='width: 270px !important;' type="text" placeholder="ACR Value (script name in the Gluu Server)" name="name_in_gluu_1"/>
                                                     </td>
                                                     <td class="value">
                                                         <input type="file" accept="image/png" name="images_1"/>
@@ -584,64 +629,26 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                 <div class="page" id="sociallogin">
                     <?php if (!$oxd_id){ ?>
                         <div class="mess_red">
-                            Please register your site in the gluu server.
-                        </div>
-                    <?php }else{ ?>
-                        <div class="mess_red">
-
-                            <form
-                                action="<?php echo $this->getadminurl('*/*/resetConfig') ?>"
-                                method="post">
-                                <input type="hidden" name="form_key"
-                                       value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
-                                <input type="hidden"
-                                       value="resetConfig"
-                                       name="resetConfig"/>
-                                <p>Reset extension configurations. <input style="width: 100px; background-color: red !important; cursor: pointer" type="submit" class="button button-primary " value="Reset" name="resetButton"/></p>
-                            </form>
-                        </div>
+                            Please enter OXD configuration to continue.
+                        </div><br/>
                     <?php } ?>
+
                     <form id="form-apps" name="form-apps" method="post"
                           action="<?php echo $this->getadminurl('*/*/saveSocialLoginConf') ?>">
                         <input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
+                        <div class="mo2f_table_layout">
+                            <input <?php if (!$oxd_id) echo 'disabled'; ?> type="submit" name="submit" value="Save" style="width:100px;margin-right:2%" class="button button-primary button-large">
+                        </div>
                         <div id="twofactor_list" class="mo2f_table_layout">
                             <h3>Gluu login config </h3>
                             <hr>
-                            <p style="font-size:14px">Select applications to enable login for your users. Customize your
-                                login icons using a range of shapes, themes and sizes. You can choose different places to
-                                display these icons and also customize redirect url after login.</p>
-                            <input <?php if (!$oxd_id) echo 'disabled'; ?> type="submit" name="submit" value="Save" style="width:100px;float:right;margin-right:2%" class="button button-primary button-large">
-                            <br>
-                            <h3>Select Apps</h3>
-                            <p>Select gluu applications to enable login</p>
-                            <table style="width:100%;display: table;">
-                                <tbody>
-                                <tr>
-                                    <?php
-                                    foreach ($custom_scripts as $custom_script) {
-                                        ?>
-                                        <td style="width:25%">
+                            <p style="font-size:14px">Customize your login icons using a range of shapes and sizes. You can choose different places to display these icons and also customize redirect url after login.</p>
+                            <br/>
 
-                                            <input type="checkbox" <?php if (!$oxd_id) echo 'disabled'; ?>
-                                                   id="<?php echo $custom_script['value']; ?>_enable"
-                                                   class="app_enable"
-                                                   name="gluuoxd_openid_<?php echo $custom_script['value']; ?>_enable"
-                                                   value="1"
-                                                   onchange="previewLoginIcons();" <?php if ($this->getConfig($custom_script['value'] . 'Enable')) echo "checked"; ?>><b><?php echo $custom_script['name']; ?></b>
-                                        </td>
-                                        <?php
-                                    }
-                                    ?>
-                                </tr>
-                                <tr style="display: none;">
-                                </tr>
-                                </tbody>
-                            </table>
-                            <br>
                             <hr>
                             <br>
                             <h3>Customize Login Icons</h3>
-                            <p>Customize shape, theme and size of social login icons</p>
+                            <p>Customize shape, theme and size of the login icons</p>
                             <table style="width:100%;display: table;">
                                 <tbody>
                                 <tr>
