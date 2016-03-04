@@ -12,6 +12,8 @@ $loginCustomTheme = Mage::getStoreConfig ( 'GluuOxd/Openid/loginCustomTheme' );
 $loginTheme = Mage::getStoreConfig ( 'GluuOxd/Openid/loginTheme' );
 $iconCustomColor = Mage::getStoreConfig ( 'GluuOxd/Openid/iconCustomColor' );
 
+if (!$loginTheme) $loginTheme = 'oval';
+if (!$loginCustomTheme) $loginCustomTheme = 'default';
 if (!$iconSpace) $iconSpace = '10';
 if (!$iconCustomSize) $iconCustomSize = '50';
 if (!$iconCustomWidth) $iconCustomWidth = '200';
@@ -87,7 +89,7 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
             <?php } else{ ?>
             jQuery('#social-login-setup > a').click();
             <?php }
-                    } ?>
+            } ?>
         });
         function setLoginTheme() {
             return jQuery('input[name=gluuoxd_openid_login_theme]:checked', '#form-apps').val();
@@ -222,12 +224,13 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                 jQuery("#gluuox_login_button_preview_<?php echo $custom_script['value'];?>").hide();
                 jQuery("#gluuOx_custom_login_button_preview_<?php echo $custom_script['value'];?>").hide();
             }
+            <?php endforeach;?>
             if (flag) {
                 jQuery("#no_apps_text").hide();
             } else {
                 jQuery("#no_apps_text").show();
             }
-            <?php endforeach;?>
+
 
 
         }
@@ -268,7 +271,7 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
     </script>
 </head>
     <body>
-        <div class="heading"><h3>GLUU AND SOCIAL LOGIN</h3></div>
+        <div class="heading"><h3>GLUU SSO</h3></div>
         <div class="mo2f_container">
         <div class="container">
             <ul class="navbar navbar-tabs">
@@ -405,7 +408,6 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                         <form action="<?php echo $this->getadminurl('*/*/scopeCustomScript') ?>" method="post"
                               enctype="multipart/form-data">
                             <input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
-
                             <div style="border: 2px solid #53cc6b;">
                                 <div>
                                     <div class="about">
@@ -424,9 +426,14 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                                                 <tr class="wrapper-trr">
                                                     <?php foreach ($get_scopes as $scop) : ?>
                                                         <td class="value">
-                                                            <input <?php if (!$oxd_id) echo 'disabled' ?> type="checkbox" <?php if ($scop == 'openid') echo 'disabled' ?> name="scope[]" <?php if ($oxd_config && in_array($scop, $oxd_config['scope'])) {
-                                                                echo "checked"; } ?> id="<?php echo $scop; ?>" value="<?php echo $scop; ?>"/>
+                                                            <?php if ($scop == 'openid'){?>
+                                                                <input <?php if (!$oxd_id) echo ' disabled ' ?> type="hidden"  name="scope[]"  <?php if ($oxd_config && in_array($scop, $oxd_config['scope'])) {
+                                                                    echo " checked "; } ?> value="<?php echo $scop; ?>" />
+                                                            <?php } ?>
+                                                            <input <?php if (!$oxd_id) echo ' disabled ' ?> type="checkbox"  name="scope[]"  <?php if ($oxd_config && in_array($scop, $oxd_config['scope'])) {
+                                                                echo " checked "; } ?> id="<?php echo $scop; ?>" value="<?php echo $scop; ?>" <?php if ($scop == 'openid') echo ' disabled '; ?> />
                                                             <label for="<?php echo $scop; ?>"><?php echo $scop; ?></label>
+
                                                         </td>
                                                     <?php endforeach; ?>
                                                 </tr>
@@ -673,7 +680,7 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                                        checked>Default
                             </span>
                             <span style="margin-left:111px;">
-                                    <input style="width:50px" <?php if (!$oxd_id) echo 'disabled'; ?>
+                                    <input style="width:50px" <?php if (!$oxd_id) echo ' disabled '; ?>
                                            onkeyup="gluuOxLoginSpaceValidate(this)" id="gluuox_login_icon_space"
                                            name="gluuox_login_icon_space" type="text" value="<?php echo $iconSpace; ?>">
                                     <input
