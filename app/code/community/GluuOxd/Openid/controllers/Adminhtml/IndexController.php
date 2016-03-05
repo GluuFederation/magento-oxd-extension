@@ -180,7 +180,9 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $storeConfig = new Mage_Core_Model_Config();
         $datahelper = $this->getDataHelper();
         $message = '';
-
+        foreach(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' )) as $custom_script){
+            $storeConfig ->saveConfig('GluuOxd/Openid/'.$custom_script['value'].'Enable',$params['gluuoxd_openid_'.$custom_script['value'].'_enable']);
+        }
         if(isset($params['count_scripts'])){
             $error_array = array();
             $error = true;
