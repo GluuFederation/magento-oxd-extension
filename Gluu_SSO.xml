@@ -1,5 +1,5 @@
 <_>
-   <form_key>1Cqru0UPMPjJ44cP</form_key>
+   <form_key>THzrkGjjE45Z2SMK</form_key>
    <name>Gluu_SSO</name>
    <channel>community</channel>
    <version_ids>
@@ -40,7 +40,7 @@
             <max/>
          </max>
          <files>
-            <files>                                                           </files>
+            <files>                                                            </files>
          </files>
       </package>
       <extension>
