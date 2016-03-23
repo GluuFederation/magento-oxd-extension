@@ -1,0 +1,21 @@
+<!--Declaring the admin ACL roles-->
+<adminhtml>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <gluuOxd translate="title" module="GluuOxd_Openid">
+                        <title>GluuOxd</title>
+                        <sort_order>81</sort_order>
+                        <children>
+                            <configure_extension translate="title" module="GluuOxd_Openid">
+                                <title>Social Login and Sharing</title>
+                                <sort_order>1</sort_order>
+                            </configure_extension>
+                        </children>
+                    </gluuOxd>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</adminhtml>
