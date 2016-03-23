@@ -78,7 +78,7 @@ For example if you are using gluu-server-2.4.2 it is necessary to use oXD-server
 
 ## Step 7. General
 
-![General](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/1.png)  
+![General](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/m1.png)  
 
 1. Admin Email: please add your or admin email address for registrating site in Gluu server.
 2. Port number: choose that port which is using oxd-server (see in oxd-server/conf/oxd-conf.json file).
@@ -86,7 +86,7 @@ For example if you are using gluu-server-2.4.2 it is necessary to use oXD-server
 
 If You are successfully registered in gluu server, you will see bottom page.
 
-![Oxd_id](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/2.png)
+![Oxd_id](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/m2.png)
 
 For making sure go to your gluu server / OpenID Connect / Clients and search  Your oxd id
 
@@ -102,14 +102,14 @@ Scopes are need for getting loged in users information from gluu server.
 Pay attention to that, which scopes you are using that are switched on in your gluu server.
 
 In Magento-gluu-sso 2.4.2.0  you can only enable, disable and delete scope.
-![Scopes1](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/3.png) 
+![Scopes1](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/m3.png) 
 
 In Magento-gluu-sso 2.4.3.0 you can not only enable, disable and delete scope, but also add new scope, but when you add new scope by {any name}, necessary to add that scop in your gluu server too. 
-![Scopes2](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/4.png) 
+![Scopes2](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/m4.png) 
 
 ### Custom scripts.
 
-![Customscripts](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/5.png)  
+![Customscripts](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/m5.png)  
 
 You can look all custom scripts in your gluu server / Configuration / Manage Custom Scripts / and enable login type, which type you want.
 Custom Script represent itself the type of login, at this moment gluu server supports (U2F, Duo, Google +, Basic) types.
@@ -127,10 +127,10 @@ Custom Script represent itself the type of login, at this moment gluu server sup
 Pay attention to that, if custom scripts are not enabled, nothing will be showed.
 Customize shape, space between icons and size of the login icons.
 
-![WordpressConfiguration](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/6.png)  
+![WordpressConfiguration](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/m6.png)  
 
 ## Step 10. Show icons in frontend
 
 Go to https://{site-base-url}/index.php/customer/account/login/
 
-![frontend](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/7.png) 
+![frontend](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/m7.png) 
