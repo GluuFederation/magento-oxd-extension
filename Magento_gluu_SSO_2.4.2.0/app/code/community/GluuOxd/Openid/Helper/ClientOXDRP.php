@@ -13,6 +13,7 @@ abstract class GluuOxd_Openid_Helper_ClientOXDRP extends Mage_Core_Helper_Abstra
     protected $response_data = array();
     protected static $socket = null;
     protected $oxd_config;
+    protected $oxd_host_port;
 
 
     /**
@@ -25,11 +26,34 @@ abstract class GluuOxd_Openid_Helper_ClientOXDRP extends Mage_Core_Helper_Abstra
         $this->setCommand();
 
     }
+
+    /**
+     * @return mixed
+     */
+    public function getOxdHostPort()
+    {
+        return $this->oxd_host_port;
+    }
+
+    /**
+     * @param mixed $oxd_host_port
+     */
+    public function setOxdHostPort($oxd_host_port)
+    {
+        $this->oxd_host_port = $oxd_host_port;
+    }
+
     /**
      * request to oxd socket
      **/
     public function oxd_socket_request($data, $char_count = 8192){
-        self::$socket = stream_socket_client( $this->oxd_config['oxd_host_ip'] . ':' . $this->oxd_config['oxd_host_port'], $errno, $errstr, STREAM_CLIENT_PERSISTENT);
+        $oxd_host_port = '';
+        if($this->getOxdHostPort()){
+            $oxd_host_port = $this->getOxdHostPort();
+        }else{
+            $oxd_host_port = $this->oxd_config['oxd_host_port'];
+        }
+        self::$socket = stream_socket_client( $this->oxd_config['oxd_host_ip'] . ':' . $oxd_host_port, $errno, $errstr, STREAM_CLIENT_PERSISTENT);
         if (!self::$socket) {
             return 'Can not connect to oxd server';
         }else{

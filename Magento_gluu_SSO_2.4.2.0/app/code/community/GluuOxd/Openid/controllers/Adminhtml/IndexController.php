@@ -33,7 +33,7 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
                 "admin_email" => Mage::getSingleton('admin/session')->getUser()->getEmail(),
                 "authorization_redirect_uri" => Mage::helper('customer')->getLoginUrl().'?option=getOxdSocialLogin',
                 "logout_redirect_uri" => Mage::helper('customer')->getLogoutUrl(),
-                "scope" => ["openid","profile","email"],
+                "scope" => ["openid", "profile","email","address", "clientinfo", "mobile_phone", "phone"],
                 "grant_types" =>["authorization_code"],
                 "response_types" => ["code"],
                 "application_type" => "web",
@@ -45,7 +45,7 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
             }
         }
         if(empty(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_scops' )))){
-            $storeConfig ->saveConfig('gluu/oxd/oxd_openid_scops',serialize(array("openid","profile","email")), 'default', 0);
+            $storeConfig ->saveConfig('gluu/oxd/oxd_openid_scops',serialize(array("openid", "profile","email","address", "clientinfo", "mobile_phone", "phone")), 'default', 0);
         }
         if(empty(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' )))){
             $storeConfig ->saveConfig('gluu/oxd/oxd_openid_custom_scripts',
@@ -120,10 +120,13 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         }
         $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
         $config_option['oxd_host_port'] = $params['oxd_port'];
+
         $config_option['admin_email'] = $email;
+        $storeConfig ->saveConfig('gluu/oxd/oxd_config',serialize($config_option), 'default', 0);
+        $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
 
         $registerSite = $this->getOxdRegisterSiteHelper();
-        $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
+        $registerSite->setOxdHostPort($params['oxd_port']);
         $registerSite->setRequestAcrValues($config_option['acr_values']);
         $registerSite->setRequestAuthorizationRedirectUri($config_option['authorization_redirect_uri']);
         $registerSite->setRequestRedirectUris($config_option['redirect_uris']);
@@ -210,7 +213,6 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
                         $img = $uploader->save($path, $_FILES['images']['name']);
                         if($img['file']){
                             array_push($custom_scripts, array('name'=>$params['name_in_site_'.$i],'image'=>$this->getAddedImage($img['file']),'value'=>$params['name_in_gluu_'.$i]));
-
                             $message.= 'New custom scripts name = '.$params['name_in_site_'.$i].' and name in gluu = '.$params['name_in_gluu_'.$i].' added Successful!<br/>';
                         }else{
                             $datahelper->displayMessage('Name = '.$params['name_in_site_'.$i]. ' or value = '. $params['name_in_gluu_'.$i]. ' is exist.',"ERROR");
