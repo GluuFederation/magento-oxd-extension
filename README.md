@@ -1,6 +1,6 @@
 Magento Extension OpenID Connect SSO By Gluu  
 =========================
-![image](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/plugin.png)
+![image](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/plugin.jpg)
 
 OpenID Connect SSO By Gluu extension gives access for login to your Magento site, with the help of GLUU server.
 
