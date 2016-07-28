@@ -1,7 +1,7 @@
 <_>
-   <form_key>5lgVHJYBEvB0BmLU</form_key>
+   <form_key>XEfXiaeYSRjihi1A</form_key>
    <name>Magento_gluu_SSO</name>
-   <channel>Magento_gluu_SSO</channel>
+   <channel>community</channel>
    <version_ids>
       <version_ids>2</version_ids>
    </version_ids>
@@ -40,7 +40,7 @@
             <max/>
          </max>
          <files>
-            <files>         </files>
+            <files>                                                                                </files>
          </files>
       </package>
       <extension>
@@ -72,10 +72,10 @@
          <target>mageskin</target>
          <target>mageskin</target>
          <target>mageskin</target>
-         <target>magelocal</target>
-         <target>magelocal</target>
-         <target>magelocal</target>
-         <target>magelocal</target>
+         <target>mageskin</target>
+         <target>mageskin</target>
+         <target>mageskin</target>
+         <target>mageskin</target>
          <target>magedesign</target>
          <target>magedesign</target>
          <target>magedesign</target>
@@ -83,7 +83,7 @@
          <target>magedesign</target>
          <target>magedesign</target>
          <target>magedesign</target>
-         <target>magelocal</target>
+         <target>mageskin</target>
       </target>
       <path>
          <path/>
