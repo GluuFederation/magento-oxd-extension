@@ -2,10 +2,7 @@ Magento Extension OpenID Connect SSO By Gluu
 =========================
 ![image](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/plugin.jpg)
 
-OpenID Connect SSO By Gluu extension gives access for login to your Magento site, with the help of GLUU server.
-
-There are already 2 versions of OpenID Connect SSO By Gluu (2.4.2.0 and 2.4.3.0) extensions, each in its turn is working with oXD and GLUU servers.
-For example if you are using OpenID Connect SSO By Gluu-2.4.2.0 extension, you need to connect with oXD-server-2.4.2.
+OpenID Connect SSO By Gluu extension gives access for login to your Magento site, with the help of Gluu server.
 
 Now I want to explain in details how to use extension step by step. 
 
@@ -13,45 +10,30 @@ Extension will not be working if your host does not have https://.
 
 ## Step 1. Install Gluu-server 
 
-(version 2.4.2 or 2.4.3)
-
 If you want to use external gluu server, You can not do this step.   
 
 [Gluu-server installation gide](https://www.gluu.org/docs/deployment/).
 
-## Step 2. Download oXD-server 
+## Step 2. Download oxd-server 
 
-(version 2.4.2 or 2.4.3)
+[Download oxd-server-2.4.4.Final](https://ox.gluu.org/maven/org/xdi/oxd-server/2.4.4.Final/oxd-server-2.4.4.Final-distribution.zip).
 
-[Download oXD-server-2.4.2.Final](https://ox.gluu.org/maven/org/xdi/oxd-server/2.4.2.Final/oxd-server-2.4.2.Final-distribution.zip).
-
-or
-
-[Download oXD-server-2.4.3.DEMO](https://ox.gluu.org/maven/org/xdi/oxd-server/2.4.3-SNAPSHOT/oxd-server-2.4.3-SNAPSHOT-distribution.zip).
-
-## Step 3. Unzip and run oXD-server
+## Step 3. Unzip and run oxd-server
  
-1. Unzip your oXD-server. 
+1. Unzip your oxd-server. 
 2. Open the command line and navigate to the extracted folder in the conf directory.
 3. Open oxd-conf.json file.  
 4. If your server is using 8099 port, please change "port" number to free port, which is not used.
-5. Set parameter "op_host":"Your gluu-server-url (internal or external)"
-6. Open the command line and navigate to the extracted folder in the bin directory.
-7. For Linux environment, run sh oxd-start.sh&. 
-8. For Windows environment, run oxd-start.bat.
-9. After the server starts, go to Step 4.
+5. Open the command line and navigate to the extracted folder in the bin directory.
+6. For Linux environment, run sh oxd-start.sh&. 
+7. For Windows environment, run oxd-start.bat.
+8. After the server starts, go to Step 4.
 
 ## Step 4. Download extension OpenID Connect SSO By Gluu
  
-(version 2.4.2 or 2.4.3)
+[Download OpenID Connect SSO Extension By Gluu 2.4.4](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/Magento_gluu_SSO_2.4.4/Magento_gluu_SSO-2.4.4.tgz).
 
-[Download Magento-gluu-sso-2.4.2.0 extension](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/Magento_gluu_SSO_2.4.2.0/Magento_gluu_SSO-2.4.2.0.tgz).
-
-or
-
-[Download Magento-gluu-sso-2.4.3.0 extension](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/Magento_gluu_SSO_2.4.3.0/Magento_gluu_SSO-2.4.3.0.tgz).
-
-For example if you are using gluu-server-2.4.2 it is necessary to use oXD-server-2.4.2 and Magento-gluu-sso-2.4.2.0-extension
+For example if you are using gluu-server-2.4.4 it is necessary to use oxd-server-2.4.4 and OpenID Connect SSO Extension By Gluu 2.4.4
 
 ## Step 5. Disable cache
  
@@ -73,20 +55,21 @@ For example if you are using gluu-server-2.4.2 it is necessary to use oXD-server
 
 ###Extension will be automatically activated.
 
-3. Open menu tab Gluu SSO/Gluu and Social Login
-![GluuSSO](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/mag4.png) 
+3. Open menu tab OpenID Connect SSO By Gluu / Open extension page
+![GluuSSO](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.mag4.png) 
 
 ## Step 7. General
 
-![General](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/m1.png)  
+![General](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m1.png)  
 
 1. Admin Email: please add your or admin email address for registrating site in Gluu server.
-2. Port number: choose that port which is using oxd-server (see in oxd-server/conf/oxd-conf.json file).
-3. Click next to continue.
+2. Gluu Server URL: please insert your Gluu server URL.
+3. Port number: choose that port which is using oxd-server (see in oxd-server/conf/oxd-conf.json file).
+4. Click next to continue.
 
 If You are successfully registered in gluu server, you will see bottom page.
 
-![Oxd_id](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/m2.png)
+![Oxd_id](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m2.png)
 
 For making sure go to your gluu server / OpenID Connect / Clients and search  Your oxd id
 
@@ -94,25 +77,20 @@ If you want to reset configurations click on Reset configurations button.
 
 ## Step 8. OpenID Connect Configuration
 
-OpenID Connect Configuration page for Magento-gluu-sso 2.4.2.0 and Magento-gluu-sso 2.4.3.0 are different.
-
 ### Scopes.
 You can look all scopes in your gluu server / OpenID Connect / Scopes and understand the meaning of  every scope.
 Scopes are need for getting loged in users information from gluu server.
 Pay attention to that, which scopes you are using that are switched on in your gluu server.
 
-In Magento-gluu-sso 2.4.2.0  you can only enable, disable and delete scope.
-![Scopes1](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/m3.png) 
-
-In Magento-gluu-sso 2.4.3.0 you can not only enable, disable and delete scope, but also add new scope, but when you add new scope by {any name}, necessary to add that scop in your gluu server too. 
-![Scopes2](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/m4.png) 
+You add, enable, disable and delete scope, but also add new scope, but when you add new scope by {any name}, necessary to add that scop in your gluu server too. 
+![Scopes2](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m4.png) 
 
 ### Custom scripts.
 
-![Customscripts](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/m5.png)  
+![Customscripts](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m5.png)  
 
 You can look all custom scripts in your gluu server / Configuration / Manage Custom Scripts / and enable login type, which type you want.
-Custom Script represent itself the type of login, at this moment gluu server supports (U2F, Duo, Google +, Basic) types.
+Custom Script represent itself the type of login, at this moment gluu server supports (U2F, Duo, Google +, Basic, OxPush) types.
 
 ### Pay attention to that.
 
@@ -127,10 +105,10 @@ Custom Script represent itself the type of login, at this moment gluu server sup
 Pay attention to that, if custom scripts are not enabled, nothing will be showed.
 Customize shape, space between icons and size of the login icons.
 
-![WordpressConfiguration](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/m6.png)  
+![WordpressConfiguration](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m6.png)  
 
 ## Step 10. Show icons in frontend
 
 Go to https://{site-base-url}/index.php/customer/account/login/
 
-![frontend](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/m7.png) 
+![frontend](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m7.png) 
