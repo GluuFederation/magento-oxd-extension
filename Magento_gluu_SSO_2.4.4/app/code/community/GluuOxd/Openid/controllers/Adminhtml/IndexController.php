@@ -35,6 +35,7 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         if(empty(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' )))){
 
             $config_option = array(
+                "op_host" => '',
                 "oxd_host_ip" => '127.0.0.1',
                 "oxd_host_port" =>8099,
                 "admin_email" => Mage::getSingleton('admin/session')->getUser()->getEmail(),
@@ -60,7 +61,8 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
                     array('name'=>'Google','image'=>$this->getAddedImage('google.png'),'value'=>'gplus'),
                     array('name'=>'Basic','image'=>$this->getAddedImage('basic.png'),'value'=>'basic'),
                     array('name'=>'Duo','image'=>$this->getAddedImage('duo.png'),'value'=>'duo'),
-                    array('name'=>'U2F token','image'=>$this->getAddedImage('u2f.png'),'value'=>'u2f')
+                    array('name'=>'U2F token','image'=>$this->getAddedImage('u2f.png'),'value'=>'u2f'),
+                    array('name'=>'OxPush','image'=>$this->getAddedImage('oxpush2.png'),'value'=>'oxpush2')
                 )), 'default', 0);
 
             header("Refresh:0");
@@ -108,10 +110,16 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $params = $this->getRequest()->getParams();
         $datahelper = $this->getDataHelper();
         $email = $params['loginemail'];
+        $gluu_server_url = $params['gluu_server_url'];
         $oxd_port = $params['oxd_port'];
         $illegal = "#$%^*()+=[]';,/{}|:<>?~";
         $illegal = $illegal . '"';
         if( $this->empty_or_null( $email )  ||  $this->empty_or_null( $oxd_port ) ) {
+            $datahelper->displayMessage('All the fields are required. Please enter valid entries.',"ERROR");
+            $this->redirect("*/*/index");
+            return;
+        }
+        if( $this->empty_or_null( $gluu_server_url )  ||  $this->empty_or_null( $gluu_server_url ) ) {
             $datahelper->displayMessage('All the fields are required. Please enter valid entries.',"ERROR");
             $this->redirect("*/*/index");
             return;
@@ -127,12 +135,13 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         }
         $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
         $config_option['oxd_host_port'] = $params['oxd_port'];
-
+        $config_option['op_host'] = $params['gluu_server_url'];
         $config_option['admin_email'] = $email;
         $storeConfig ->saveConfig('gluu/oxd/oxd_config',serialize($config_option), 'default', 0);
         $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
 
         $registerSite = $this->getOxdRegisterSiteHelper();
+        $registerSite->setRequestOpHost($params['gluu_server_url']);
         $registerSite->setOxdHostPort($params['oxd_port']);
         $registerSite->setRequestAcrValues($config_option['acr_values']);
         $registerSite->setRequestAuthorizationRedirectUri($config_option['authorization_redirect_uri']);

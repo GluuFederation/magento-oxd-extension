@@ -1,11 +1,11 @@
-Magento GLUU SSO extension 
+Magento Extension OpenID Connect SSO By Gluu  
 =========================
 ![image](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/plugin.png)
 
-MAGENTO-GLUU-SSO extension gives access for login to your Magento site, with the help of GLUU server.
+OpenID Connect SSO By Gluu extension gives access for login to your Magento site, with the help of GLUU server.
 
-There are already 2 versions of MAGENTO-GLUU-SSO (2.4.2.0 and 2.4.3.0) extensions, each in its turn is working with oXD and GLUU servers.
-For example if you are using MAGENTO-gluu-sso-2.4.2.0 extension, you need to connect with oXD-server-2.4.2.
+There are already 2 versions of OpenID Connect SSO By Gluu (2.4.2.0 and 2.4.3.0) extensions, each in its turn is working with oXD and GLUU servers.
+For example if you are using OpenID Connect SSO By Gluu-2.4.2.0 extension, you need to connect with oXD-server-2.4.2.
 
 Now I want to explain in details how to use extension step by step. 
 
@@ -41,7 +41,7 @@ or
 8. For Windows environment, run oxd-start.bat.
 9. After the server starts, go to Step 4.
 
-## Step 4. Download Magento-gluu-sso extension
+## Step 4. Download extension OpenID Connect SSO By Gluu
  
 (version 2.4.2 or 2.4.3)
 

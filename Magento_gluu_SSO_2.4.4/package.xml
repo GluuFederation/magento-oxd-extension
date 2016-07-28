@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
     <name>Magento_gluu_SSO</name>
-    <version>2.4.3.0</version>
+    <version>2.4.4</version>
     <stability>stable</stability>
     <license uri="https://github.com/GluuFederation/gluu-sso-login-magento-extension/blob/master/LICENSE">Gluu inc.</license>
     <channel>community</channel>
