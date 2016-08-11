@@ -1,5 +1,4 @@
 <?php
-
 $oxd_id = Mage::getStoreConfig('gluu/oxd/oxd_id');
 $get_scopes = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_scops'));
 $oxd_config = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_config'));
@@ -11,7 +10,6 @@ $iconCustomHeight = Mage::getStoreConfig ( 'GluuOxd/Openid/iconCustomHeight' );
 $loginCustomTheme = Mage::getStoreConfig ( 'GluuOxd/Openid/loginCustomTheme' );
 $loginTheme = Mage::getStoreConfig ( 'GluuOxd/Openid/loginTheme' );
 $iconCustomColor = Mage::getStoreConfig ( 'GluuOxd/Openid/iconCustomColor' );
-
 if (!$loginTheme) $loginTheme = 'oval';
 if (!$loginCustomTheme) $loginCustomTheme = 'default';
 if (!$iconSpace) $iconSpace = '10';
@@ -42,7 +40,6 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                 $href = $m(this).data('method');
                 voiddisplay($href);
             });
-
             $m('#error-cancel').click(function () {
                 $error = "";
                 $m(".error-msg").css("display", "none");
@@ -51,7 +48,6 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                 $success = "";
                 $m(".success-msg").css("display", "none");
             });
-
             $m(".test").click(function () {
                 $m(".mo2f_thumbnail").hide();
                 $m("#twofactorselect").show();
@@ -72,9 +68,7 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
         function mo2f_valid(f) {
             !(/^[a-zA-Z?,.\(\)\/@ 0-9]*$/).test(f.value) ? f.value = f.value.replace(/[^a-zA-Z?,.\(\)\/@ 0-9]/, '') : null;
         }
-
         jQuery(document).ready(function () {
-
             var tempHorSize = '<?php echo $iconCustomSize ?>';
             var tempHorTheme = '<?php echo $loginTheme ?>';
             var tempHorCustomTheme = '<?php echo $loginCustomTheme ?>';
@@ -84,7 +78,7 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
             gluuOxLoginPreview(setSizeOfIcons(), tempHorTheme, tempHorCustomTheme, tempHorCustomColor, tempHorSpace, tempHorHeight);
             checkLoginButton();
             <?php if( $this->getConfig('email')){
-                        if(isset($_GET['q']) && $_GET['q']=='sharing'){ ?>
+            if(isset($_GET['q']) && $_GET['q']=='sharing'){ ?>
             jQuery('#social-sharing-setup > a').click();
             <?php } else{ ?>
             jQuery('#social-login-setup > a').click();
@@ -105,7 +99,6 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
             }
         }
         function gluuOxLoginPreview(t, r, l, p, n, h) {
-
             if (l == 'default') {
                 if (r == 'longbutton') {
                     var a = "btn-defaulttheme";
@@ -157,7 +150,6 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                     jQuery("." + a).css("padding-top", "8px");
                     jQuery("." + a).css("margin-left", n + "px");
                     jQuery("." + a).css("background", p);
-
                     if (r == "circle") {
                         jQuery("." + a).css("borderRadius", "999px");
                     } else if (r == "oval") {
@@ -201,7 +193,6 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                 jQuery("#commontheme").show();
                 jQuery(".longbuttontheme").hide();
             }
-
             previewLoginIcons();
         }
         function previewLoginIcons() {
@@ -230,9 +221,6 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
             } else {
                 jQuery("#no_apps_text").show();
             }
-
-
-
         }
         var selectedApps = [];
         function setTheme() {
@@ -472,11 +460,11 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                                                                 <input type="hidden"
                                                                        value="<?php echo $scop; ?>"
                                                                        name="value_scope"/>
-                                                                 <?php if ($scop != 'openid'){ ?>
-                                                                     <input  style="width: 100px; background-color: red !important; cursor: pointer"
-                                                                    type="submit"
-                                                                    class="button button-primary " <?php if (!$oxd_id) echo 'disabled' ?>
-                                                                    value="Delete" name="delete_scop"/>
+                                                                <?php if ($scop != 'openid'){ ?>
+                                                                    <input  style="width: 100px; background-color: red !important; cursor: pointer"
+                                                                            type="submit"
+                                                                            class="button button-primary " <?php if (!$oxd_id) echo 'disabled' ?>
+                                                                            value="Delete" name="delete_scop"/>
                                                                 <?php } ?>
                                                             </form>
                                                         </td>
@@ -680,44 +668,44 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                                                name="gluuoxd_openid_login_theme" value="circle"
                                                onclick="checkLoginButton();gluuOxLoginPreview(document.getElementById('gluuox_login_icon_size').value ,'circle',setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)"
                                                style="width: auto;" checked>Round
-                            <span style="margin-left:106px; display: none">
-                                <input type="radio" <?php if (!$oxd_id) echo 'disabled'; ?>
-                                       id="gluuoxd_openid_login_default_radio" name="gluuoxd_openid_login_custom_theme"
-                                       value="default"
-                                       onclick="checkLoginButton();gluuOxLoginPreview(setSizeOfIcons(), setLoginTheme(),'default',document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)"
-                                       checked>Default
-                            </span>
-                            <span style="margin-left:111px;">
-                                    <input style="width:50px" <?php if (!$oxd_id) echo ' disabled '; ?>
-                                           onkeyup="gluuOxLoginSpaceValidate(this)" id="gluuox_login_icon_space"
-                                           name="gluuox_login_icon_space" type="text" value="<?php echo $iconSpace; ?>">
-                                    <input
-                                        id="gluuox_login_space_plus" <?php if (!$oxd_id) echo 'disabled'; ?> <?php if (!$oxd_id) echo 'disabled'; ?> <?php if (!$oxd_id) echo 'disabled'; ?>
-                                        type="button" value="+"
-                                        onmouseup="document.getElementById('gluuox_login_icon_space').value=parseInt(document.getElementById('gluuox_login_icon_space').value)+1;gluuOxLoginPreview(setSizeOfIcons() ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)">
-                                    <input
-                                        id="gluuox_login_space_minus" <?php if (!$oxd_id) echo 'disabled'; ?> <?php if (!$oxd_id) echo 'disabled'; ?>
-                                        type="button" value="-"
-                                        onmouseup="document.getElementById('gluuox_login_icon_space').value=parseInt(document.getElementById('gluuox_login_icon_space').value)-1;gluuOxLoginPreview(setSizeOfIcons()  ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)">
-                            </span>
-                            <span id="commontheme" style="margin-left:95px">
-                                <input style="width:50px " <?php if (!$oxd_id) echo 'disabled'; ?> id="gluuox_login_icon_size"
-                                       onkeyup="gluuOxLoginSizeValidate(this)" name="gluuox_login_icon_custom_size" type="text"
-                                       value="<?php if ($iconCustomSize) echo $iconCustomSize; else echo '35'; ?>">
-                                <input id="gluuox_login_size_plus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="+"
-                                       onmouseup="document.getElementById('gluuox_login_icon_size').value=parseInt(document.getElementById('gluuox_login_icon_size').value)+1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_size').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)">
-                                <input id="gluuox_login_size_minus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="-"
-                                       onmouseup="document.getElementById('gluuox_login_icon_size').value=parseInt(document.getElementById('gluuox_login_icon_size').value)-1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_size').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)">
-                            </span>
-                            <span style="margin-left: 95px; display: none;" class="longbuttontheme">Width:&nbsp;
-                                <input style="width:50px" <?php if (!$oxd_id) echo 'disabled'; ?> id="gluuox_login_icon_width"
-                                       onkeyup="gluuOxLoginWidthValidate(this)" name="gluuox_login_icon_custom_width" type="text"
-                                       value="<?php echo $iconCustomWidth; ?>">
-                                <input id="gluuox_login_width_plus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="+"
-                                       onmouseup="document.getElementById('gluuox_login_icon_width').value=parseInt(document.getElementById('gluuox_login_icon_width').value)+1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_width').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)">
-                                <input id="gluuox_login_width_minus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="-"
-                                       onmouseup="document.getElementById('gluuox_login_icon_width').value=parseInt(document.getElementById('gluuox_login_icon_width').value)-1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_width').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)">
-                            </span>
+                                <span style="margin-left:106px; display: none">
+                                    <input type="radio" <?php if (!$oxd_id) echo 'disabled'; ?>
+                                           id="gluuoxd_openid_login_default_radio" name="gluuoxd_openid_login_custom_theme"
+                                           value="default"
+                                           onclick="checkLoginButton();gluuOxLoginPreview(setSizeOfIcons(), setLoginTheme(),'default',document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)"
+                                           checked>Default
+                                </span>
+                                <span style="margin-left:111px;">
+                                        <input style="width:50px" <?php if (!$oxd_id) echo ' disabled '; ?>
+                                               onkeyup="gluuOxLoginSpaceValidate(this)" id="gluuox_login_icon_space"
+                                               name="gluuox_login_icon_space" type="text" value="<?php echo $iconSpace; ?>">
+                                        <input
+                                            id="gluuox_login_space_plus" <?php if (!$oxd_id) echo 'disabled'; ?> <?php if (!$oxd_id) echo 'disabled'; ?> <?php if (!$oxd_id) echo 'disabled'; ?>
+                                            type="button" value="+"
+                                            onmouseup="document.getElementById('gluuox_login_icon_space').value=parseInt(document.getElementById('gluuox_login_icon_space').value)+1;gluuOxLoginPreview(setSizeOfIcons() ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)">
+                                        <input
+                                            id="gluuox_login_space_minus" <?php if (!$oxd_id) echo 'disabled'; ?> <?php if (!$oxd_id) echo 'disabled'; ?>
+                                            type="button" value="-"
+                                            onmouseup="document.getElementById('gluuox_login_icon_space').value=parseInt(document.getElementById('gluuox_login_icon_space').value)-1;gluuOxLoginPreview(setSizeOfIcons()  ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)">
+                                </span>
+                                <span id="commontheme" style="margin-left:95px">
+                                    <input style="width:50px " <?php if (!$oxd_id) echo 'disabled'; ?> id="gluuox_login_icon_size"
+                                           onkeyup="gluuOxLoginSizeValidate(this)" name="gluuox_login_icon_custom_size" type="text"
+                                           value="<?php if ($iconCustomSize) echo $iconCustomSize; else echo '35'; ?>">
+                                    <input id="gluuox_login_size_plus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="+"
+                                           onmouseup="document.getElementById('gluuox_login_icon_size').value=parseInt(document.getElementById('gluuox_login_icon_size').value)+1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_size').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)">
+                                    <input id="gluuox_login_size_minus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="-"
+                                           onmouseup="document.getElementById('gluuox_login_icon_size').value=parseInt(document.getElementById('gluuox_login_icon_size').value)-1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_size').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)">
+                                </span>
+                                <span style="margin-left: 95px; display: none;" class="longbuttontheme">Width:&nbsp;
+                                    <input style="width:50px" <?php if (!$oxd_id) echo 'disabled'; ?> id="gluuox_login_icon_width"
+                                           onkeyup="gluuOxLoginWidthValidate(this)" name="gluuox_login_icon_custom_width" type="text"
+                                           value="<?php echo $iconCustomWidth; ?>">
+                                    <input id="gluuox_login_width_plus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="+"
+                                           onmouseup="document.getElementById('gluuox_login_icon_width').value=parseInt(document.getElementById('gluuox_login_icon_width').value)+1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_width').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)">
+                                    <input id="gluuox_login_width_minus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="-"
+                                           onmouseup="document.getElementById('gluuox_login_icon_width').value=parseInt(document.getElementById('gluuox_login_icon_width').value)-1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_width').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)">
+                                </span>
                                     </td>
                                 </tr>
                                 <tr>
@@ -727,22 +715,22 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                                                value="oval"
                                                onclick="checkLoginButton();gluuOxLoginPreview(document.getElementById('gluuox_login_icon_size').value,'oval',setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_size').value )"
                                                style="width: auto;" <?php if ($loginTheme == 'oval') echo "checked"; ?>>Rounded Edges
-                        <span style="margin-left:50px; display: none">
-                                <input type="radio"
-                                       <?php if (!$oxd_id) echo 'disabled'; ?>id="gluuoxd_openid_login_custom_radio"
-                                       name="gluuoxd_openid_login_custom_theme" value="custom"
-                                       onclick="checkLoginButton();gluuOxLoginPreview(setSizeOfIcons(), setLoginTheme(),'custom',document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)"
-                                    <?php if ($loginCustomTheme == 'custom') echo "checked"; ?> >Custom Background*
-                                </span>
-                            <span style="margin-left: 256px; display: none;" class="longbuttontheme">Height:
-                        <input style="width:50px" <?php if (!$oxd_id) echo 'disabled'; ?> id="gluuox_login_icon_height"
-                               onkeyup="gluuOxLoginHeightValidate(this)" name="gluuox_login_icon_custom_height" type="text"
-                               value="<?php if ($iconCustomHeight) echo $iconCustomHeight; else echo '35'; ?>">
-                        <input id="gluuox_login_height_plus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="+"
-                               onmouseup="document.getElementById('gluuox_login_icon_height').value=parseInt(document.getElementById('gluuox_login_icon_height').value)+1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_width').value,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)">
-                        <input id="gluuox_login_height_minus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="-"
-                               onmouseup="document.getElementById('gluuox_login_icon_height').value=parseInt(document.getElementById('gluuox_login_icon_height').value)-1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_width').value,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)">
-                        </span>
+                            <span style="margin-left:50px; display: none">
+                                    <input type="radio"
+                                           <?php if (!$oxd_id) echo 'disabled'; ?>id="gluuoxd_openid_login_custom_radio"
+                                           name="gluuoxd_openid_login_custom_theme" value="custom"
+                                           onclick="checkLoginButton();gluuOxLoginPreview(setSizeOfIcons(), setLoginTheme(),'custom',document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)"
+                                        <?php if ($loginCustomTheme == 'custom') echo "checked"; ?> >Custom Background*
+                                    </span>
+                                <span style="margin-left: 256px; display: none;" class="longbuttontheme">Height:
+                            <input style="width:50px" <?php if (!$oxd_id) echo 'disabled'; ?> id="gluuox_login_icon_height"
+                                   onkeyup="gluuOxLoginHeightValidate(this)" name="gluuox_login_icon_custom_height" type="text"
+                                   value="<?php if ($iconCustomHeight) echo $iconCustomHeight; else echo '35'; ?>">
+                            <input id="gluuox_login_height_plus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="+"
+                                   onmouseup="document.getElementById('gluuox_login_icon_height').value=parseInt(document.getElementById('gluuox_login_icon_height').value)+1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_width').value,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)">
+                            <input id="gluuox_login_height_minus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="-"
+                                   onmouseup="document.getElementById('gluuox_login_icon_height').value=parseInt(document.getElementById('gluuox_login_icon_height').value)-1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_width').value,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)">
+                            </span>
                                     </td>
                                 </tr>
                                 <tr>
@@ -751,12 +739,12 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                                                name="gluuoxd_openid_login_theme" value="square"
                                                onclick="checkLoginButton();gluuOxLoginPreview(document.getElementById('gluuox_login_icon_size').value ,'square',setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_size').value )"
                                                style="width: auto;" <?php if ($loginTheme == 'square') echo "checked"; ?>>Square
-                                    <span style="margin-left:113px; display: none">
-                                        <input type="color" <?php if (!$oxd_id) echo 'disabled'; ?>
-                                               name="gluuox_login_icon_custom_color" id="gluuox_login_icon_custom_color"
-                                               value="<?php echo $iconCustomColor; ?>"
-                                               onchange="gluuOxLoginPreview(setSizeOfIcons(), setLoginTheme(),'custom',document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)">
-                                    </span>
+                                        <span style="margin-left:113px; display: none">
+                                            <input type="color" <?php if (!$oxd_id) echo 'disabled'; ?>
+                                                   name="gluuox_login_icon_custom_color" id="gluuox_login_icon_custom_color"
+                                                   value="<?php echo $iconCustomColor; ?>"
+                                                   onchange="gluuOxLoginPreview(setSizeOfIcons(), setLoginTheme(),'custom',document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)">
+                                        </span>
                                     </td>
                                 </tr>
                                 <tr style="display: none">
@@ -827,6 +815,7 @@ if (!$iconCustomColor) $iconCustomColor = '#0000FF';
                         <p>If you want to use external gluu server, You can not do this step.</p>
                         <p><a target="_blank" href="https://www.gluu.org/docs/deployment/">Gluu-server installation gide</a>.</p>
                         <h2><a id="Step_2_Download_oxDserver_21"></a>Step 2. Download oxd-server</h2>
+                        <p><a target="_blank" href="https://oxd.gluu.org/docs/oxdserver/install/">Oxd-server installation gide</a>.</p>
                         <p><a target="_blank" href="https://ox.gluu.org/maven/org/xdi/oxd-server/2.4.4.Final/oxd-server-2.4.4.Final-distribution.zip">Download oxd-server-2.4.4.Final</a>.</p>
                         <h2><a id="Step_3_Unzip_and_run_oXDserver_31"></a>Step 3. Unzip and run oxd-server</h2>
                         <ol>

@@ -29,7 +29,11 @@ If you want to use external gluu server, You can not do this step.
 7. For Windows environment, run oxd-start.bat.
 8. After the server starts, go to Step 4.
 
+[Oxd-server installation gide](https://oxd.gluu.org/docs/oxdserver/install/).
+
 ## Step 4. Download extension OpenID Connect SSO By Gluu
+
+[Link to Magento marketplace](https://www.magentocommerce.com/magento-connect/openid-connect-sso.html)
  
 [Download OpenID Connect SSO Extension By Gluu 2.4.4](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/Magento_gluu_SSO_2.4.4/Magento_gluu_SSO-2.4.4.tgz).
 

@@ -413,7 +413,7 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
             "contacts" => $this->getRequestContacts(),
             "grant_types" => $this->getRequestGrantTypes(),
             "response_types"=> $this->getRequestResponseTypes(),
-            "client_secret_expires_at"=> 1467718072127,
+            "client_secret_expires_at"=> 3080736637943,
             "client_logout_uris"=> [$this->getRequestClientLogoutUris()]
         );
     }
