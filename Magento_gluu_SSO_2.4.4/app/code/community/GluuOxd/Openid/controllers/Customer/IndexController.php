@@ -45,7 +45,6 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
                 "grant_types" =>["authorization_code"],
                 "response_types" => ["code"],
                 "application_type" => "web",
-                "redirect_uris" => [ Mage::helper('customer')->getLoginUrl().'?option=getOxdSocialLogin' ],
                 "acr_values" => [],
             );
             if(empty(unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' )))){
@@ -145,7 +144,6 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $registerSite->setOxdHostPort($params['oxd_port']);
         $registerSite->setRequestAcrValues($config_option['acr_values']);
         $registerSite->setRequestAuthorizationRedirectUri($config_option['authorization_redirect_uri']);
-        $registerSite->setRequestRedirectUris($config_option['redirect_uris']);
         $registerSite->setRequestLogoutRedirectUri($config_option['logout_redirect_uri']);
         $registerSite->setRequestContacts([$config_option['admin_email']]);
         $registerSite->setRequestApplicationType('web');
@@ -270,7 +268,6 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $updateSiteRegistration->setRequestOxdId(Mage::getStoreConfig ( 'gluu/oxd/oxd_id' ));
         $updateSiteRegistration->setRequestAcrValues($config_option['acr_values']);
         $updateSiteRegistration->setRequestAuthorizationRedirectUri($config_option['authorization_redirect_uri']);
-        $updateSiteRegistration->setRequestRedirectUris($config_option['redirect_uris']);
         $updateSiteRegistration->setRequestLogoutRedirectUri($config_option['logout_redirect_uri']);
         $updateSiteRegistration->setRequestContacts([$config_option['admin_email']]);
         $updateSiteRegistration->setRequestApplicationType('web');

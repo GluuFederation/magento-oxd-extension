@@ -139,7 +139,8 @@ class GluuOxd_Openid_Helper_GetAuthorizationUrl extends GluuOxd_Openid_Helper_Cl
     {
         $this->params = array(
             "oxd_id" => $this->getRequestOxdId(),
-            "acr_values" => $this->getRequestAcrValues()
+            "acr_values" => $this->getRequestAcrValues(),
+            "prompt" => 'login'
 
         );
     }

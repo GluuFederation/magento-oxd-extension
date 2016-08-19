@@ -71,10 +71,6 @@ class GluuOxd_Openid_Helper_RegisterSite extends GluuOxd_Openid_Helper_ClientOXD
      */
     private $request_application_type = null;
     /**
-     * @var array $request_redirect_uris                    Site redirect uris after login or logout
-     */
-    private $request_redirect_uris = null;
-    /**
      * @var array $request_acr_values                       Gluu login acr type, can be basic, duo, u2f, gplus and etc.
      */
     private $request_acr_values = null;
@@ -320,23 +316,6 @@ class GluuOxd_Openid_Helper_RegisterSite extends GluuOxd_Openid_Helper_ClientOXD
     /**
      * @return array
      */
-    public function getRequestRedirectUris()
-    {
-        return $this->request_redirect_uris;
-    }
-
-    /**
-     * @param array $request_redirect_uris
-     * @return void
-     */
-    public function setRequestRedirectUris($request_redirect_uris)
-    {
-        $this->request_redirect_uris = $request_redirect_uris;
-    }
-
-    /**
-     * @return array
-     */
     public function getRequestAcrValues()
     {
         return $this->request_acr_values;
@@ -404,7 +383,6 @@ class GluuOxd_Openid_Helper_RegisterSite extends GluuOxd_Openid_Helper_ClientOXD
             "authorization_redirect_uri" => $this->getRequestAuthorizationRedirectUri(),
             "post_logout_redirect_uri" => $this->getRequestLogoutRedirectUri(),
             "application_type" => $this->getRequestApplicationType(),
-            "redirect_uris" => $this->getRequestRedirectUris(),
             "acr_values" => $this->getRequestAcrValues(),
             "scope" => $this->getRequestScope(),
             "client_jwks_uri" => $this->getRequestClientJwksUri(),
