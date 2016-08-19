@@ -1,45 +1,27 @@
-Magento Extension OpenID Connect SSO By Gluu  
-=========================
+[TOC]
+
+#Magento OpenID Connect SSO Extension By Gluu  
+
 ![image](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/plugin.jpg)
 
-OpenID Connect SSO By Gluu extension gives access for login to your Magento site, with the help of Gluu server.
+Gluu's Magento OpenID Connect Single Sign On (SSO) Extension will enable you to authenticate users against any standard OpenID Connect Provider (OP). If you don't already have an OP you can [deploy the free open source Gluu Server](https://gluu.org/docs/deployment).  
 
-Now I want to explain in details how to use extension step by step. 
+## Requirements
+In order to use the Magento Extension, you will need to have deployed a standard OP like the Gluu Server and the oxd Server.
 
-Extension will not be working if your host does not have https://. 
+* [Gluu Server Installation Guide](https://www.gluu.org/docs/deployment/).
 
-## Step 1. Install Gluu-server 
+* [oxd Server Installation Guide](https://oxd.gluu.org/docs/oxdserver/install/)
 
-If you want to use external gluu server, You can not do this step.   
+## Installation
 
-[Gluu-server installation gide](https://www.gluu.org/docs/deployment/).
-
-## Step 2. Download oxd-server 
-
-[Download oxd-server-2.4.4.Final](https://ox.gluu.org/maven/org/xdi/oxd-server/2.4.4.Final/oxd-server-2.4.4.Final-distribution.zip).
-
-## Step 3. Unzip and run oxd-server
- 
-1. Unzip your oxd-server. 
-2. Open the command line and navigate to the extracted folder in the conf directory.
-3. Open oxd-conf.json file.  
-4. If your server is using 8099 port, please change "port" number to free port, which is not used.
-5. Open the command line and navigate to the extracted folder in the bin directory.
-6. For Linux environment, run sh oxd-start.sh&. 
-7. For Windows environment, run oxd-start.bat.
-8. After the server starts, go to Step 4.
-
-[Oxd-server installation gide](https://oxd.gluu.org/docs/oxdserver/install/).
-
-## Step 4. Download extension OpenID Connect SSO By Gluu
+### Step 1. Download
 
 [Link to Magento marketplace](https://www.magentocommerce.com/magento-connect/openid-connect-sso.html)
  
-[Download OpenID Connect SSO Extension By Gluu 2.4.4](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/Magento_gluu_SSO_2.4.4/Magento_gluu_SSO-2.4.4.tgz).
+[Github source](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/Magento_gluu_SSO_2.4.4/Magento_gluu_SSO-2.4.4.tgz).
 
-For example if you are using gluu-server-2.4.4 it is necessary to use oxd-server-2.4.4 and OpenID Connect SSO Extension By Gluu 2.4.4
-
-## Step 5. Disable cache
+### Step 2. Disable cache
  
 1. Open menu tab System/Cache Management
 ![Management](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/mag0.png) 
@@ -47,7 +29,7 @@ For example if you are using gluu-server-2.4.4 it is necessary to use oxd-server
 2. Check select all, set action on disable and click on submit button. 
 ![submit](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/mag1.png) 
 
-## Step 6. Install extension
+### Step 3. Install extension
  
 1. Open menu tab System/Magento Connect/Magento Connect Manager
 ![Manager](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/mag2.png) 
@@ -57,12 +39,12 @@ For example if you are using gluu-server-2.4.4 it is necessary to use oxd-server
 
 3. See Auto-scroll console contents, if extension successfully installed return to admin panel.
 
-###Extension will be automatically activated.
+####Extension will be automatically activated.
 
 3. Open menu tab OpenID Connect SSO By Gluu / Open extension page
 ![GluuSSO](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.mag4.png) 
 
-## Step 7. General
+### Step 4. General
 
 ![General](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m1.png)  
 
@@ -75,43 +57,37 @@ If You are successfully registered in gluu server, you will see bottom page.
 
 ![Oxd_id](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m2.png)
 
-For making sure go to your gluu server / OpenID Connect / Clients and search  Your oxd id
+To make sure everything is configured properly, login to your Gluu Server and navigate to the OpenID Connect > Clients page. Search for your `oxd id`.
 
-If you want to reset configurations click on Reset configurations button.
+### Step 5. OpenID Connect Provider (OP) Configuration
 
-## Step 8. OpenID Connect Configuration
+#### Scopes.
+Scopes are groups of user attributes that are sent from your OP (in this case, the Gluu Server) to the application during login and enrollment. You can view all available scopes in your Gluu Server by navigating to the OpenID Connect > Scopes intefrace. 
 
-### Scopes.
-You can look all scopes in your gluu server / OpenID Connect / Scopes and understand the meaning of  every scope.
-Scopes are need for getting loged in users information from gluu server.
-Pay attention to that, which scopes you are using that are switched on in your gluu server.
-
-You add, enable, disable and delete scope, but also add new scope, but when you add new scope by {any name}, necessary to add that scop in your gluu server too. 
+In the Extension interface you can enable, disable and delete scopes. You can also add new scopes. If/when you add new scopes via the extension, be sure to also add the same scopes in your gluu server. 
 ![Scopes2](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m4.png) 
 
-### Custom scripts.
-
+#### Authentication.
+To specify the desired authentication mechanism navigate to the Configuration > Manage Custom Scripts menu in your Gluu Server. From there you can enable one of the out-of-the-box authentication mechanisms, such as password, U2F device (like yubikey), or mobile authentication. You can learn more about the Gluu Server authentication capabilities in the [docs](https://gluu.org/docs/multi-factor/intro/).
 ![Customscripts](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m5.png)  
 
-You can look all custom scripts in your gluu server / Configuration / Manage Custom Scripts / and enable login type, which type you want.
-Custom Script represent itself the type of login, at this moment gluu server supports (U2F, Duo, Google +, Basic, OxPush) types.
+Note:    
+- The authentication mechanism specified in your Magento extension page must match the authentication mechanism specified in your Gluu Server.     
+- After saving the authentication mechanism in your Gluu Server, it will be displayed in the Magento extension configuration page too.      
+- If / when you create a new custom script, both fields are required.    
 
-### Pay attention to that.
 
-1. Which custom script you enable in your Magento site in order it must be switched on in gluu server too.
-2. Which custom script you will be enable in OpenID Connect Configuration page, after saving that will be showed in Magento Configuration page too.
-3. When you create new custom script, both fields are required.
+### Step 6. Magento Configuration
 
-## Step 9. Magento Configuration
-
-### Customize Login Icons
+#### Customize Login Icons
  
-Pay attention to that, if custom scripts are not enabled, nothing will be showed.
-Customize shape, space between icons and size of the login icons.
+If custom scripts are not enabled, nothing will be showed. Customize shape, space between icons and size of the login icons.
 
-![WordpressConfiguration](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m6.png)  
+![MagentoConfiguration](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m6.png)  
 
-## Step 10. Show icons in frontend
+### Step 7. Show icons in frontend
+
+Once you've configured all the options, you should see your supported authentication mechanisms on your default Magento customer login page like the screenshot below
 
 Go to https://{site-base-url}/index.php/customer/account/login/
 
