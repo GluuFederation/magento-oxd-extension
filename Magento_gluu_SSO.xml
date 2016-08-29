@@ -1,23 +1,23 @@
 <_>
-   <form_key>4A0kJYiMvPpN6fsx</form_key>
+   <form_key>SlRtK5xWjYliLLVd</form_key>
    <name>Magento_gluu_SSO</name>
    <channel>community</channel>
    <version_ids>
       <version_ids>2</version_ids>
    </version_ids>
-   <summary>Gluu and Social login extension for magento</summary>
-   <description>Use OpenID Connect to login by leveraging the oxd client service demon.</description>
+   <summary>This extension will enable you to authenticate users against any standard OpenID Connect Provider.</summary>
+   <description>This extension will enable you to authenticate users against any standard OpenID Connect Provider. You’ll need to also run a local oxd OpenID Connect client service. The oxd middleware service is easy to install, and makes it easier to keep up-to-date with the latest security fixes for OAuth2. There are oxd plugins, modules and extennsions for many popular platforms and frameworks like: Wordpress, Magento, OpenCart, SugarCRM, SuiteCRM, Drupal, Roundcube, Spring Framework, Play Framework, Ruby on Rails and Python Flask. Using this extension, you’ll be able to request a certain type of authentication using the OpenID Connect “acr” parameter. You may want to use strong two-factor authentication (2FA), or social login to Google, Facebook or other popular sites. Also supported is Super Gluu--a free mobile two factor authentication app. If you are also looking for a modern access management platform, you should consider the Gluu Server Community Edition. The Gluu Server includes an OpenID Connect Provider that will enable you to create local accounts for people in your domain, and to manage single sign-on (SSO) across your websites.</description>
    <license>Gluu inc.</license>
    <license_uri>https://github.com/GluuFederation/gluu-sso-login-magento-extension/blob/master/LICENSE</license_uri>
-   <version>2.4.3.0</version>
+   <version>2.4.4</version>
    <stability>stable</stability>
-   <notes>Use OpenID Connect to login by leveraging the oxd client service demon.</notes>
+   <notes>This extension will enable you to authenticate users against any standard OpenID Connect Provider.</notes>
    <authors>
       <name>
-         <name>GluuSSO</name>
+         <name>Vlad</name>
       </name>
       <user>
-         <user>admin</user>
+         <user>MAG003268474</user>
       </user>
       <email>
          <email>vlad.karapetyan.1988@mail.ru</email>
@@ -40,7 +40,7 @@
             <max/>
          </max>
          <files>
-            <files>                                                                      </files>
+            <files>                                                                                  </files>
          </files>
       </package>
       <extension>
@@ -83,6 +83,7 @@
          <target>magedesign</target>
          <target>magedesign</target>
          <target>magedesign</target>
+         <target>mageskin</target>
       </target>
       <path>
          <path/>
@@ -111,6 +112,7 @@
          <path>adminhtml/default/default/template/gluuoxd_openid/gluuOxOpenidConfig.phtml</path>
          <path>adminhtml/default/default/template/gluuoxd_openid/login.phtml</path>
          <path>adminhtml/default/default/layout/GluuOxd_Openid.xml</path>
+         <path>adminhtml/default/default/GluuOxd_Openid/images/icons/oxpush2.png</path>
       </path>
       <type>
          <type>file</type>
@@ -134,6 +136,7 @@
          <type>file</type>
          <type>file</type>
          <type>dir</type>
+         <type>file</type>
          <type>file</type>
          <type>file</type>
          <type>file</type>
@@ -167,8 +170,10 @@
          <include/>
          <include/>
          <include/>
+         <include/>
       </include>
       <ignore>
+         <ignore/>
          <ignore/>
          <ignore/>
          <ignore/>

@@ -1,33 +1,125 @@
 <?php
 /**
- * Created Vlad Karapetyan
+ * Gluu-oxd-library
+ *
+ * An open source application library for PHP
+ *
+ * This content is released under the MIT License (MIT)
+ *
+ * Copyright (c) 2015, Gluu inc, USA, Austin
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @package	Gluu-oxd-library
+ * @version 2.4.4
+ * @author	Vlad Karapetyan
+ * @author		vlad.karapetyan.1988@mail.ru
+ * @copyright	Copyright (c) 2015, Gluu inc federation (https://gluu.org/)
+ * @license	http://opensource.org/licenses/MIT	MIT License
+ * @link	https://gluu.org/
+ * @since	Version 2.4.4
+ * @filesource
+ */
+
+/**
+ * Oxd client update site registration class
+ *
+ * Class is connecting to oXD-server via socket, and updating registered site data in gluu server.
+ *
+ * @package		Gluu-oxd-library
+ * @subpackage	Libraries
+ * @category	Relying Party (RP) and User Managed Access (UMA)
+ * @author		Vlad Karapetyan
+ * @author		vlad.karapetyan.1988@mail.ru
+ * @see	        ClientOXDRP
  */
 
 require_once 'ClientOXDRP.php';
 
 class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper_ClientOXDRP
 {
-    /**start parameter for request!**/
-    private $request_authorization_redirect_uri = null;
-    private $request_logout_redirect_uri = null;
-    private $request_application_type = null;
-    private $request_redirect_uris = null;
-    private $request_acr_values = null;
-    private $request_client_jwks_uri = null;
-    private $request_client_token_endpoint_auth_method = null;
-    private $request_client_request_uris = null;
-    private $request_contacts = null;
-    private $request_scope = null;
-    private $request_grant_types = null;
-    private $request_response_types = null;
-    private $request_client_logout_uri = null;
+    /**
+     * @var string $request_oxd_id                          This parameter you must get after registration site in gluu-server
+     */
     private $request_oxd_id = null;
-    /**end request parameter**/
+    /**
+     * @var string $request_authorization_redirect_uri      Site authorization redirect uri
+     */
+    private $request_authorization_redirect_uri = null;
+    /**
+     * @var string $request_logout_redirect_uri             Site logout redirect uri
+     */
+    private $request_logout_redirect_uri = null;
+    /**
+     * @var string $request_application_type                web or mobile
+     */
+    private $request_application_type = null;
+    /**
+     * @var array $request_acr_values                       Gluu login acr type, can be basic, duo, u2f, gplus and etc.
+     */
+    private $request_acr_values = null;
+    /**
+     * @var string $request_client_jwks_uri
+     */
+    private $request_client_jwks_uri = null;
+    /**
+     * @var string $request_client_token_endpoint_auth_method
+     */
+    private $request_client_token_endpoint_auth_method = null;
+    /**
+     * @var array $request_client_request_uris
+     */
+    private $request_client_request_uris = null;
+    /**
+     * @var array $request_contacts
+     */
+    private $request_contacts = null;
+    /**
+     * @var array $request_scope                            For getting needed scopes from gluu-server
+     */
+    private $request_scope = null;
+    /**
+     * @var string $request_grant_types                     OpenID Token Request type
+     */
+    private $request_grant_types = null;
+    /**
+     * @var array $request_response_types                   OpenID Authentication response types
+     */
+    private $request_response_types = null;
+    /**
+     * @var array $request_client_logout_uris
+     */
+    private $request_client_logout_uris = null;
 
-    /**start parameter for response!**/
+    /**
+     * Response parameter from oXD-server
+     * It is basic parameter for other protocols
+     *
+     * @var string $response_oxd_id
+     */
     private $response_oxd_id;
-    /**end response parameter**/
 
+    /**
+     * Constructor
+     *
+     * @return	void
+     */
     public function __construct()
     {
         parent::__construct(); // TODO: Change the autogenerated stub
@@ -35,23 +127,24 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @return null
+     * @return array
      */
-    public function getRequestClientLogoutUri()
+    public function getRequestClientLogoutUris()
     {
-        return $this->request_client_logout_uri;
+        return $this->request_client_logout_uris;
     }
 
     /**
-     * @param null $request_client_logout_uri
+     * @param array $request_client_logout_uris
+     * @return void
      */
-    public function setRequestClientLogoutUri($request_client_logout_uri)
+    public function setRequestClientLogoutUri($request_client_logout_uris)
     {
-        $this->request_client_logout_uri = $request_client_logout_uri;
+        $this->request_client_logout_uris = $request_client_logout_uris;
     }
 
     /**
-     * @return null
+     * @return array
      */
     public function getRequestResponseTypes()
     {
@@ -59,7 +152,8 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @param null $request_response_types
+     * @param array $request_response_types
+     * @return void
      */
     public function setRequestResponseTypes($request_response_types)
     {
@@ -67,7 +161,7 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @return null
+     * @return array
      */
     public function getRequestGrantTypes()
     {
@@ -75,7 +169,8 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @param null $request_grant_types
+     * @param array $request_grant_types
+     * @return void
      */
     public function setRequestGrantTypes($request_grant_types)
     {
@@ -83,7 +178,7 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @return null
+     * @return array
      */
     public function getRequestScope()
     {
@@ -91,7 +186,8 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @param null $request_scope
+     * @param array $request_scope
+     * @return void
      */
     public function setRequestScope($request_scope)
     {
@@ -99,7 +195,7 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @return null
+     * @return string
      */
     public function getRequestLogoutRedirectUri()
     {
@@ -107,7 +203,8 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @param null $request_logout_redirect_uri
+     * @param string $request_logout_redirect_uri
+     * @return void
      */
     public function setRequestLogoutRedirectUri($request_logout_redirect_uri)
     {
@@ -115,7 +212,7 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @return null
+     * @return string
      */
     public function getRequestClientJwksUri()
     {
@@ -123,7 +220,8 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @param null $request_client_jwks_uri
+     * @param string $request_client_jwks_uri
+     * @return void
      */
     public function setRequestClientJwksUri($request_client_jwks_uri)
     {
@@ -131,7 +229,7 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @return null
+     * @return string
      */
     public function getRequestClientTokenEndpointAuthMethod()
     {
@@ -139,7 +237,8 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @param null $request_client_token_endpoint_auth_method
+     * @param string $request_client_token_endpoint_auth_method
+     * @return void
      */
     public function setRequestClientTokenEndpointAuthMethod($request_client_token_endpoint_auth_method)
     {
@@ -147,7 +246,7 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @return null
+     * @return array
      */
     public function getRequestClientRequestUris()
     {
@@ -155,7 +254,8 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @param null $request_client_request_uris
+     * @param array $request_client_request_uris
+     * @return void
      */
     public function setRequestClientRequestUris($request_client_request_uris)
     {
@@ -163,7 +263,7 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getRequestApplicationType()
     {
@@ -171,7 +271,8 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @param mixed $request_application_type
+     * @param string $request_application_type
+     * @return void
      */
     public function setRequestApplicationType($request_application_type = 'web')
     {
@@ -179,7 +280,7 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @return null
+     * @return string
      */
     public function getRequestAuthorizationRedirectUri()
     {
@@ -187,7 +288,8 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @param null $request_authorization_redirect_uri
+     * @param string $request_authorization_redirect_uri
+     * @return void
      */
     public function setRequestAuthorizationRedirectUri($request_authorization_redirect_uri)
     {
@@ -195,23 +297,7 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @return null
-     */
-    public function getRequestRedirectUris()
-    {
-        return $this->request_redirect_uris;
-    }
-
-    /**
-     * @param null $request_redirect_uris
-     */
-    public function setRequestRedirectUris($request_redirect_uris)
-    {
-        $this->request_redirect_uris = $request_redirect_uris;
-    }
-
-    /**
-     * @return null
+     * @return array
      */
     public function getRequestAcrValues()
     {
@@ -219,7 +305,8 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @param null $request_acr_values
+     * @param array $request_acr_values
+     * @return void
      */
     public function setRequestAcrValues($request_acr_values = 'basic')
     {
@@ -227,7 +314,7 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @return null
+     * @return array
      */
     public function getRequestContacts()
     {
@@ -235,7 +322,8 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @param null $request_contacts
+     * @param array $request_contacts
+     * @return void
      */
     public function setRequestContacts($request_contacts)
     {
@@ -243,7 +331,7 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getResponseOxdId()
     {
@@ -252,20 +340,15 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @param mixed $response_oxd_id
+     * @param string $response_oxd_id
+     * @return void
      */
     public function setResponseOxdId($response_oxd_id)
     {
         $this->response_oxd_id = $response_oxd_id;
     }
-
-    public function setCommand()
-    {
-        $this->command = 'update_site_registration';
-    }
-
     /**
-     * @return null
+     * @return string
      */
     public function getRequestOxdId()
     {
@@ -273,13 +356,26 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
     }
 
     /**
-     * @param null $request_oxd_id
+     * @param string $request_oxd_id
+     * @return void
      */
     public function setRequestOxdId($request_oxd_id)
     {
         $this->request_oxd_id = $request_oxd_id;
     }
 
+    /**
+     * Protocol command to oXD server
+     * @return void
+     */
+    public function setCommand()
+    {
+        $this->command = 'update_site_registration';
+    }
+    /**
+     * Protocol parameter to oXD server
+     * @return void
+     */
     public function setParams()
     {
         $this->params = array(
@@ -287,7 +383,6 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
             "oxd_id" => $this->getRequestOxdId(),
             "post_logout_redirect_uri" => $this->getRequestLogoutRedirectUri(),
             "application_type" => $this->getRequestApplicationType(),
-            "redirect_uris" => $this->getRequestRedirectUris(),
             "acr_values" => $this->getRequestAcrValues(),
             "scope" => $this->getRequestScope(),
             "client_jwks_uri" => $this->getRequestClientJwksUri(),
@@ -296,8 +391,8 @@ class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper
             "contacts" => $this->getRequestContacts(),
             "grant_types" => $this->getRequestGrantTypes(),
             "response_types"=> $this->getRequestResponseTypes(),
-            "client_secret_expires_at"=> 1916258400,
-            "client_logout_uris"=> [$this->getRequestClientLogoutUri()]
+            "client_secret_expires_at"=> 3080736637943,
+            "client_logout_uris"=> [$this->getRequestClientLogoutUris()]
         );
     }
 

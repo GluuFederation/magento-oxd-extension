@@ -46,11 +46,11 @@
         </layout>
         <menu>
             <GluuOxdOpenid translate="title" module="GluuOxd_Openid">
-                <title>Gluu SSO</title>
+                <title>OpenID Connect Single Sign-On (SSO) Extension by Gluu</title>
                 <sort_order>81</sort_order>
                 <children>
                     <configure_extension translate="title" module="GluuOxd_Openid">
-                        <title>Gluu and Social Login </title>
+                        <title>Open Extension page </title>
                         <sort_order>1</sort_order>
                         <action>openid/adminhtml_index</action>
                     </configure_extension>
