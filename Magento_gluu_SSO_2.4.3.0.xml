@@ -9,7 +9,7 @@
    <description>Use OpenID Connect to login by leveraging the oxd client service demon.</description>
    <license>Gluu inc.</license>
    <license_uri>https://github.com/GluuFederation/gluu-sso-login-magento-extension/blob/master/LICENSE</license_uri>
-   <version>2.4.2.0</version>
+   <version>2.4.3.0</version>
    <stability>stable</stability>
    <notes>Use OpenID Connect to login by leveraging the oxd client service demon.</notes>
    <authors>
@@ -40,7 +40,7 @@
             <max/>
          </max>
          <files>
-            <files>                                                                    </files>
+            <files>                                                                      </files>
          </files>
       </package>
       <extension>

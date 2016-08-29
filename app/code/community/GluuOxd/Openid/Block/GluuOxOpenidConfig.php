@@ -254,6 +254,7 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
             $get_tokens_by_code->setRequestScopes($config_option["scope"]);
             $get_tokens_by_code->request();
             $get_tokens_by_code_array = $get_tokens_by_code->getResponseObject()->data->id_token_claims;
+
             $_SESSION['user_oxd_id_token']  = $get_tokens_by_code->getResponseIdToken();
             $_SESSION['user_oxd_access_token']  = $get_tokens_by_code->getResponseAccessToken();
             $_SESSION['session_state'] = $_REQUEST['session_state'];
@@ -264,6 +265,7 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
             $get_user_info->setRequestAccessToken($_SESSION['user_oxd_access_token']);
             $get_user_info->request();
             $get_user_info_array = $get_user_info->getResponseObject()->data->claims;
+
             $reg_first_name = '';
             $reg_last_name = '';
             $reg_middle_name = '';

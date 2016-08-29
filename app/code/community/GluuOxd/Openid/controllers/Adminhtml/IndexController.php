@@ -8,6 +8,7 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
 {
     private $dataHelper = "GluuOxd_Openid";
     private $oxdRegisterSiteHelper = "GluuOxd_Openid/registerSite";
+    private $oxdUpdateSiteRegistrationHelper = "GluuOxd_Openid/updateSiteRegistration";
 
     /**
      * @return string
@@ -16,7 +17,13 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
     {
         return Mage::helper($this->oxdRegisterSiteHelper);
     }
-
+    /**
+     * @return string
+     */
+    public function getOxdUpdateSiteRegistrationHelper()
+    {
+        return Mage::helper($this->oxdUpdateSiteRegistrationHelper);
+    }
     /**
      * @return gluuOxd admin index page
      */
@@ -248,6 +255,28 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
             $oxd_config['scope'] =  unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
         }
         $storeConfig ->saveConfig('gluu/oxd/oxd_config',serialize($oxd_config), 'default', 0);
+
+        $config_option = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_config' ));
+        $updateSiteRegistration = $this->getOxdUpdateSiteRegistrationHelper();
+        $updateSiteRegistration->setRequestOxdId(Mage::getStoreConfig ( 'gluu/oxd/oxd_id' ));
+        $updateSiteRegistration->setRequestAcrValues($config_option['acr_values']);
+        $updateSiteRegistration->setRequestAuthorizationRedirectUri($config_option['authorization_redirect_uri']);
+        $updateSiteRegistration->setRequestRedirectUris($config_option['redirect_uris']);
+        $updateSiteRegistration->setRequestLogoutRedirectUri($config_option['logout_redirect_uri']);
+        $updateSiteRegistration->setRequestContacts([$config_option['admin_email']]);
+        $updateSiteRegistration->setRequestApplicationType('web');
+        $updateSiteRegistration->setRequestScope($config_option['scope']);
+        $updateSiteRegistration->setRequestGrantTypes($config_option['grant_types']);
+        $updateSiteRegistration->setRequestResponseTypes($config_option['response_types']);
+        $updateSiteRegistration->setRequestClientLogoutUri($config_option['logout_redirect_uri']);
+        $status = $updateSiteRegistration->request();
+        if(!$status['status']){
+            $datahelper->displayMessage($status['message'],"ERROR");
+            $this->redirect("*/*/index");
+            return;
+        }
+        $storeConfig ->saveConfig('gluu/oxd/oxd_id',$updateSiteRegistration->getResponseOxdId(), 'default', 0);
+
         $datahelper->displayMessage($message,"SUCCESS");
         $this->redirect("*/*/index");
     }

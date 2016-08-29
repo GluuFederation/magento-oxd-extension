@@ -5,7 +5,7 @@
 
 require_once 'ClientOXDRP.php';
 
-class GluuOxd_Openid_Helper_RegisterSite extends GluuOxd_Openid_Helper_ClientOXDRP
+class GluuOxd_Openid_Helper_UpdateSiteRegistration extends GluuOxd_Openid_Helper_ClientOXDRP
 {
     /**start parameter for request!**/
     private $request_authorization_redirect_uri = null;
@@ -21,6 +21,7 @@ class GluuOxd_Openid_Helper_RegisterSite extends GluuOxd_Openid_Helper_ClientOXD
     private $request_grant_types = null;
     private $request_response_types = null;
     private $request_client_logout_uri = null;
+    private $request_oxd_id = null;
     /**end request parameter**/
 
     /**start parameter for response!**/
@@ -260,13 +261,30 @@ class GluuOxd_Openid_Helper_RegisterSite extends GluuOxd_Openid_Helper_ClientOXD
 
     public function setCommand()
     {
-        $this->command = 'register_site';
+        $this->command = 'update_site_registration';
+    }
+
+    /**
+     * @return null
+     */
+    public function getRequestOxdId()
+    {
+        return $this->request_oxd_id;
+    }
+
+    /**
+     * @param null $request_oxd_id
+     */
+    public function setRequestOxdId($request_oxd_id)
+    {
+        $this->request_oxd_id = $request_oxd_id;
     }
 
     public function setParams()
     {
         $this->params = array(
             "authorization_redirect_uri" => $this->getRequestAuthorizationRedirectUri(),
+            "oxd_id" => $this->getRequestOxdId(),
             "post_logout_redirect_uri" => $this->getRequestLogoutRedirectUri(),
             "application_type" => $this->getRequestApplicationType(),
             "redirect_uris" => $this->getRequestRedirectUris(),
@@ -278,6 +296,7 @@ class GluuOxd_Openid_Helper_RegisterSite extends GluuOxd_Openid_Helper_ClientOXD
             "contacts" => $this->getRequestContacts(),
             "grant_types" => $this->getRequestGrantTypes(),
             "response_types"=> $this->getRequestResponseTypes(),
+            "client_secret_expires_at"=> 1916258400,
             "client_logout_uris"=> [$this->getRequestClientLogoutUri()]
         );
     }

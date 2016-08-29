@@ -44,7 +44,7 @@
         </layout>
         <menu>
             <GluuOxdOpenid translate="title" module="GluuOxd_Openid">
-                <title>Gluu SSO 2.4.2</title>
+                <title>OpenID Connect SSO by Gluu</title>
                 <sort_order>81</sort_order>
                 <children>
                     <configure_extension translate="title" module="GluuOxd_Openid">
