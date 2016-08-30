@@ -113,6 +113,11 @@ class GluuOxd_Openid_Adminhtml_IndexController extends Mage_Adminhtml_Controller
         $oxd_port = $params['oxd_port'];
         $illegal = "#$%^*()+=[]';,/{}|:<>?~";
         $illegal = $illegal . '"';
+        if(!isset($_SERVER['HTTPS']) or $_SERVER['HTTPS'] != "on") {
+            $datahelper->displayMessage('OpenID Connect requires https. This plugin will not work if your website uses http only.',"ERROR");
+            $this->redirect("*/*/index");
+            return;
+        }
         if( $this->empty_or_null( $email )  ||  $this->empty_or_null( $oxd_port ) ) {
             $datahelper->displayMessage('All the fields are required. Please enter valid entries.',"ERROR");
             $this->redirect("*/*/index");
