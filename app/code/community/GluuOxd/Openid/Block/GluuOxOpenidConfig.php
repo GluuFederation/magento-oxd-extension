@@ -256,6 +256,7 @@ class GluuOxd_Openid_Block_GluuOxOpenidConfig extends Mage_Core_Block_Template{
             $_SESSION['user_oxd_id_token']  = $get_tokens_by_code->getResponseIdToken();
             $_SESSION['user_oxd_access_token']  = $get_tokens_by_code->getResponseAccessToken();
             $_SESSION['session_state'] = $_REQUEST['session_state'];
+            $_SESSION['state'] = $_REQUEST['state'];
 
             $get_user_info = $this->getGetUserInfo();
             $get_user_info->setRequestOxdId($oxd_id);

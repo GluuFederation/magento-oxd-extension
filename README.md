@@ -19,7 +19,7 @@ In order to use the Magento Extension, you will need to have deployed a standard
 
 [Link to Magento marketplace](https://www.magentocommerce.com/magento-connect/openid-connect-sso.html)
  
-[Github source](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/blob/master/Magento_gluu_SSO-2.4.4.tgz).
+[Github source](https://github.com/GluuFederation/gluu-magento-sso-login-extension/blob/master/Magento_gluu_SSO-2.4.4.tgz?raw=true).
 
 ### Step 2. Disable cache
  
