@@ -231,9 +231,7 @@ class GluuOxd_Openid_Helper_GetTokensByCode extends GluuOxd_Openid_Helper_Client
     {
         $this->params = array(
             "oxd_id" => $this->getRequestOxdId(),
-            "code" => $this->getRequestCode(),
-            "state" => $this->getRequestState(),
-            "scopes" => $this->getRequestScopes()
+            "code" => $this->getRequestCode()
         );
     }
 
