@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<layout>
+    <default>
+        <reference name="right">
+            <block type="GluuOxd_Gluufolder/GluuOxOpenidConfig" before="-" name="openid_login_home" template="gluuoxd_openid/homepage.phtml" />
+        </reference>
+    </default>
+    <customer_account_login>
+        <reference name="content">
+            <block type="GluuOxd_Gluufolder/GluuOxOpenidConfig" before="-" name="openid_login_home" template="gluuoxd_openid/homepage.phtml" />
+        </reference>
+    </customer_account_login>
+    <customer_account_create>
+        <reference name="content">
+            <block type="GluuOxd_Gluufolder/GluuOxOpenidConfig" before="-" name="openid_login_home" template="gluuoxd_openid/homepage.phtml" />
+        </reference>
+    </customer_account_create>
+    <!--
+Layout for customer log out page
+-->
+
+    <customer_account_logoutsuccess translate="label">
+        <reference name="content">
+            <block type="GluuOxd_Gluufolder/GluuOxOpenidConfig" before="-" name="openid_logout_home" template="gluuoxd_openid/logout.phtml"/>
+        </reference>
+    </customer_account_logoutsuccess>
+</layout>

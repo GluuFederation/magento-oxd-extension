@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <GluuOxd_Gluufolder>
+            <version>1.9.3</version>
+            <active>true</active>
+            <codePool>community</codePool>
+        </GluuOxd_Gluufolder>
+    </modules>
+    <frontend>
+        <routers>
+            <GluuOxd_Gluufolder_customer>
+                <use>standard</use>
+                <args>
+                    <module>GluuOxd_Gluufolder_Customer</module>
+                    <frontName>sociallogin</frontName>
+                </args>
+            </GluuOxd_Gluufolder_customer>
+        </routers>
+        <layout>
+            <updates>
+                <GluuOxd_Gluufolder_layout>
+                    <file>GluuOxd_Gluufolder_layout.xml</file>
+                </GluuOxd_Gluufolder_layout>
+            </updates>
+        </layout>
+    </frontend>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <GluuOxd_Gluufolder before="Mage_Adminhtml">
+                            GluuOxd_Gluufolder_Adminhtml
+                        </GluuOxd_Gluufolder>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+    <adminhtml>
+        <layout>
+            <updates>
+                <GluuOxd_Gluufolder_admin_layout>
+                    <file>GluuOxd_Gluufolder.xml</file>
+                </GluuOxd_Gluufolder_admin_layout>
+            </updates>
+        </layout>
+        <menu>
+            <GluuOxdGluufolder translate="title" module="GluuOxd_Gluufolder">
+                <title>OpenID Connect</title>
+                <sort_order>85</sort_order>
+                <children>
+                    <configure_extension translate="title" module="GluuOxd_Gluufolder">
+                        <title>Open Extension page </title>
+                        <sort_order>1</sort_order>
+                        <action>gluufolder/adminhtml_index</action>
+                    </configure_extension>
+                </children>
+            </GluuOxdGluufolder>
+        </menu>
+    </adminhtml>
+    <global>
+        <blocks>
+            <GluuOxd_Gluufolder>
+                <class>GluuOxd_Gluufolder_Block</class>
+            </GluuOxd_Gluufolder>
+        </blocks>
+        <helpers>
+            <GluuOxd_Gluufolder>
+                <class>GluuOxd_Gluufolder_Helper</class>
+            </GluuOxd_Gluufolder>
+        </helpers>
+        <resources>
+            <GluuOxd_Gluufolder_setup>
+                <setup>
+                    <module>GluuOxd_Gluufolder</module>
+                </setup>
+            </GluuOxd_Gluufolder_setup>
+        </resources>
+    </global>
+</config>

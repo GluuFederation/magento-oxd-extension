@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <GluuOxd_Gluufolder>
+            <version>1.9.3</version>
+        </GluuOxd_Gluufolder>
+    </modules>
+    <frontend>
+        <layout>
+            <updates>
+                <GluuOxd_Gluufolder_layout>
+                    <file>GluuOxd_Gluufolder_layout.xml</file>
+                </GluuOxd_Gluufolder_layout>
+            </updates>
+        </layout>
+    </frontend>
+    <adminhtml>
+        <layout>
+            <updates>
+                <GluuOxd_Gluufolder_admin_layout>
+                    <file>GluuOxd_Gluufolder.xml</file>
+                </GluuOxd_Gluufolder_admin_layout>
+            </updates>
+        </layout>
+        <menu>
+            <GluuOxdGluufolder translate="title" module="GluuOxd_Gluufolder">
+                <title>OpenID Connect</title>
+                <sort_order>81</sort_order>
+                <children>
+                    <configure_extension translate="title" module="GluuOxd_Gluufolder">
+                        <title>Open extension page</title>
+                        <sort_order>1</sort_order>
+                        <action>gluufolder/adminhtml_index</action>
+                    </configure_extension>
+                </children>
+            </GluuOxdGluufolder>
+        </menu>
+    </adminhtml>
+
+    <global>
+        <blocks>
+            <GluuOxd_Gluufolder>
+                <class>GluuOxd_Gluufolder_Block</class>
+            </GluuOxd_Gluufolder>
+        </blocks>
+        <helpers>
+            <GluuOxd_Gluufolder>
+                <class>GluuOxd_Gluufolder_Helper</class>
+            </GluuOxd_Gluufolder>
+        </helpers>
+    </global>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <GluuOxd_Gluufolder before="Mage_Adminhtml">GluuOxd_Gluufolder_Adminhtml</GluuOxd_Gluufolder>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+</config>

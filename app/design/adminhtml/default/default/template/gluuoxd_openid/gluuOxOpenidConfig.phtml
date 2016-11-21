@@ -1,858 +1,599 @@
 <?php
-$oxd_id = Mage::getStoreConfig('gluu/oxd/oxd_id');
-$get_scopes = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_scops'));
-$oxd_config = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_config'));
-$custom_scripts = unserialize(Mage::getStoreConfig('gluu/oxd/oxd_openid_custom_scripts'));
-$iconSpace = Mage::getStoreConfig ( 'GluuOxd/Openid/iconSpace' );
-$iconCustomSize = Mage::getStoreConfig ( 'GluuOxd/Openid/iconCustomSize' );
-$iconCustomWidth = Mage::getStoreConfig ( 'GluuOxd/Openid/iconCustomWidth' );
-$iconCustomHeight = Mage::getStoreConfig ( 'GluuOxd/Openid/iconCustomHeight' );
-$loginCustomTheme = Mage::getStoreConfig ( 'GluuOxd/Openid/loginCustomTheme' );
-$loginTheme = Mage::getStoreConfig ( 'GluuOxd/Openid/loginTheme' );
-$iconCustomColor = Mage::getStoreConfig ( 'GluuOxd/Openid/iconCustomColor' );
-if (!$loginTheme) $loginTheme = 'oval';
-if (!$loginCustomTheme) $loginCustomTheme = 'default';
-if (!$iconSpace) $iconSpace = '10';
-if (!$iconCustomSize) $iconCustomSize = '50';
-if (!$iconCustomWidth) $iconCustomWidth = '200';
-if (!$iconCustomHeight) $iconCustomHeight = '35';
-if (!$iconCustomColor) $iconCustomColor = '#0000FF';
+
+$user_types = $groups = Mage::helper('customer')->getGroups()->toOptionArray();
+                                       
+function getBaseUrl()
+{
+// output: /myproject/index.php
+    $currentPath = $_SERVER['PHP_SELF'];
+
+// output: Array ( [dirname] => /myproject [basename] => index.php [extension] => php [filename] => index )
+    $pathInfo = pathinfo($currentPath);
+
+// output: localhost
+    $hostName = $_SERVER['HTTP_HOST'];
+
+// output: http://
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+
+// return: http://localhost/myproject/
+    return $protocol.$hostName.$pathInfo['dirname'];
+}
+$base_url  = getBaseUrl();
+
+function select_query($action){
+    $result = Mage::getStoreConfig($action);
+    return $result;
+}
+function insert_query($action, $value){
+    $storeConfig = new Mage_Core_Model_Config();
+    $storeConfig ->saveConfig($action,$value, 'default', 0);
+    $result = Mage::getStoreConfig($action);
+    return $result;
+}
+if(!select_query('gluu/oxd/gluu_scopes')){
+    $get_scopes = json_encode(array("openid", "profile","email"));
+    $result = insert_query('gluu/oxd/gluu_scopes', $get_scopes);
+}
+if(!select_query('gluu/oxd/gluu_acr')){
+    $custom_scripts = json_encode(array('none'));
+    $result = insert_query('gluu/oxd/gluu_acr', $custom_scripts);
+}
+if(!select_query('gluu/oxd/gluu_config')){
+    $gluu_config = json_encode(array(
+        "gluu_oxd_port" =>8099,
+        "admin_email" => Mage::getSingleton('admin/session')->getUser()->getEmail(),
+        "authorization_redirect_uri" => Mage::helper('customer')->getLoginUrl().'?option=getOxdSocialLogin',
+        "post_logout_redirect_uri" => Mage::helper('customer')->getLogoutUrl(),
+        "config_scopes" => ["openid","profile","email"],
+        "gluu_client_id" => "",
+        "gluu_client_secret" => "",
+        "config_acr" => []
+    ));
+    $result = insert_query('gluu/oxd/gluu_config', $gluu_config);
+}
+if(!select_query('gluu/oxd/gluu_auth_type')){
+    $gluu_auth_type = 'default';
+    $result = insert_query('gluu/oxd/gluu_auth_type', $gluu_auth_type);
+}
+if(!select_query('gluu/oxd/gluu_custom_logout')){
+    $gluu_custom_logout = '';
+    $result = insert_query('gluu/oxd/gluu_custom_logout', $gluu_custom_logout);
+}
+if(!select_query('gluu/oxd/gluu_provider')){
+    $gluu_provider = '';
+    $result = insert_query('gluu/oxd/gluu_provider', $gluu_provider);
+}
+if(!select_query('gluu/oxd/gluu_send_user_check')){
+    $gluu_send_user_check = 0;
+    $result = insert_query('gluu/oxd/gluu_send_user_check', $gluu_send_user_check);
+}
+if(!select_query('gluu/oxd/gluu_send_admin_check')){
+    $gluu_send_admin_check = 0;
+    $result = insert_query('gluu/oxd/gluu_send_admin_check', $gluu_send_admin_check);
+}
+if(!select_query('gluu/oxd/gluu_oxd_id')){
+    $gluu_oxd_id = '';
+    $result = insert_query('gluu/oxd/gluu_oxd_id', $gluu_oxd_id);
+}
+if(!select_query('gluu/oxd/gluu_users_can_register')){
+    $gluu_users_can_register = 1;
+    $result = insert_query('gluu/oxd/gluu_users_can_register', $gluu_users_can_register);
+}
+if(!select_query('gluu/oxd/gluu_new_role')){
+    $result = insert_query('gluu/oxd/gluu_new_role', null);
+}
+if(!select_query('gluu/oxd/gluu_user_role')){
+    $gluu_user_role = 1;
+    $result = insert_query('gluu/oxd/gluu_user_role', $gluu_user_role);
+}
+$get_scopes                 = json_decode(select_query('gluu/oxd/gluu_scopes'),true);
+$gluu_config                = json_decode(select_query('gluu/oxd/gluu_config'),true);
+$gluu_acr                   = json_decode(select_query('gluu/oxd/gluu_acr'),true);
+$gluu_auth_type             = select_query('gluu/oxd/gluu_auth_type');
+$gluu_send_user_check       = select_query('gluu/oxd/gluu_send_user_check');
+$gluu_send_admin_check      = select_query('gluu/oxd/gluu_send_admin_check');
+$gluu_provider              = select_query('gluu/oxd/gluu_provider');
+$gluu_custom_logout         = select_query('gluu/oxd/gluu_custom_logout');
+$gluu_new_roles             = json_decode(select_query('gluu/oxd/gluu_new_role'));
+$gluu_users_can_register    = select_query('gluu/oxd/gluu_users_can_register');
+$gluu_user_role    = select_query('gluu/oxd/gluu_user_role');
+if(empty($gluu_config)){
+    header("Refresh:0");
+    exit;
+}
+function gluu_is_oxd_registered(){
+    if(select_query('gluu/oxd/gluu_oxd_id')){
+        $oxd_id = select_query('gluu/oxd/gluu_oxd_id');
+        if(!$oxd_id ) {
+            return 0;
+        } else {
+            return $oxd_id;
+        }
+    }
+}
 ?>
-<html>
-    <head>
-    <link href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/GluuOxd_Openid/css/gluu-oxd-css.css'; ?>" rel="stylesheet"/>
-    <link href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/GluuOxd_Openid/css/font-awesome.min.css'; ?>" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/GluuOxd_Openid/js/scope-custom-script.js'; ?>"></script>
-    <script>
-        var $m = jQuery.noConflict();
-        $m(document).ready(function () {
-            $oxd_id = "<?php echo $oxd_id; ?>";
-            if ($oxd_id) {
-                voiddisplay("#socialsharing");
-                setactive('social-sharing-setup');
-            } else {
-                setactive('account_setup');
-            }
-            $m(".navbar a").click(function () {
-                $id = $m(this).parent().attr('id');
-                setactive($id);
-                $href = $m(this).data('method');
-                voiddisplay($href);
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script type="application/javascript">
+    var jQuery = $.noConflict();
+    jQuery(document ).ready(function() {
+        jQuery(document).ready(function() {
+
+            jQuery('[data-toggle="tooltip"]').tooltip();
+            jQuery('#p_role').on('click', '.remrole', function() {
+                jQuery(this).parents('.role_p').remove();
             });
-            $m('#error-cancel').click(function () {
-                $error = "";
-                $m(".error-msg").css("display", "none");
-            });
-            $m('#success-cancel').click(function () {
-                $success = "";
-                $m(".success-msg").css("display", "none");
-            });
-            $m(".test").click(function () {
-                $m(".mo2f_thumbnail").hide();
-                $m("#twofactorselect").show();
-                $m("#test_2factor").val($m(this).data("method"));
-                $m("#mo2f_2factor_test_form").submit();
-            });
+
         });
-        function setactive($id) {
-            $m(".navbar-tabs>li").removeClass("active");
-            $m("#minisupport").show();
-            $id = '#' + $id;
-            $m($id).addClass("active");
+        <?php
+        if($gluu_users_can_register == 2){
+        ?>
+        jQuery("#p_role").children().prop('disabled',false);
+        jQuery("#p_role *").prop('disabled',false);
+        <?php
         }
-        function voiddisplay($href) {
-            $m(".page").css("display", "none");
-            $m($href).css("display", "block");
-        }
-        function mo2f_valid(f) {
-            !(/^[a-zA-Z?,.\(\)\/@ 0-9]*$/).test(f.value) ? f.value = f.value.replace(/[^a-zA-Z?,.\(\)\/@ 0-9]/, '') : null;
-        }
-        jQuery(document).ready(function () {
-            var tempHorSize = '<?php echo $iconCustomSize ?>';
-            var tempHorTheme = '<?php echo $loginTheme ?>';
-            var tempHorCustomTheme = '<?php echo $loginCustomTheme ?>';
-            var tempHorCustomColor = '<?php echo $iconCustomColor ?>';
-            var tempHorSpace = '<?php echo $iconSpace ?>';
-            var tempHorHeight = '<?php echo $iconCustomHeight ?>';
-            gluuOxLoginPreview(setSizeOfIcons(), tempHorTheme, tempHorCustomTheme, tempHorCustomColor, tempHorSpace, tempHorHeight);
-            checkLoginButton();
-            <?php if( $this->getConfig('email')){
-            if(isset($_GET['q']) && $_GET['q']=='sharing'){ ?>
-            jQuery('#social-sharing-setup > a').click();
-            <?php } else{ ?>
-            jQuery('#social-login-setup > a').click();
-            <?php }
-            } ?>
+        else if($gluu_users_can_register == 3){
+        ?>
+        jQuery("#p_role").children().prop('disabled',true);
+        jQuery("#p_role *").prop('disabled',true);
+        jQuery("input[name='gluu_new_role[]']").each(function(){
+            var striped = jQuery('#p_role');
+            var value =  jQuery(this).attr("value");
+            jQuery('<p><input type="hidden" name="gluu_new_role[]"  value= "'+value+'"/></p>').appendTo(striped);
         });
-        function setLoginTheme() {
-            return jQuery('input[name=gluuoxd_openid_login_theme]:checked', '#form-apps').val();
+        jQuery("#UserType").prop('disabled',true);
+        <?php
         }
-        function setLoginCustomTheme() {
-            return jQuery('input[name=gluuoxd_openid_login_custom_theme]:checked', '#form-apps').val();
+        else{
+        ?>
+        jQuery("#p_role").children().prop('disabled',true);
+        jQuery("#p_role *").prop('disabled',true);
+        jQuery("input[name='gluu_new_role[]']").each(function(){
+            var striped = jQuery('#p_role');
+            var value =  jQuery(this).attr("value");
+            jQuery('<p><input type="hidden" name="gluu_new_role[]"  value= "'+value+'"/></p>').appendTo(striped);
+        });
+        <?php
         }
-        function setSizeOfIcons() {
-            if ((jQuery('input[name=gluuoxd_openid_login_theme]:checked', '#form-apps').val()) == 'longbutton') {
-                return document.getElementById('gluuox_login_icon_width').value;
-            } else {
-                return document.getElementById('gluuox_login_icon_size').value;
+        ?>
+        jQuery('input:radio[name="gluu_users_can_register"]').change(function(){
+            if(jQuery(this).is(':checked') && jQuery(this).val() == '2'){
+                jQuery("#p_role").children().prop('disabled',false);
+                jQuery("#p_role *").prop('disabled',false);
+                jQuery("input[type='hidden'][name='gluu_new_role[]']").remove();
+                jQuery("#UserType").prop('disabled',false);
+            }else if(jQuery(this).is(':checked') && jQuery(this).val() == '3'){
+                jQuery("#p_role").children().prop('disabled',true);
+                jQuery("#p_role *").prop('disabled',true);
+                jQuery("input[type='hidden'][name='gluu_new_role[]']").remove();
+                jQuery("input[name='gluu_new_role[]']").each(function(){
+                    var striped = jQuery('#p_role');
+                    var value =  jQuery(this).attr("value");
+                    jQuery('<p><input type="hidden" name="gluu_new_role[]"  value= "'+value+'"/></p>').appendTo(striped);
+                });
+                jQuery("#UserType").prop('disabled',true);
+            }else{
+                jQuery("#p_role").children().prop('disabled',true);
+                jQuery("#p_role *").prop('disabled',true);
+                jQuery("input[type='hidden'][name='gluu_new_role[]']").remove();
+                jQuery("input[name='gluu_new_role[]']").each(function(){
+                    var striped = jQuery('#p_role');
+                    var value =  jQuery(this).attr("value");
+                    jQuery('<p><input type="hidden" name="gluu_new_role[]"  value= "'+value+'"/></p>').appendTo(striped);
+                });
+                jQuery("#UserType").prop('disabled',false);
             }
-        }
-        function gluuOxLoginPreview(t, r, l, p, n, h) {
-            if (l == 'default') {
-                if (r == 'longbutton') {
-                    var a = "btn-defaulttheme";
-                    jQuery("." + a).css("width", t + "px");
-                    if (h > 26) {
-                        jQuery("." + a).css("height", "26px");
-                        jQuery("." + a).css("padding-top", (h - 26) / 2 + "px");
-                        jQuery("." + a).css("padding-bottom", (h - 26) / 2 + "px");
-                    } else {
-                        jQuery("." + a).css("height", h + "px");
-                        jQuery("." + a).css("padding-top", (h - 26) / 2 + "px");
-                        jQuery("." + a).css("padding-bottom", (h - 26) / 2 + "px");
-                    }
-                    jQuery(".fa").css("padding-top", (h - 35) + "px");
-                    jQuery("." + a).css("margin-bottom", n + "px");
-                } else {
-                    var a = "gluuox_login_icon_preview";
-                    jQuery("." + a).css("margin-left", n + "px");
-                    if (r == "circle") {
-                        jQuery("." + a).css({height: t, width: t});
-                        jQuery("." + a).css("borderRadius", "999px");
-                    } else if (r == "oval") {
-                        jQuery("." + a).css("borderRadius", "5px");
-                        jQuery("." + a).css({height: t, width: t});
-                    } else if (r == "square") {
-                        jQuery("." + a).css("borderRadius", "0px");
-                        jQuery("." + a).css({height: t, width: t});
-                    }
-                }
+        });
+        jQuery("input[name='scope[]']").change(function(){
+            var form=$("#scpe_update");
+            if (jQuery(this).is(':checked')) {
+                jQuery.ajax({
+                    url: window.location,
+                    type: 'POST',
+                    data:form.serialize(),
+                    success: function(result){
+                        if(result){
+                            return false;
+                        }
+                    }});
+            }else{
+                jQuery.ajax({
+                    url: window.location,
+                    type: 'POST',
+                    data:form.serialize(),
+                    success: function(result){
+                        if(result){
+                            return false;
+                        }
+                    }});
             }
-            else if (l == 'custom') {
-                if (r == 'longbutton') {
-                    var a = "btn-customtheme";
-                    jQuery("." + a).css("width", (t) + "px");
-                    if (h > 26) {
-                        jQuery("." + a).css("height", "26px");
-                        jQuery("." + a).css("padding-top", (h - 26) / 2 + "px");
-                        jQuery("." + a).css("padding-bottom", (h - 26) / 2 + "px");
-                    } else {
-                        jQuery("." + a).css("height", h + "px");
-                        jQuery("." + a).css("padding-top", (h - 26) / 2 + "px");
-                        jQuery("." + a).css("padding-bottom", (h - 26) / 2 + "px");
-                    }
-                    jQuery("." + a).css("margin-bottom", n + "px");
-                    jQuery("." + a).css("background", p);
-                } else {
-                    var a = "gluuOx_custom_login_icon_preview";
-                    jQuery("." + a).css({height: t - 8, width: t});
-                    jQuery("." + a).css("padding-top", "8px");
-                    jQuery("." + a).css("margin-left", n + "px");
-                    jQuery("." + a).css("background", p);
-                    if (r == "circle") {
-                        jQuery("." + a).css("borderRadius", "999px");
-                    } else if (r == "oval") {
-                        jQuery("." + a).css("borderRadius", "5px");
-                    } else if (r == "square") {
-                        jQuery("." + a).css("borderRadius", "0px");
-                    }
-                    jQuery("." + a).css("font-size", (t - 16) + "px");
-                }
-            }
-            previewLoginIcons();
-        }
-        function checkLoginButton() {
-            if (document.getElementById('iconwithtext').checked) {
-                if (setLoginCustomTheme() == 'default') {
-                    jQuery(".gluuox_login_icon_preview").hide();
-                    jQuery(".gluuOx_custom_login_icon_preview").hide();
-                    jQuery(".btn-customtheme").hide();
-                    jQuery(".btn-defaulttheme").show();
-                } else if (setLoginCustomTheme() == 'custom') {
-                    jQuery(".gluuox_login_icon_preview").hide();
-                    jQuery(".gluuOx_custom_login_icon_preview").hide();
-                    jQuery(".btn-defaulttheme").hide();
-                    jQuery(".btn-customtheme").show();
-                }
-                jQuery("#commontheme").hide();
-                jQuery(".longbuttontheme").show();
-            }
-            else {
-                if (setLoginCustomTheme() == 'default') {
-                    jQuery(".gluuox_login_icon_preview").show();
-                    jQuery(".btn-defaulttheme").hide();
-                    jQuery(".btn-customtheme").hide();
-                    jQuery(".gluuOx_custom_login_icon_preview").hide();
-                } else if (setLoginCustomTheme() == 'custom') {
-                    jQuery(".gluuox_login_icon_preview").hide();
-                    jQuery(".gluuOx_custom_login_icon_preview").show();
-                    jQuery(".btn-defaulttheme").hide();
-                    jQuery(".btn-customtheme").hide();
-                }
-                jQuery("#commontheme").show();
-                jQuery(".longbuttontheme").hide();
-            }
-            previewLoginIcons();
-        }
-        function previewLoginIcons() {
-            var flag = 0;
-            <?php foreach($custom_scripts as $custom_script):?>
-            if (document.getElementById('<?php echo $custom_script['value'];?>_enable').checked) {
-                flag = 1;
-                if (document.getElementById('gluuoxd_openid_login_default_radio').checked && !document.getElementById('iconwithtext').checked)
-                    jQuery("#gluuox_login_icon_preview_<?php echo $custom_script['value'];?>").show();
-                if (document.getElementById('gluuoxd_openid_login_custom_radio').checked && !document.getElementById('iconwithtext').checked)
-                    jQuery("#gluuOx_custom_login_icon_preview_<?php echo $custom_script['value'];?>").show();
-                if (document.getElementById('gluuoxd_openid_login_default_radio').checked && document.getElementById('iconwithtext').checked)
-                    jQuery("#gluuox_login_button_preview_<?php echo $custom_script['value'];?>").show();
-                if (document.getElementById('gluuoxd_openid_login_custom_radio').checked && document.getElementById('iconwithtext').checked)
-                    jQuery("#gluuOx_custom_login_button_preview_<?php echo $custom_script['value'];?>").show();
-            }
-            else if (!document.getElementById('<?php echo $custom_script['value'];?>_enable').checked) {
-                jQuery("#gluuox_login_icon_preview_<?php echo $custom_script['value'];?>").hide();
-                jQuery("#gluuOx_custom_login_icon_preview_<?php echo $custom_script['value'];?>").hide();
-                jQuery("#gluuox_login_button_preview_<?php echo $custom_script['value'];?>").hide();
-                jQuery("#gluuOx_custom_login_button_preview_<?php echo $custom_script['value'];?>").hide();
-            }
-            <?php endforeach;?>
-            if (flag) {
-                jQuery("#no_apps_text").hide();
-            } else {
-                jQuery("#no_apps_text").show();
-            }
-        }
-        var selectedApps = [];
-        function setTheme() {
-            return jQuery('input[name=gluuoxd_openid_share_theme]:checked', '#settings_form').val();
-        }
-        function setCustomTheme() {
-            return jQuery('input[name=gluuoxd_openid_share_custom_theme]:checked', '#settings_form').val();
-        }
-        function gluuOxLoginSizeValidate(e) {
-            var t = parseInt(e.value.trim());
-            t > 60 ? e.value = 60 : 20 > t && (e.value = 20);
-            reloadLoginPreview();
-        }
-        function gluuOxLoginSpaceValidate(e) {
-            var t = parseInt(e.value.trim());
-            t > 60 ? e.value = 60 : 0 > t && (e.value = 0);
-            reloadLoginPreview();
-        }
-        function gluuOxLoginWidthValidate(e) {
-            var t = parseInt(e.value.trim());
-            t > 1000 ? e.value = 1000 : 140 > t && (e.value = 140)
-            reloadLoginPreview();
-        }
-        function gluuOxLoginHeightValidate(e) {
-            var t = parseInt(e.value.trim());
-            t > 100 ? e.value = 100 : 10 > t && (e.value = 10)
-            reloadLoginPreview();
-        }
-        function reloadLoginPreview() {
-            if (setLoginTheme() == 'longbutton')
-                gluuOxLoginPreview(document.getElementById('gluuox_login_icon_width').value, setLoginTheme(), setLoginCustomTheme(), document.getElementById('gluuox_login_icon_custom_color').value, document.getElementById('gluuox_login_icon_space').value,
-                    document.getElementById('gluuox_login_icon_height').value);
-            else
-                gluuOxLoginPreview(document.getElementById('gluuox_login_icon_size').value, setLoginTheme(), setLoginCustomTheme(), document.getElementById('gluuox_login_icon_custom_color').value, document.getElementById('gluuox_login_icon_space').value);
-        }
-    </script>
-</head>
-    <body>
-        <div class="heading"><h3>OpenID Connect Single Sign-On (SSO) Extension by Gluu</h3></div>
-        <div class="mo2f_container">
-        <div class="container">
+        });
+        jQuery('#p_role').on('click', '.remrole', function() {
+            jQuery(this).parents('.role_p').remove();
+        });
+    });
+</script>
+<style>
+    .tooltipLink { display: inline !important; }
+    .tooltipLink:hover { display: inline !important; }
+    td{ border-top:none !important;  }
+</style>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/GluuOxd_Openid/css/gluu-oxd-css.css'; ?>"  rel="stylesheet"/>
+<script src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/GluuOxd_Openid/js/scope-custom-script.js'; ?>"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<div class="heading"><h3>OpenID Connect Single Sign-On (SSO) Extension by Gluu</h3></div>
+<div class="container" style="width: 100%">
+    <div class="row">
+        <div class="col-md-12" style="padding: 0px !important;">
+            <div id="messages">
+                <ul class="mini-messages">
+                    <?php if (Mage::getSingleton('core/session')->getErrorMessage()) { ?>
+                        <li class="error-msg">
+                            <ul>
+                                <li>
+                                    <span><?php echo Mage::getSingleton('core/session')->getErrorMessage(); ?></span>
+                                    <a id="error-cancel" href="#">&times;</a>
+                                </li>
+                            </ul>
+                        </li>
+                    <?php } ?>
+                    <?php if (Mage::getSingleton('core/session')->getSuccessMessage()) { ?>
+                        <li class="success-msg">
+                            <ul>
+                                <li>
+                                    <span><?php echo Mage::getSingleton('core/session')->getSuccessMessage(); ?></span><a id="success-cancel" href="#">&times;</a>
+                                </li>
+                            </ul>
+                        </li>
+                    <?php } ?>
+                </ul>
+            </div>
             <ul class="navbar navbar-tabs">
-                <li id="account_setup"><a data-method="#accountsetup">General</a></li>
-                <li id="social-sharing-setup"><a data-method="#socialsharing">OpenID Connect Configuration</a></li>
-                <li id="social-login-setup"><a data-method="#sociallogin">Magento Configuration</a></li>
-                <li id="help_trouble"><a data-method="#helptrouble">Help & Troubleshooting</a></li>
+                <li class="active" id="account_setup"><a data-method="#accountsetup">General</a></li>
+                <?php if ( !gluu_is_oxd_registered()) {?>
+                    <li id="social-sharing-setup"><a style="pointer-events: none; cursor: default;">OpenID Connect Configuration</a></li>
+                <?php }else {?>
+                    <li id="social-sharing-setup"><a href="<?php echo $this->getadminurl('*/*/openidConfigPage') ?>">OpenID Connect Configuration</a></li>
+                <?php }?>
+                <li id=""><a data-method="#configopenid" href="https://oxd.gluu.org/docs/plugin/magento/" target="_blank">Documentation</a></li>
             </ul>
-            <div class="container-page">
-                <div id="messages">
-                    <ul class="mini-messages">
-                        <?php if (Mage::getSingleton('core/session')->getErrorMessage()) { ?>
-                            <li class="error-msg">
-                                <ul>
-                                    <li>
-                                        <span><?php echo Mage::getSingleton('core/session')->getErrorMessage(); ?></span>
-                                        <a id="error-cancel" href="#">&times;</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        <?php } ?>
-                        <?php if (Mage::getSingleton('core/session')->getSuccessMessage()) { ?>
-                            <li class="success-msg">
-                                <ul>
-                                    <li>
-                                        <span><?php echo Mage::getSingleton('core/session')->getSuccessMessage(); ?></span><a id="success-cancel" href="#">&times;</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        <?php } ?>
-                    </ul>
-                </div>
+            <div class="container-page"  style="padding: 0px !important;">
                 <!-- General -->
-                <?php if (!$oxd_id) { ?>
+                <?php if (!gluu_is_oxd_registered()) { ?>
                     <!-- General tab-->
                     <div class="page" id="accountsetup">
                         <div class="mo2f_table_layout">
                             <form id="register_GluuOxd" name="f" method="post"
                                   action="<?php echo $this->getadminurl('*/*/generalFunction') ?>">
                                 <input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
+                                <input type="hidden" name="form_key_value" value="general_register_page"/>
                                 <div class="login_GluuOxd">
-                                    <div class="mess_red">
-                                        Please enter the details of your OpenID Connect Provider.
-                                    </div>
                                     <br/>
-                                    <div><h3>Register your site with an OpenID Connect Provider</h3></div>
+                                    <div  style="padding-left: 20px;">Register your site with any standard OpenID Provider (OP). If you need an OpenID Provider you can deploy the <a target="_blank" href="https://gluu.org/docs/deployment/"> free open source Gluu Server.</a></div>
                                     <hr>
-                                    <div class="mess_red">If you do not have an OpenID Connect provider, you may want to look at the Gluu Server (
-                                        <a target="_blank" href="http://www.gluu.org/docs">Like Magento, there is a free open source Community Edition. For more information about Gluu Server support please visit <a target="_blank" href="http://www.gluu.org">our website.</a></a>)
-                                    </div>
-                                    <div class="mess_red">
-                                        <h3>Instructions to Install oxd server</h3>
-                                        <br><b>NOTE:</b> The oxd server should be installed on the same server as your Magento site. It is recommended that the oxd server listen only on the localhost interface, so only your local applications can reach its API's.
-                                        <ol style="list-style:decimal !important; margin: 30px">
-                                            <li>Extract and copy in your DMZ Server.</li>
-                                            <li>Download the latest oxd-server package for Centos or Ubuntu. See
-                                                <a target="_blank" href="http://gluu.org/docs-oxd">oxd docs</a> for more info.
-                                            </li><li>If you are installing an .rpm or .deb, make sure you have Java in your server.
-                                            </li><li>Edit <b>oxd-conf.json</b> in the <b>conf</b> directory to specify the port on which
-                                                it will run, and specify the hostname of the OpenID Connect provider.</li>
-                                            <li>Open the command line and navigate to the extracted folder in the <b>bin</b> directory.</li>
-                                            <li>For Linux environment, run <b>sh oxd-start.sh &amp;</b></li>
-                                            <li>For Windows environment, run <b>oxd-start.bat</b></li>
-                                            <li>After the server starts, set the port number, Gluu Server URL and your email in this page and click Next.</li>
-                                        </ol>
-                                    </div>
+                                    <div style="padding-left: 20px;">This plugin relies on the oxd mediator service. For oxd deployment instructions and license information, please visit the <a target="_blank" href="http://gluu.org">oxd website.</a></div>
                                     <hr>
-                                    <div>
-                                        <table class="table">
-                                            <tr>
-                                                <td><b><font color="#FF0000">*</font>Admin Email:</b></td>
-                                                <td><input class="" type="email" name="loginemail" id="loginemail"
-                                                           autofocus="true" required placeholder="person@example.com"
-                                                           style="width:400px;"
-                                                           value="<?php echo $oxd_config['admin_email']; ?>"/>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td><b><font color="#FF0000">*</font>Gluu Server URL:</b></td>
-                                                <td><input class="" type="url" name="gluu_server_url" id="gluu_server_url"
-                                                           autofocus="true" required placeholder="Enter your gluu server url"
-                                                           style="width:400px;"
-                                                           value="<?php echo $oxd_config['op_host']; ?>"/>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td><b><font color="#FF0000">*</font>Port number:</b></td>
-                                                <td>
-                                                    <input class="" type="number" name="oxd_port" min="0" max="65535"
-                                                           value="<?php echo $oxd_config['oxd_host_port']; ?>"
-                                                           style="width:400px;" placeholder="Enter port number."/>
-                                                </td>
-                                            </tr>
-                                        </table>
+                                    <div style="margin-left: 20px">
+                                        <h3 style="padding-left: 10px;padding-bottom: 20px; border-bottom: 2px solid black; width: 60% "> Server Settings</h3>
+                                        <div style="padding-left: 20px;">
+                                            <table class="table">
+                                                <tr >
+                                                    <td style=" width: 40%"><b>URI of the OpenID Provider:</b></td>
+                                                    <td><input class="" type="url" name="gluu_provider" id="gluu_provider"
+                                                               autofocus="true"  placeholder="Enter URI of the OpenID Provider."
+                                                               style="width:400px;"
+                                                               value="<?php echo $gluu_provider;?>"/>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Custom URI after logout:</b></td>
+                                                    <td><input class="" type="url" name="gluu_custom_logout" id="gluu_custom_logout"
+                                                               autofocus="true"  placeholder="Enter custom URI after logout"
+                                                               style="width:400px;"
+                                                               value="<?php echo $gluu_custom_logout;?>"/>
+                                                    </td>
+                                                </tr>
+                                                <?php if(!empty($_SESSION['openid_error'])){?>
+                                                    <tr>
+                                                        <td><b>Redirect URL for customer page:</b></td>
+                                                        <td><?php echo Mage::helper('customer')->getLoginUrl().'?option=getOxdSocialLogin';?>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Redirect URL for administrator page:</b></td>
+                                                        <td><?php echo Mage::getUrl('adminhtml').'?option=getOxdAdminLogin';?>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b><font color="#FF0000">*</font>Client ID:</b></td>
+                                                        <td><input class="" type="text" name="gluu_client_id" id="gluu_client_id"
+                                                                   autofocus="true" placeholder="Enter OpenID Provider client ID."
+                                                                   style="width:400px;"
+                                                                   value="<?php if(!empty($gluu_config['gluu_client_id'])) echo $gluu_config['gluu_client_id']; ?>"/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b><font color="#FF0000">*</font>Client Secret:</b></td>
+                                                        <td>
+                                                            <input class="" type="text" name="gluu_client_secret" id="gluu_client_secret"
+                                                                   autofocus="true" placeholder="Enter OpenID Provider client secret."  style="width:400px;" value="<?php if(!empty($gluu_config['gluu_client_secret'])) echo $gluu_config['gluu_client_secret']; ?>"/>
+                                                        </td>
+                                                    </tr>
+                                                <?php }?>
+                                                <tr>
+                                                    <td><b><font color="#FF0000">*</font>oxd port:</b></td>
+                                                    <td>
+                                                        <input class="" type="number" name="gluu_oxd_port" min="0" max="65535"
+                                                               value="<?php echo $gluu_config['gluu_oxd_port']; ?>"
+                                                               style="width:400px;" placeholder="Please enter free port (for example 8099). (Min. number 0, Max. number 65535)."/>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
                                     </div>
-                                    <div><input type="submit" name="submit" value="Next" style="width: 120px" class=""/>
+                                    <div style="margin-left: 20px">
+                                        <h3 style="padding-left: 10px;padding-bottom: 20px; border-bottom: 2px solid black; width: 60% ">Enrollment
+                                            <a data-toggle="tooltip" class="tooltipLink" data-original-title="Choose whether to register new users when they login at an external identity provider. If you disable automatic registration, new users will need to be manually created">
+                                                <span class="glyphicon glyphicon-info-sign"></span>
+                                            </a>
+                                        </h3>
+                                        <div class="radio" style="padding-left: 20px;">
+                                            <p><label><input name="gluu_users_can_register" type="radio" id="gluu_users_can_register" <?php if($gluu_users_can_register==1){ echo "checked";} ?> value="1" style="margin-right: 3px"> Automatically register any user with an account in the OpenID Provider</label></p>
+                                        </div>
+                                        <div class="radio" style="padding-left: 20px;">
+                                            <p><label ><input name="gluu_users_can_register" type="radio" id="gluu_users_can_register" <?php if($gluu_users_can_register==2){ echo "checked";} ?> value="2" style="margin-right: 3px"> Only register users with the following role(s) in the OpenID Provider</label></p>
+                                            <div style="margin-left: 20px;">
+                                                <div id="p_role">
+                                                    <?php $k=0;
+                                                    if(!empty($gluu_new_roles)) {
+                                                        foreach ($gluu_new_roles as $gluu_new_role) {
+                                                            if (!$k) {
+                                                                $k++;
+                                                                ?>
+                                                                <p class="role_p" style="padding-top: 10px">
+                                                                    <input  type="text" name="gluu_new_role[]" class="form-control" style="display: inline; width: 200px !important;"
+                                                                            placeholder="Input role name"
+                                                                            value="<?php echo $gluu_new_role; ?>"/>
+                                                                    <button type="button" class="btn btn-primary btn-xs add_new_role" onclick="test_add()"><span class="glyphicon glyphicon-plus"></span></button>
+                                                                </p>
+                                                                <?php
+                                                            } else {
+                                                                ?>
+                                                                <p class="role_p" style="padding-top: 10px">
+                                                                    <input type="text" name="gluu_new_role[]" class="form-control" style="display: inline; width: 200px !important;"
+                                                                           placeholder="Input role name"
+                                                                           value="<?php echo $gluu_new_role; ?>"/>
+                                                                    <button type="button" class="btn btn-primary btn-xs add_new_role" onclick="test_add()"><span class="glyphicon glyphicon-plus"></span></button>
+                                                                    <button type="button" class="btn btn-primary btn-xs remrole"><span class="glyphicon glyphicon-minus"></span></button>
+                                                                </p>
+                                                            <?php }
+                                                        }
+                                                    }else{
+                                                        ?>
+                                                        <p class="role_p" style="padding-top: 10px">
+                                                            <input type="text" name="gluu_new_role[]" class="form-control" placeholder="Input role name" style="display: inline; width: 200px !important;" value=""/>
+                                                            <button type="button" class="btn btn-primary btn-xs add_new_role" onclick="test_add()"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </p>
+                                                        <?php
+                                                    }?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="radio" style="padding-left: 20px;">
+                                            <p><label><input name="gluu_users_can_register" type="radio" id="gluu_users_can_register" <?php if($gluu_users_can_register==3){ echo "checked";} ?> value="3" style="margin-right: 3px"> Disable automatic registration</label></p>
+                                        </div>
+                                        
+                                        <div style="padding-left: 20px;">
+                                            <table class="table">
+                                                <tr >
+                                                    <td  style="width: 270px"><b>New Customer Default Group:</b></td>
+                                                    <td>
+                                                        <div class="form-group">
+                                                            <select style="width: 400px" id="UserType" class="form-control" name="gluu_user_role" >
+                                                                <?php
+                                                                foreach($user_types as $user_type){
+                                                                    ?>
+                                                                    <option <?php if($user_type['value'] == $gluu_user_role) echo 'selected'; ?> value="<?php echo $user_type['value'];?>"><?php echo $user_type['label'];?></option>
+                                                                    <?php
+                                                                }
+                                                                ?>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <?php if(!empty($_SESSION['openid_error'])){?>
+
+                                                    <tr>
+                                                        <td>
+                                                            <div><input type="submit" name="register" value="Register" style="width: 120px; float: right;"/></div>
+                                                        </td>
+                                                        <td>
+                                                            <div>
+                                                                <a class="btn btn-primary btn-md" onclick="return confirm('Are you sure that you want to remove this OpenID Connect provider? Users will no longer be able to authenticate against this OP.')" style="text-align:center;margin-top: 25px; float: left; width: 120px;background-color: red" href="<?php echo $this->getadminurl('*/*/resetConfig') ?>">Delete</a></div>
+                                                        </td>
+                                                    </tr>
+                                                <?php }
+                                                else{?>
+                                                    <tr>
+                                                        <?php if(!empty($gluu_provider)){?>
+                                                            <td>
+                                                                <div><input type="submit" name="register" value="Register" style="width: 120px; float: right;" class="btn btn-primary btn-md"/></div>
+                                                            </td>
+                                                            <td>
+                                                                <div>
+                                                                    <a class="btn btn-primary btn-md" onclick="return confirm('Are you sure that you want to remove this OpenID Connect provider? Users will no longer be able to authenticate against this OP.')" style="text-align:center; float: left; width: 120px;background-color: red;margin-top: 25px;" href="<?php echo $this->getadminurl('*/*/resetConfig') ?>">Delete</a></div>
+                                                            </td>
+                                                        <?php }else{?>
+                                                            <td>
+                                                                <div><input type="submit" name="submit" value="Register" style="width: 120px; float: left;" class="btn btn-primary btn-md"/></div>
+                                                            </td>
+                                                            <td>
+                                                            </td>
+                                                        <?php }?>
+                                                    </tr>
+                                                <?php }?>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
                         </div>
                     </div>
-                <?php } else{?>
-                    <div class="page" id="accountsetup">
-                        <div style="border: 2px solid #53cc6b; margin-bottom: 20px; margin-top: 20px;">
-                            <div>
-                                <div class="about">
-                                    <h3 style="color: #45a8ff" class="sc"><img style=" height: 45px; margin-left: 20px;" src="<?php echo $this->getIconImage('ox'); ?>"/>&nbsp; server config</h3>
-                                </div>
-                            </div>
-                            <div class="entry-edit" style="width: 1000px !important; margin-left: 30px; ">
-                                <div class="entry-edit-head">
-                                    <h4 class="icon-head head-edit-form fieldset-legend">OXD id</h4>
-                                </div>
-                                <div class="fieldset">
-                                    <div class="hor-scroll">
-                                        <table class="form-list container">
-                                            <tr class="wrapper-trr">
-                                                <td class="value">
-                                                    <input <?php echo 'disabled' ?> type="text" name="oxd_id" value="<?php echo $oxd_id; ?>"/>
+                <?php }
+                else{?>
+                    <!-- General edit tab without client_id and client_secret -->
+                    <div style="padding: 20px !important;" id="accountsetup">
+                        <form id="register_GluuOxd" name="f" method="post"
+                              action="<?php echo $this->getadminurl('*/*/resetConfig') ?>">
+                            <input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
+                            <input type="hidden" name="form_key_value" value="general_oxd_id_reset"/>
+                            <fieldset style="border: 2px solid #53cc6b; padding: 20px">
+                                <legend style="border-bottom:none; width: 110px !important; visibility: visible !important; overflow: visible; height: inherit !important;">
+                                    <img style=" height: 45px;" src="<?php echo $this->getIconImage('gl'); ?>"/>
+                                </legend>
+                                <div style="margin-left: 20px">
+                                    <h3 style="padding-left: 10px;padding-bottom: 20px; border-bottom: 2px solid black; width: 60% "> Server Settings</h3>
+                                    <div style="padding-left: 10px;">
+                                        <table class="table">
+                                            <tr>
+                                                <td style=" width: 40%"><b>URI of the OpenID Provider:</b></td>
+                                                <td><input type="url" name="gluu_provider" id="gluu_provider"
+                                                           disabled placeholder="Enter URI of the OpenID Provider."
+                                                           style="width:400px;"
+                                                           value="<?php echo $gluu_provider; ?>"/>
+                                                </td>
+                                            </tr>
+                                            <?php if(!empty($gluu_config['gluu_client_id']) and !empty($gluu_config['gluu_client_secret'])){?>
+                                                <tr>
+                                                    <td><b>Redirect URL for customer page:</b></td>
+                                                    <td><?php echo Mage::getBaseUrl().'customer/account/login?option=getOxdSocialLogin';?>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Redirect URL for administrator page:</b></td>
+                                                    <td><?php echo Mage::getBaseUrl().'admin?option=getOxdAdminLogin';?>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b><font color="#FF0000">*</font>Client ID:</b></td>
+                                                    <td><input class="" type="text" disabled name="gluu_client_id" id="gluu_client_id" autofocus="true" placeholder="Enter OpenID Provider client ID." style="width:400px; background-color: rgb(235, 235, 228);" value="<?php if(!empty($gluu_config['gluu_client_id'])) echo $gluu_config['gluu_client_id']; ?>"/>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b><font color="#FF0000">*</font>Client Secret:</b></td>
+                                                    <td>
+                                                        <input class="" type="text" disabled name="gluu_client_secret" id="gluu_client_secret" autofocus="true" placeholder="Enter OpenID Provider client secret."  style="width:400px; background-color: rgb(235, 235, 228);" value="<?php if(!empty($gluu_config['gluu_client_secret'])) echo $gluu_config['gluu_client_secret']; ?>"/>
+                                                    </td>
+                                                </tr>
+                                            <?php }?>
+                                            <tr>
+                                                <td><b>Custom URI after logout:</b></td>
+                                                <td><input class="" type="url" name="gluu_custom_logout" id="gluu_custom_logout"
+                                                           autofocus="true" disabled placeholder="Enter custom URI after logout"
+                                                           style="width:400px;"
+                                                           value="<?php echo $gluu_custom_logout;?>"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>oxd port:</b></td>
+                                                <td>
+                                                    <input class="" type="text" disabled name="gluu_oxd_port" min="0" max="65535" value="<?php echo $gluu_config['gluu_oxd_port']; ?>" style="width:400px; background-color: rgb(235, 235, 228);" placeholder="Please enter free port (for example 8099). (Min. number 0, Max. number 65535)."/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>oxd ID:</b></td>
+                                                <td>
+                                                    <input class="" type="text" disabled name="oxd_id" value="<?php echo gluu_is_oxd_registered(); ?>" style="width:400px; background-color: rgb(235, 235, 228);" placeholder="Your oxd id" />
                                                 </td>
                                             </tr>
                                         </table>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <form action="<?php echo $this->getadminurl('*/*/resetConfig') ?>" method="post">
-                            <input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
-                            <input type="hidden" value="resetConfig" name="resetConfig"/>
-                            <p><input style="width: 200px; background-color: red !important; cursor: pointer" type="submit" class="button button-primary " value="Reset configurations" name="resetButton"/></p>
-                        </form>
-                    </div>
-                <?php }?>
-                <!--Scopes and custom scripts tab-->
-                <div class="page" id="socialsharing">
-                    <?php if (!$oxd_id){ ?>
-                        <div class="mess_red">
-                            Please enter OXD configuration to continue.
-                        </div><br/>
-                    <?php } ?>
-                    <div>
-                        <form action="<?php echo $this->getadminurl('*/*/scopeCustomScript') ?>" method="post"
-                              enctype="multipart/form-data">
-                            <input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
-                            <div style="border: 2px solid #53cc6b;">
-                                <div>
-                                    <div class="about">
-                                        <br/>
-                                        <h3 style="color: #00aa00" class="sc"><img style="height: 45px; margin-left: 30px;" src="<?php echo $this->getIconImage('gl'); ?>"/> &nbsp; server config
-                                        </h3>
+                                <div style="margin-left: 20px">
+                                    <h3 style="padding-left: 10px;padding-bottom: 20px; border-bottom: 2px solid black; width: 60% ">Enrollment
+                                        <a data-toggle="tooltip" class="tooltipLink" data-original-title="Choose whether to register new users when they login at an external identity provider. If you disable automatic registration, new users will need to be manually created">
+                                            <span class="glyphicon glyphicon-info-sign"></span>
+                                        </a>
+                                    </h3>
+                                    <div style="padding-left: 10px;">
+                                        <p><label><input name="gluu_users_can_register" disabled type="radio" id="gluu_users_can_register" <?php if($gluu_users_can_register==1){ echo "checked";} ?> value="1" style="margin-right: 3px"> Automatically register any user with an account in the OpenID Provider</label></p>
                                     </div>
-                                </div>
-                                <div class="entry-edit" style="width: 1000px !important; margin-left: 30px; ">
-                                    <div class="entry-edit-head" style="background-color: #00aa00 !important;">
-                                        <h4 class="icon-head head-edit-form fieldset-legend">All Scopes</h4>
-                                    </div>
-                                    <div class="fieldset">
-                                        <div class="hor-scroll">
-                                            <table class="form-list">
-                                                <tr class="wrapper-trr">
-                                                    <?php foreach ($get_scopes as $scop) : ?>
-                                                        <td class="value">
-                                                            <?php if ($scop == 'openid'){?>
-                                                                <input <?php if (!$oxd_id) echo ' disabled ' ?> type="hidden"  name="scope[]"  <?php if ($oxd_config && in_array($scop, $oxd_config['scope'])) {
-                                                                    echo " checked "; } ?> value="<?php echo $scop; ?>" />
-                                                            <?php } ?>
-                                                            <input <?php if (!$oxd_id) echo ' disabled ' ?> type="checkbox"  name="scope[]"  <?php if ($oxd_config && in_array($scop, $oxd_config['scope'])) {
-                                                                echo " checked "; } ?> id="<?php echo $scop; ?>" value="<?php echo $scop; ?>" <?php if ($scop == 'openid') echo ' disabled '; ?> />
-                                                            <label for="<?php echo $scop; ?>"><?php echo $scop; ?></label>
-
-                                                        </td>
-                                                    <?php endforeach; ?>
-                                                </tr>
-                                            </table>
-                                            <table class="form-list" style="text-align: center">
-                                                <tr class="wrapper-tr" style="text-align: center">
-                                                    <th style="border: 1px solid #43ffdf; width: 70px;text-align: center"><h3>N</h3></th>
-                                                    <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>Name</h3></th>
-                                                    <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>Delete</h3></th>
-                                                </tr>
-                                                <?php
-                                                $n = 0;
-                                                foreach ($get_scopes as $scop) {
-                                                    $n++;
-                                                    ?>
-                                                    <tr class="wrapper-trr">
-                                                        <td style="border: 1px solid #43ffdf; padding: 0px; width: 70px"><h3><?php echo $n; ?></h3></td>
-                                                        <td style="border: 1px solid #43ffdf; padding: 0px; width: 200px"><h3><label for="<?php echo $scop; ?>"><?php echo $scop; ?></label></h3></td>
-                                                        <td style="border: 1px solid #43ffdf; padding: 0px; width: 200px">
-                                                            <?php if ($n == 1): ?>
-                                                                <form></form>
-                                                            <?php endif; ?>
-                                                            <form
-                                                                action="<?php echo $this->getadminurl('*/*/deleteCustomScopes') ?>"
-                                                                method="post">
-                                                                <input type="hidden" name="form_key"
-                                                                       value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
-                                                                <input type="hidden"
-                                                                       value="<?php echo $scop; ?>"
-                                                                       name="value_scope"/>
-                                                                <?php if ($scop != 'openid'){ ?>
-                                                                    <input  style="width: 100px; background-color: red !important; cursor: pointer"
-                                                                            type="submit"
-                                                                            class="button button-primary " <?php if (!$oxd_id) echo 'disabled' ?>
-                                                                            value="Delete" name="delete_scop"/>
-                                                                <?php } ?>
-                                                            </form>
-                                                        </td>
-                                                    </tr>
-                                                    <?php
-                                                }
-                                                ?>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="entry-edit" style="width: 1000px !important; margin-left: 30px">
-                                    <div class="entry-edit-head" style="background-color: #00aa00 !important;">
-                                        <h4 class="icon-head head-edit-form fieldset-legend">Add scopes</h4>
-                                    </div>
-                                    <div class="fieldset">
-                                        <input type="button" class="button button-primary button-large add" style="width: 100px" value="Add scopes"/>
-                                        <div class="hor-scroll">
-                                            <table class="form-list0 container">
-                                                <tr class="wrapper-tr">
-                                                    <td class="value">
-                                                        <input type="text" placeholder="Input scope name" name="scope_name[]"/>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="entry-edit" style="width: 1000px !important; margin-left: 30px">
-                                    <div class="entry-edit-head" style="background-color: #00aa00 !important;">
-                                        <h4 class="icon-head head-edit-form fieldset-legend">All custom scripts</h4>
-                                    </div>
-                                    <div class="fieldset">
-                                        <div class="hor-scroll">
-                                            <h3>Manage Authentication</h3>
-                                            <p>An OpenID Connect Provider (OP) like the Gluu Server may provide many different work flows for
-                                                authentication. For example, an OP may offer password authentication, token authentication, social
-                                                authentication, biometric authentication, and other different mechanisms. Offering a lot of different
-                                                types of authentication enables an OP to offer the most convenient, secure, and affordable option to
-                                                identify a person, depending on the need to mitigate risk, and the sensors and inputs available on the
-                                                device that the person is using.
-                                            </p>
-                                            <p>
-                                                The OP enables a client (like a Magento site), to signal which type of authentication should be
-                                                used. The client can register a
-                                                <a target="_blank" href="http://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata">default_acr_value</a>
-                                                or during the authentication process, a client may request a specific type of authentication using the
-                                                <a target="_blank" href="http://openid.net/specs/openid-connect-core-1_0.html#AuthRequest">acr_values</a> parameter.
-                                                This is the mechanism that the OpenID Connect SSO Extension by Gluu uses: each login icon corresponds to a acr request value.
-                                                For example, and acr may tell the OpenID Connect to use Facebook, Google or even plain old password authentication.
-                                                The nice thing about this approach is that your applications (like Magento) don't have
-                                                to implement the business logic for social login--it's handled by the OpenID Connect Provider.
-                                            </p>
-                                            <p>
-                                                If you are using the Gluu Server as your OP, you'll notice that in the Manage Custom Scripts
-                                                tab of oxTrust (the Gluu Server admin interface), each authentication script has a name.
-                                                This name corresponds to the acr value.  The default acr for password authentication is set in
-                                                the
-                                                <a target="_blank" href="https://www.gluu.org/docs/admin-guide/configuration/#manage-authentication">LDAP Authentication</a>,
-                                                section--look for the "Name" field. Likewise, each custom script has a "Name", for example see the
-                                                <a target="_blank" href="https://www.gluu.org/docs/admin-guide/configuration/#manage-custom-scripts">Manage Custom Scripts</a> section.
-                                            </p>
-                                            <table style="width:100%;display: table;">
-                                                <tbody>
-                                                <tr>
-                                                    <?php
-                                                    foreach ($custom_scripts as $custom_script) {
-                                                        ?>
-                                                        <td style="width:25%">
-                                                            <input type="checkbox" <?php if (!$oxd_id) echo 'disabled'; ?>
-                                                                   id="<?php echo $custom_script['value']; ?>_enable"
-                                                                   class="app_enable"
-                                                                   name="gluuoxd_openid_<?php echo $custom_script['value']; ?>_enable"
-                                                                   value="1"
-                                                                   onchange="previewLoginIcons();" <?php if ($this->getConfig($custom_script['value'] . 'Enable')) echo "checked"; ?> /><b><?php echo $custom_script['name']; ?></b>
-                                                        </td>
-                                                        <?php
+                                    <div style="padding-left: 10px;">
+                                        <p><label ><input name="gluu_users_can_register" disabled type="radio" id="gluu_users_can_register" <?php if($gluu_users_can_register==2){ echo "checked";} ?> value="2" style="margin-right: 3px"> Only register users with the following role(s) in the OpenID Provider</label></p>
+                                        <div style="margin-left: 20px;">
+                                            <div id="p_role">
+                                                <?php $k=0;
+                                                if(!empty($gluu_new_roles)) {
+                                                    foreach ($gluu_new_roles as $gluu_new_role) {
+                                                        if (!$k) {
+                                                            $k++;
+                                                            ?>
+                                                            <p class="role_p" style="padding-top: 10px">
+                                                                <input  type="text" name="gluu_new_role[]" disabled  style="display: inline; width: 200px !important;"
+                                                                        placeholder="Input role name" class="form-control"
+                                                                        value="<?php echo $gluu_new_role; ?>"/>
+                                                                <button type="button" class="btn btn-primary btn-xs " disabled="true"><span class="glyphicon glyphicon-plus"></span></button>
+                                                            </p>
+                                                            <?php
+                                                        } else {
+                                                            ?>
+                                                            <p class="role_p" style="padding-top: 10px">
+                                                                <input type="text" name="gluu_new_role[]" disabled class="form-control"
+                                                                       placeholder="Input role name" style="display: inline; width: 200px !important;"
+                                                                       value="<?php echo $gluu_new_role; ?>"/>
+                                                                <button type="button" class="btn btn-primary btn-xs " disabled="true" ><span class="glyphicon glyphicon-plus"></span></button>
+                                                                <button type="button" class="btn btn-primary btn-xs " disabled="true"><span class="glyphicon glyphicon-minus"></span></button>
+                                                            </p>
+                                                        <?php }
                                                     }
+                                                }else{
                                                     ?>
-                                                </tr>
-                                                <tr style="display: none;">
-                                                </tr>
-                                                </tbody>
-                                            </table>
-                                            <table class="form-list" style="text-align: center">
-                                                <tr class="wrapper-tr" style="text-align: center">
-                                                    <th style="border: 1px solid #43ffdf; width: 70px;text-align: center"><h3>N</h3></th>
-                                                    <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>Display Name</h3></th>
-                                                    <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>ACR Value</h3></th>
-                                                    <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>Image</h3></th>
-                                                    <th style="border: 1px solid #43ffdf;width: 200px;text-align: center"><h3>Delete</h3></th>
-                                                </tr>
-                                                <?php
-                                                $n = 0;
-                                                foreach ($custom_scripts as $custom_script) {
-                                                    $n++;
-                                                    ?>
-                                                    <tr class="wrapper-trr">
-                                                        <td style="border: 1px solid #43ffdf; padding: 0px; width: 70px"><h3><?php echo $n; ?></h3></td>
-                                                        <td style="border: 1px solid #43ffdf; padding: 0px; width: 200px"><h3><?php echo $custom_script['name']; ?></h3></td>
-                                                        <td style="border: 1px solid #43ffdf; padding: 0px; width: 200px"><h3><?php echo $custom_script['value']; ?></h3></td>
-                                                        <td style="border: 1px solid #43ffdf; padding: 0px; width: 200px"><img src="<?php echo $custom_script['image']; ?>" width="40px" height="40px"/></td>
-                                                        <td style="border: 1px solid #43ffdf; padding: 0px; width: 200px">
-                                                            <?php if ($n == 1): ?>
-                                                                <form></form>
-                                                            <?php endif; ?>
-                                                            <form
-                                                                action="<?php echo $this->getadminurl('*/*/deleteCustomScript') ?>"
-                                                                method="post">
-                                                                <input type="hidden" name="form_key"
-                                                                       value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
-                                                                <input type="hidden"
-                                                                       value="<?php echo $custom_script['value']; ?>"
-                                                                       name="value_script"/>
-                                                                <input
-                                                                    style="width: 100px; background-color: red !important; cursor: pointer"
-                                                                    type="submit"
-                                                                    class="button button-primary " <?php if (!$oxd_id) echo 'disabled' ?>
-                                                                    value="Delete" name="delete_config"/>
-                                                            </form>
-                                                        </td>
-                                                    </tr>
+                                                    <p class="role_p" style="padding-top: 10px">
+                                                        <input type="text" name="gluu_new_role[]" disabled placeholder="Input role name" class="form-control" style="display: inline; width: 200px !important;" value=""/>
+                                                        <button type="button" class="btn btn-primary btn-xs " disabled="true" ><span class="glyphicon glyphicon-plus"></span></button>
+                                                    </p>
                                                     <?php
-                                                }
-                                                ?>
-                                            </table>
+                                                }?>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="entry-edit-head" style="background-color: #00aa00 !important;">
-                                        <h4 class="icon-head head-edit-form fieldset-legend">Add multiple custom scripts</h4>
-                                        <br/>
-                                        <hr/>
-                                        <p style="color:#cc0b07; font-style: italic; font-weight: bold;font-size: larger"> Both fields are required</p>
+                                    <div style="padding-left: 10px;">
+                                        <p><label><input name="gluu_users_can_register" disabled type="radio" id="gluu_users_can_register_2" <?php if($gluu_users_can_register==3){ echo "checked";} ?> value="3" style="margin-right: 3px">Disable automatic registration</label></p>
                                     </div>
-                                    <div class="fieldset">
-                                        <div class="hor-scroll">
-                                            <input type="hidden" name="count_scripts" value="1" id="count_scripts">
-                                            <input type="button" class="button button-primary button-large " style="width: 100px" id="adder" value="Add acr"/>
-                                            <table class="form-list1 container">
-                                                <tr class="count_scripts wrapper-trr">
-                                                    <td class="value">
-                                                        <input style='width: 200px !important;' type="text" placeholder="Display name (example Google+)" name="name_in_site_1"/>
-                                                    </td>
-                                                    <td class="value">
-                                                        <input style='width: 270px !important;' type="text" placeholder="ACR Value (script name in the Gluu Server)" name="name_in_gluu_1"/>
-                                                    </td>
-                                                    <td class="value">
-                                                        <input type="file" accept="image/png" name="images_1"/>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
+                                    <div style="padding-left: 10px;">
+                                        <table>
+                                            <tr >
+                                                <td  style="width: 270px"><b>New Customer Default Group:</b></td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <select disabled style="width: 400px" id="UserType" class="form-control" name="gluu_user_role" >
+                                                            <?php
+                                                            foreach($user_types as $user_type){
+                                                                ?>
+                                                                <option <?php if($user_type['value'] == $gluu_user_role) echo 'selected'; ?> value="<?php echo $user_type['value'];?>"><?php echo $user_type['label'];?></option>
+                                                                <?php
+                                                            }
+                                                            ?>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><a class="btn btn-primary btn-large" style="text-decoration:none; text-align:center; float: right; width: 120px;" href="<?php echo $this->getadminurl('*/*/general') ?>">Edit</a></td>
+                                                <td>
+                                                    <div><input type="submit" onclick="return confirm('Are you sure that you want to remove this OpenID Connect provider? Users will no longer be able to authenticate against this OP.')" name="resetButton" value="Delete" style="width: 120px; background-color: red !important; " class="btn btn-danger btn-large"/></div>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </div>
                                 </div>
-                            </div>
-                            <div>
-                                <input style="width: 100px" type="submit" class="button button-primary button-large" <?php if (!$oxd_id) echo 'disabled' ?> value="Save" name="set_oxd_config"/>
-                                <br/>
-                            </div>
+                            </fieldset>
                         </form>
                     </div>
-                </div>
-                <!--Gluu and social login config tab-->
-                <div class="page" id="sociallogin">
-                    <?php if (!$oxd_id){ ?>
-                        <div class="mess_red">
-                            Please enter OXD configuration to continue.
-                        </div><br/>
-                    <?php } ?>
 
-                    <form id="form-apps" name="form-apps" method="post"
-                          action="<?php echo $this->getadminurl('*/*/saveSocialLoginConf') ?>">
-                        <input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
-                        <div class="mo2f_table_layout">
-                            <input <?php if (!$oxd_id) echo 'disabled'; ?> type="submit" name="submit" value="Save" style="width:100px;margin-right:2%" class="button button-primary button-large">
-                        </div>
-                        <div id="twofactor_list" class="mo2f_table_layout">
-                            <h3>Gluu login config </h3>
-                            <hr>
-                            <p style="font-size:14px">Customize your login icons using a range of shapes and sizes. You can choose different places to display these icons and also customize redirect url after login.</p>
-                            <br/>
-
-                            <hr>
-                            <br>
-                            <h3>Customize Login Icons</h3>
-                            <p>Customize shape, theme and size of the login icons</p>
-                            <table style="width:100%;display: table;">
-                                <tbody>
-                                <tr>
-                                    <td>
-                                        <b>Shape</b>
-                                        <b style="margin-left:130px; display: none">Theme</b>
-                                        <b style="margin-left:130px;">Space between Icons</b>
-                                        <b style="margin-left:86px;">Size of Icons</b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="gluuoxd_openid_table_td_checkbox">
-                                        <input type="radio" <?php if (!$oxd_id) echo 'disabled'; ?>
-                                               name="gluuoxd_openid_login_theme" value="circle"
-                                               onclick="checkLoginButton();gluuOxLoginPreview(document.getElementById('gluuox_login_icon_size').value ,'circle',setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)"
-                                               style="width: auto;" checked>Round
-                                <span style="margin-left:106px; display: none">
-                                    <input type="radio" <?php if (!$oxd_id) echo 'disabled'; ?>
-                                           id="gluuoxd_openid_login_default_radio" name="gluuoxd_openid_login_custom_theme"
-                                           value="default"
-                                           onclick="checkLoginButton();gluuOxLoginPreview(setSizeOfIcons(), setLoginTheme(),'default',document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)"
-                                           checked>Default
-                                </span>
-                                <span style="margin-left:111px;">
-                                        <input style="width:50px" <?php if (!$oxd_id) echo ' disabled '; ?>
-                                               onkeyup="gluuOxLoginSpaceValidate(this)" id="gluuox_login_icon_space"
-                                               name="gluuox_login_icon_space" type="text" value="<?php echo $iconSpace; ?>">
-                                        <input
-                                            id="gluuox_login_space_plus" <?php if (!$oxd_id) echo 'disabled'; ?> <?php if (!$oxd_id) echo 'disabled'; ?> <?php if (!$oxd_id) echo 'disabled'; ?>
-                                            type="button" value="+"
-                                            onmouseup="document.getElementById('gluuox_login_icon_space').value=parseInt(document.getElementById('gluuox_login_icon_space').value)+1;gluuOxLoginPreview(setSizeOfIcons() ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)">
-                                        <input
-                                            id="gluuox_login_space_minus" <?php if (!$oxd_id) echo 'disabled'; ?> <?php if (!$oxd_id) echo 'disabled'; ?>
-                                            type="button" value="-"
-                                            onmouseup="document.getElementById('gluuox_login_icon_space').value=parseInt(document.getElementById('gluuox_login_icon_space').value)-1;gluuOxLoginPreview(setSizeOfIcons()  ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)">
-                                </span>
-                                <span id="commontheme" style="margin-left:95px">
-                                    <input style="width:50px " <?php if (!$oxd_id) echo 'disabled'; ?> id="gluuox_login_icon_size"
-                                           onkeyup="gluuOxLoginSizeValidate(this)" name="gluuox_login_icon_custom_size" type="text"
-                                           value="<?php if ($iconCustomSize) echo $iconCustomSize; else echo '35'; ?>">
-                                    <input id="gluuox_login_size_plus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="+"
-                                           onmouseup="document.getElementById('gluuox_login_icon_size').value=parseInt(document.getElementById('gluuox_login_icon_size').value)+1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_size').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)">
-                                    <input id="gluuox_login_size_minus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="-"
-                                           onmouseup="document.getElementById('gluuox_login_icon_size').value=parseInt(document.getElementById('gluuox_login_icon_size').value)-1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_size').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)">
-                                </span>
-                                <span style="margin-left: 95px; display: none;" class="longbuttontheme">Width:&nbsp;
-                                    <input style="width:50px" <?php if (!$oxd_id) echo 'disabled'; ?> id="gluuox_login_icon_width"
-                                           onkeyup="gluuOxLoginWidthValidate(this)" name="gluuox_login_icon_custom_width" type="text"
-                                           value="<?php echo $iconCustomWidth; ?>">
-                                    <input id="gluuox_login_width_plus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="+"
-                                           onmouseup="document.getElementById('gluuox_login_icon_width').value=parseInt(document.getElementById('gluuox_login_icon_width').value)+1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_width').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)">
-                                    <input id="gluuox_login_width_minus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="-"
-                                           onmouseup="document.getElementById('gluuox_login_icon_width').value=parseInt(document.getElementById('gluuox_login_icon_width').value)-1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_width').value ,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)">
-                                </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="gluuoxd_openid_table_td_checkbox">
-                                        <input type="radio"
-                                               name="gluuoxd_openid_login_theme" <?php if (!$oxd_id) echo 'disabled'; ?>
-                                               value="oval"
-                                               onclick="checkLoginButton();gluuOxLoginPreview(document.getElementById('gluuox_login_icon_size').value,'oval',setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_size').value )"
-                                               style="width: auto;" <?php if ($loginTheme == 'oval') echo "checked"; ?>>Rounded Edges
-                            <span style="margin-left:50px; display: none">
-                                    <input type="radio"
-                                           <?php if (!$oxd_id) echo 'disabled'; ?>id="gluuoxd_openid_login_custom_radio"
-                                           name="gluuoxd_openid_login_custom_theme" value="custom"
-                                           onclick="checkLoginButton();gluuOxLoginPreview(setSizeOfIcons(), setLoginTheme(),'custom',document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)"
-                                        <?php if ($loginCustomTheme == 'custom') echo "checked"; ?> >Custom Background*
-                                    </span>
-                                <span style="margin-left: 256px; display: none;" class="longbuttontheme">Height:
-                            <input style="width:50px" <?php if (!$oxd_id) echo 'disabled'; ?> id="gluuox_login_icon_height"
-                                   onkeyup="gluuOxLoginHeightValidate(this)" name="gluuox_login_icon_custom_height" type="text"
-                                   value="<?php if ($iconCustomHeight) echo $iconCustomHeight; else echo '35'; ?>">
-                            <input id="gluuox_login_height_plus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="+"
-                                   onmouseup="document.getElementById('gluuox_login_icon_height').value=parseInt(document.getElementById('gluuox_login_icon_height').value)+1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_width').value,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)">
-                            <input id="gluuox_login_height_minus" <?php if (!$oxd_id) echo 'disabled'; ?> type="button" value="-"
-                                   onmouseup="document.getElementById('gluuox_login_icon_height').value=parseInt(document.getElementById('gluuox_login_icon_height').value)-1;gluuOxLoginPreview(document.getElementById('gluuox_login_icon_width').value,setLoginTheme(),setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)">
-                            </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="gluuoxd_openid_table_td_checkbox">
-                                        <input type="radio" <?php if (!$oxd_id) echo 'disabled'; ?>
-                                               name="gluuoxd_openid_login_theme" value="square"
-                                               onclick="checkLoginButton();gluuOxLoginPreview(document.getElementById('gluuox_login_icon_size').value ,'square',setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_size').value )"
-                                               style="width: auto;" <?php if ($loginTheme == 'square') echo "checked"; ?>>Square
-                                        <span style="margin-left:113px; display: none">
-                                            <input type="color" <?php if (!$oxd_id) echo 'disabled'; ?>
-                                                   name="gluuox_login_icon_custom_color" id="gluuox_login_icon_custom_color"
-                                                   value="<?php echo $iconCustomColor; ?>"
-                                                   onchange="gluuOxLoginPreview(setSizeOfIcons(), setLoginTheme(),'custom',document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value)">
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr style="display: none">
-                                    <td class="gluuoxd_openid_table_td_checkbox">
-                                        <input
-                                            type="radio" <?php if (!$oxd_id) echo 'disabled'; ?> <?php if (!$oxd_id) echo 'disabled'; ?>
-                                            id="iconwithtext" name="gluuoxd_openid_login_theme" value="longbutton"
-                                            onclick="checkLoginButton();gluuOxLoginPreview(document.getElementById('gluuox_login_icon_width').value ,'longbutton',setLoginCustomTheme(),document.getElementById('gluuox_login_icon_custom_color').value,document.getElementById('gluuox_login_icon_space').value,document.getElementById('gluuox_login_icon_height').value)"
-                                            style="width: auto;" <?php if ($loginTheme == 'longbutton') echo "checked"; ?>>Long
-                                        Button with Text
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                            <br>
-                            <h3>Preview : </h3>
-                            <span hidden id="no_apps_text">No apps selected</span>
-                            <div>
-                                <?php foreach ($custom_scripts as $custom_script): ?>
-                                    <img class="gluuox_login_icon_preview"
-                                         id="gluuox_login_icon_preview_<?php echo $custom_script['value']; ?>"
-                                         src="<?php echo $custom_script['image']; ?>"/>
-                                <?php endforeach; ?>
-                            </div>
-                            <div>
-                                <?php foreach ($custom_scripts as $custom_script): ?>
-                                    <a id="gluuox_login_button_preview_<?php echo $custom_script['value']; ?>"
-                                       class="btn btn-block btn-defaulttheme btn-social btn-<?php echo $custom_script['value']; ?> btn-custom-size"
-                                       style="width: <?php echo $iconCustomWidth; ?>px; height:<?php echo $iconCustomHeight; ?>px; padding-top: 6px; padding-bottom: 6px; margin-bottom: <?php echo $iconSpace . 'px'; ?>">
-                                        <i class="fa fa-<?php echo $custom_script['value']; ?>-plus"
-                                           style="padding-top: 0px;"></i>Login with <?php echo $custom_script['name']; ?>
-                                    </a>
-                                <?php endforeach; ?>
-                            </div>
-                            <div>
-                                <?php foreach ($custom_scripts as $custom_script): ?>
-                                    <i class="gluuOx_custom_login_icon_preview fa fa-<?php echo $custom_script['value']; ?>-plus"
-                                       id="gluuOx_custom_login_icon_preview_<?php echo $custom_script['value']; ?>"
-                                       style="color:#ffffff;text-align:center;margin-top:5px;"></i>
-                                <?php endforeach; ?>
-                            </div>
-
-                            <div>
-                                <?php foreach ($custom_scripts as $custom_script): ?>
-                                    <a id="gluuOx_custom_login_button_preview_<?php echo $custom_script['value']; ?>"
-                                       class="btn btn-block btn-customtheme btn-social   btn-custom-size"
-                                       style="width:<?php echo $iconCustomWidth; ?>px;height:<?php echo $iconCustomHeight; ?>px;padding-top: 6px;padding-bottom: 6px;margin-bottom:<?php echo $iconSpace; ?>px;background:<?php echo $iconCustomColor; ?>;">
-                                        <i class="fa fa-<?php echo $custom_script['value']; ?>-plus"></i>Login
-                                        with <?php echo $custom_script['name']; ?></a>
-                                <?php endforeach; ?>
-                            </div>
-
-                            <br><br>
-
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Help & Troubleshooting tab-->
-                <div class="page" id="helptrouble">
-                    <div class="mo2f_table_layout">
-                        <h1><a id="Magento_GLUU_SSO_extension_0"></a>OpenID Connect Single Sign-On (SSO) Extension by Gluu</h1>
-                        <p><img style="width: 100%; height: 100%;"  src="https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/plugin.jpg" alt="image"></p>
-                        <p>Gluu's Magento OpenID Connect Single Sign On (SSO) Extension will enable you to authenticate users against any standard OpenID Connect Provider (OP). If you don't already have an OP you can [deploy the free open source Gluu Server](https://gluu.org/docs/deployment).</p>
-                        <h2><a id="Step_1_Install_Gluuserver_13"></a>Requirements</h2>
-                        <p>In order to use the Magento Extension, you will need to have deployed a standard OP like the Gluu Server and the oxd Server.</p>
-                        <p><a target="_blank" href="https://www.gluu.org/docs/deployment/">Gluu-server installation gide</a>.</p>
-                        <p><a target="_blank" href="https://oxd.gluu.org/docs/oxdserver/install/">oxd server installation gide</a>.</p>
-                        <h2><a id="Step_6_General_73"></a>Step 1. General</h2>
-                        <p><img style="width: 100%; height: 100%;"  src="https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m1.png" alt="General"></p>
-                        <ol>
-                            <li>Admin Email: please add your or admin email address for registrating site in Gluu server.</li>
-                            <li>Gluu Server URL: please insert your Gluu Server URL.</li>
-                            <li>Port number: choose that port which is using oxd-server (see in oxd-server/conf/oxd-conf.json file).</li>
-                            <li>Click <code>Next</code> to continue.</li>
-                        </ol>
-                        <p>If You are successfully registered in gluu server, you will see bottom page.</p>
-                        <p><img style="width: 100%; height: 100%;"  src="https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m2.png" alt="oxD_id"></p>
-                        <p>To make sure everything is configured properly, login to your Gluu Server and navigate to the OpenID Connect > Clients page. Search for your `oxd id`.</p>
-                        <h2><a id="Step_8_OpenID_Connect_Configuration_89"></a>Step 2. OpenID Connect Configuration</h2>
-                        <h3><a id="Scopes_93"></a>Scopes.</h3>
-                        <p>Scopes are groups of user attributes that are sent from your OP (in this case, the Gluu Server) to the application during login and enrollment. You can view all available scopes in your Gluu Server by navigating to the OpenID Connect > Scopes intefrace.</p>
-                        <p>
-                            In the Extension interface you can enable, disable and delete scopes. You can also add new scopes. If/when you add new scopes via the extension, be sure to also add the same scopes in your gluu server.
-                            <img style="width: 100%; height: 100%;"  src="https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m4.png" alt="Scopes1"></p>
-                        <h3><a id="Custom_scripts_104"></a>Custom scripts.</h3>
-                        <p><img style="width: 100%; height: 100%;"  src="https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m5.png" alt="Customscripts"></p>
-                        <p>To specify the desired authentication mechanism navigate to the Configuration > Manage Custom Scripts menu in your Gluu Server. From there you can enable one of the out-of-the-box authentication mechanisms, such as password, U2F device (like yubikey), or mobile authentication. You can learn more about the Gluu Server authentication capabilities in the [docs](https://gluu.org/docs/multi-factor/intro/).</p>
-                        <h3><a id="Pay_attention_to_that_111"></a>Note:</h3>
-                        <ol>
-                            <li> - The authentication mechanism specified in your Magento extension page must match the authentication mechanism specified in your Gluu Server.</li>
-                            <li> - After saving the authentication mechanism in your Gluu Server, it will be displayed in the Magento extension configuration page too.</li>
-                            <li> - If / when you create a new custom script, both fields are required.</li>
-                        </ol>
-                        <h2><a id="Step_9_Magento_Configuration_117"></a>Step 3. Magento Configuration</h2>
-                        <h3><a id="Customize_Login_Icons_119"></a>Customize Login Icons</h3>
-                        <p>If custom scripts are not enabled, nothing will be showed. Customize shape, space between icons and size of the login icons.</p>
-                        <p><img style="width: 100%; height: 100%;"  src="https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m6.png" alt="MagentoConfiguration"></p>
-                        <h2><a id="Step_10_Show_icons_in_frontend_126"></a>Step 4. Show icons in frontend</h2>
-                        <p>Once you've configured all the options, you should see your supported authentication mechanisms on your default Magento customer login page like the screenshot below
-                        </p>
-                        <p><img  src="https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m7.png" alt="frontend"></p>
-                    </div>
-                </div>
+                <?php }?>
             </div>
-            <!-- END of Container Page -->
         </div>
-        <!-- END of Container -->
     </div>
-    </body>
-</html>
+</div>

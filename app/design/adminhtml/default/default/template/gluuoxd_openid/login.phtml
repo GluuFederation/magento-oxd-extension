@@ -1,123 +1,56 @@
-<?php $this->gluuoxd_openid_login_validate(); ?>
-<style>
-    .gluuox_login_icon_preview{
-        width:35px;
-        cursor:pointer;
-    }
-</style>
-<link  href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN).'adminhtml/default/default/GluuOxd_Openid/css/bootstrap-social.css'; ?>" rel="stylesheet">
-<link  href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN).'adminhtml/default/default/GluuOxd_Openid/css/font-awesome.min.css'; ?>" rel="stylesheet">
-
-<div id="messages">
-    <ul class="mini-messages">
-        <?php if(Mage::getSingleton('core/session')->getErrorMessage()){?>
-            <li class="error-msg"><ul><li><span><?php echo Mage::getSingleton('core/session')->getErrorMessage(); ?></span><a id="error-cancel" href="#">&times;</a></li></ul></li>
-        <?php }?>
-        <?php if(Mage::getSingleton('core/session')->getSuccessMessage()){?>
-            <li class="success-msg"><ul><li><span><?php echo Mage::getSingleton('core/session')->getSuccessMessage(); ?></span><a id="success-cancel" href="#">&times;</a></li></ul></li>
-        <?php }?>
-    </ul>
-</div>
-
 <?php
-    $iconSpace = $this->getOpendIdConfig('iconSpace');
-    if(!$iconSpace) $iconSpace = '4';
-    $iconCustomSize = $this->getOpendIdConfig('iconCustomSize');
-    if(!$iconCustomSize) $iconCustomSize = '35';
-    $iconCustomWidth = $this->getOpendIdConfig('iconCustomWidth');
-    if(!$iconCustomWidth) $iconCustomWidth = '200';
-    $iconCustomHeight = $this->getOpendIdConfig('iconCustomHeight');
-    if(!$iconCustomHeight) $iconCustomHeight = '35';
-    $loginCustomTheme = $this->getOpendIdConfig('loginCustomTheme');
-    $loginTheme = $this->getOpendIdConfig('loginTheme');
-    $iconCustomColor = $this->getOpendIdConfig('iconCustomColor');
-    if(!$iconCustomColor) $iconCustomColor = '#0000FF';
-    $enableds = array();
-    $custom_scripts = unserialize(Mage::getStoreConfig ( 'gluu/oxd/oxd_openid_custom_scripts' ));
-    foreach($custom_scripts as $custom_script){
-        $enableds[] = array('enable'=>$this->getOpendIdConfig($custom_script['value'].'Enable'), 'value'=>$custom_script['value'], 'name'=>$custom_script['name'], 'image'=>$custom_script['image']);
+function select_query($action){
+    $result = Mage::getStoreConfig($action);
+    return $result;
+}
+
+$gluu_oxd_id_admin          = select_query('gluu/oxd/gluu_oxd_id_admin');
+$get_scopes                 = json_decode(select_query('gluu/oxd/gluu_scopes'),true);
+$gluu_config                = json_decode(select_query('gluu/oxd/gluu_config'),true);
+$gluu_acr                   = json_decode(select_query('gluu/oxd/gluu_acr'),true);
+$gluu_auth_type             = select_query('gluu/oxd/gluu_auth_type');
+$gluu_send_admin_check      = select_query('gluu/oxd/gluu_send_admin_check');
+$gluu_provider              = select_query('gluu/oxd/gluu_provider');
+$gluu_custom_logout         = select_query('gluu/oxd/gluu_custom_logout');
+$gluu_new_roles             = json_decode(select_query('gluu/oxd/gluu_new_role'));
+$gluu_users_can_register    = select_query('gluu/oxd/gluu_users_can_register');
+
+$this->gluuoxd_openid_login_validate_admin();
+if($this->gluu_is_port_working()) {
+    if($gluu_send_admin_check && $gluu_oxd_id_admin) {
+        header("Location: ".$this->gluuoxd_get_auth_url_admin());
+        exit;
     }
-?>
+    elseif(!$gluu_send_admin_check && $gluu_oxd_id_admin) {
 
+        ?>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script type="application/javascript">
+            var jQuery = $.noConflict();
+            jQuery(document).ready(function () {
+                jQuery(".login-form").attr('id', 'core_form');
+                jQuery("#core_form").before("<div class='login-form' style='padding-bottom: 5px !important;'><label><h3><input type='radio' name='radio' id='OpenID' value='Yes' style='margin-right: 7px'/>Login by OpenID Provider </h3></label>" +
+                    "<label><h3><input type='radio' name='radio' id='base' value='No' style='margin-right: 7px'/>Show login form</h3></label></div>");
+                jQuery("#core_form").before('<div id="openid_form" class="login-form"><a href="<?php echo $this->gluuoxd_get_auth_url_admin();?>"  style="text-decoration:none; cursor: pointer;background:green; color:#ffffff; font-size: 17px;padding: 15px" class="button" id="gluu_login">Login by OpenID Provider</a></div>');
 
-<?php if($loginTheme=='longbutton') {
-
-    if($loginCustomTheme=='custom') { ?>
-
-        <div><center><br><br><br>
-                <?php
-                foreach($enableds as $enabled){
-                    if($enabled['enable']){
-                        ?>
-                        <a id="gluuOx_custom_login_button_preview_<?php echo $enabled['value'];?>" class="btn btn-block btn-customtheme btn-social   btn-custom-size" style="width:<?php echo $iconCustomWidth;?>px;height:<?php echo $iconCustomHeight;?>px;padding-top: 6px;padding-bottom: 6px;margin-bottom:<?php echo $iconSpace;?>px;background:<?php echo $iconCustomColor;?>" onclick="socialLogin('<?php echo $enabled['value'];?>')" >
-                            <i class="fa fa-<?php echo $enabled['value'];?>-plus"></i>Login with <?php echo $enabled['name'];?>
-                        </a>
-                    <?php }
-                }
-                ?>
-        </div>
-
-    <?php } else { ?>
-        <div>
-            <center><br><br><br>
-                <?php
-                foreach($enableds as $enabled){
-                    if($enabled['enable']){
-                        ?>
-                        <a id="gluuox_login_button_preview_<?php echo $enabled['value'];?>" class="btn btn-block btn-defaulttheme btn-social btn-<?php echo $enabled['value'];?> btn-custom-size" style="width: <?php echo $iconCustomWidth;?>px; height:<?php echo $iconCustomHeight;?>px; padding-top: 6px; padding-bottom: 6px; margin-bottom: <?php echo $iconSpace.'px'; ?>"  onclick="socialLogin('<?php echo $enabled['value'];?>')" >
-                            <i class="fa fa-<?php echo $enabled['value'];?>-plus" style="padding-top: 0px;"></i>Login with <?php echo $enabled['name'];?>
-                        </a>
-                    <?php }
-                }
-                ?>
-            </center>
-        </div>
-    <?php } ?>
-
-<?php } else {
-    ?>
-    <style>.gluuOx_custom_login_icon_preview{cursor:pointer;}</style>
-    <?php
-    if($loginTheme=='circle'){ ?>
-        <style> .gluuox_login_icon_preview, .gluuOx_custom_login_icon_preview{border-radius: 999px !important;}</style>
-    <?php } else if($loginTheme=='oval'){ ?>
-        <style> .gluuox_login_icon_preview, .gluuOx_custom_login_icon_preview{border-radius: 5px !important;}</style>
-    <?php }
-
-    if($loginCustomTheme=='custom') { ?>
-        <div>
-            <?php
-            foreach($enableds as $enabled){
-                if($enabled['enable']){
-                    ?>
-                    <i class="gluuOx_custom_login_icon_preview fa fa-<?php echo $enabled['value'];?>-plus" id="gluuOx_custom_login_icon_preview_<?php echo $enabled['value'];?>"  style="color: rgb(255, 255, 255); text-align: center; margin-top: 5px; height: <?php echo $iconCustomSize-8;?>px; width: <?php echo $iconCustomSize;?>px; padding-top: 8px; margin-left: <?php echo $iconSpace.'px'; ?>; font-size: <?php echo $iconCustomSize-16;?>px; background: <?php echo $iconCustomColor;?>"  onclick="socialLogin('<?php echo $enabled['value'];?>')" ></i>
-
-                <?php }
-            }
-            ?>
-
-        </div>
-    <?php } else { ?>
-        <div style="margin-top:60px">
-            <?php
-            foreach($enableds as $enabled){
-                if($enabled['enable']){
-                    ?>
-                    <img class="gluuox_login_icon_preview" id="gluuox_login_icon_preview_<?php echo $enabled['value'];?>" src="<?php echo $enabled['image']; ?>"
-                         style="margin-left: <?php echo $iconSpace.'px'; ?>; height:<?php echo $iconCustomSize;?>px; width:<?php echo $iconCustomSize;?>px;" onclick="socialLogin('<?php echo $enabled['value'];?>')"  />
-                    <i class="gluuOx_custom_login_icon_preview fa fa-<?php echo $enabled['value'];?>-plus" id="gluuOx_custom_login_icon_preview_<?php echo $enabled['value'];?>"  style="color: rgb(255, 255, 255); text-align: center; margin-top: 5px; height: <?php echo $iconCustomSize-8;?>px; width: <?php echo $iconCustomSize;?>px; padding-top: 8px; margin-left: <?php echo $iconSpace.'px'; ?>; font-size: <?php echo $iconCustomSize-16;?>px; background: <?php echo $iconCustomColor;?>"  onclick="socialLogin('<?php echo $enabled['value'];?>')" ></i>
-
-                <?php }
-            }
-            ?>
-        </div>
-    <?php }
-} ?>
-
-<script>
-    var baseUrl = '<?php echo $this->getOpenIdAdminUrl(); ?>';
-
-    function socialLogin(appName){
-        window.location.href = window.location + '?option=getMoSocialLogin&app_name='+appName;
+                jQuery("#core_form").hide();
+                jQuery('input:radio[name="radio"]').change(
+                    function () {
+                        if (jQuery(this).is(':checked') && jQuery(this).val() == 'Yes') {
+                            jQuery('#openid_form').show();
+                            jQuery('#core_form').hide();
+                        } else {
+                            jQuery('#openid_form').hide();
+                            jQuery('#core_form').show();
+                        }
+                    });
+                jQuery('#OpenID').attr('checked', true);
+            });
+        </script>
+        <?php
     }
-</script>
+}
+
+
+
+

@@ -1,0 +1,408 @@
+<?php
+function getBaseUrl()
+{
+// output: /myproject/index.php
+    $currentPath = $_SERVER['PHP_SELF'];
+
+// output: Array ( [dirname] => /myproject [basename] => index.php [extension] => php [filename] => index )
+    $pathInfo = pathinfo($currentPath);
+
+// output: localhost
+    $hostName = $_SERVER['HTTP_HOST'];
+
+// output: http://
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+
+// return: http://localhost/myproject/
+    return $protocol.$hostName.$pathInfo['dirname'];
+}
+$base_url  = getBaseUrl();
+function select_query($action){
+    $result = Mage::getStoreConfig($action);
+    return $result;
+}
+$get_scopes                 = json_decode(select_query('gluu/oxd/gluu_scopes'),true);
+$gluu_config                = json_decode(select_query('gluu/oxd/gluu_config'),true);
+$gluu_acr                   = json_decode(select_query('gluu/oxd/gluu_acr'),true);
+$gluu_auth_type             = select_query('gluu/oxd/gluu_auth_type');
+$gluu_send_user_check       = select_query('gluu/oxd/gluu_send_user_check');
+$gluu_send_admin_check      = select_query('gluu/oxd/gluu_send_admin_check');
+$gluu_provider              = select_query('gluu/oxd/gluu_provider');
+$gluu_user_role             = select_query('gluu/oxd/gluu_user_role');
+$gluu_custom_logout         = select_query('gluu/oxd/gluu_custom_logout');
+$gluu_new_roles             = json_decode(select_query('gluu/oxd/gluu_new_role'));
+$gluu_users_can_register    = select_query('gluu/oxd/gluu_users_can_register');
+if(empty($gluu_config) or !gluu_is_oxd_registered()){
+    header("Refresh:0");
+    exit;
+}
+function gluu_is_oxd_registered(){
+    if(select_query('gluu/oxd/gluu_oxd_id')){
+        $oxd_id = select_query('gluu/oxd/gluu_oxd_id');
+        if(!$oxd_id ) {
+            return 0;
+        } else {
+            return $oxd_id;
+        }
+    }
+}
+?>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/GluuOxd_Openid/js/scope-custom-script.js'; ?>"></script>
+<script type="application/javascript">
+    jQuery(document).ready(function(){
+        jQuery('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+<script type="application/javascript">
+    var jQuery = $.noConflict();
+        jQuery(document).ready(function() {
+            jQuery('#p_role').on('click', 'a.remrole', function() {
+            jQuery(this).parents('.role_p').remove();
+        });
+        jQuery("input[name='scope[]']").change(function(){
+
+            var form=jQuery("#scpe_update");
+            if (jQuery(this).is(':checked')) {
+                jQuery.ajax({
+                    url: '<?php echo $this->getadminurl('*/*/ajaxconfig') ?>',
+                    type: 'POST',
+                    data:form.serialize(),
+                    success: function(result){
+                        if(result){
+                            return false;
+                        }
+                    }});
+            }else{
+                jQuery.ajax({
+                    url: '<?php echo $this->getadminurl('*/*/ajaxconfig') ?>',
+                    type: 'POST',
+                    data:form.serialize(),
+                    success: function(result){
+                        if(result){
+                            return false;
+                        }
+                    }});
+            }
+        });
+    });
+    function delete_scopes(val){
+        if (confirm("Are you sure that you want to delete this scope? You will no longer be able to request this user information from the OP.")) {
+            jQuery.ajax({
+                url: '<?php echo $this->getadminurl('*/*/ajaxopenid') ?>',
+                type: 'POST',
+                data:{form_key_scope_delete:'form_key_scope_delete', delete_scope:val, form_key:'<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>' },
+                success: function(result){
+                    location.reload();
+                }});
+        }
+        else{
+            return false;
+        }
+
+    }
+    function add_scope_for_delete() {
+        var striped = jQuery('#table-striped');
+        var k = jQuery('#p_scents p').size() + 1;
+        var new_scope_field = jQuery('#new_scope_field').val();
+        var m = true;
+        if(new_scope_field){
+            jQuery("input[name='scope[]']").each(function(){
+                // get name of input
+                var value =  jQuery(this).attr("value");
+                if(value == new_scope_field){
+                    m = false;
+                }
+            });
+            if(m){
+                jQuery('<tr >' +
+                    '<td style="padding: 0px !important;">' +
+                    '   <p  id="'+new_scope_field+'">' +
+                    '     <input type="checkbox" name="scope[]" id="new_'+new_scope_field+'" value="'+new_scope_field+'"  />'+
+                    '   </p>' +
+                    '</td>' +
+                    '<td style="padding: 0px !important;">' +
+                    '   <p  id="'+new_scope_field+'">' +
+                    new_scope_field+
+                    '   </p>' +
+                    '</td>' +
+                    '<td style="padding: 0px !important; ">' +
+                    '   <a href="#scop_section" class="btn btn-danger btn-xs" style="margin: 5px; float: right" onclick="delete_scopes(\''+new_scope_field+'\')" >' +
+                    '<span class="glyphicon glyphicon-trash"></span>' +
+                    '</a>' +
+                    '</td>' +
+                    '</tr>').appendTo(striped);
+                jQuery('#new_scope_field').val('');
+
+                jQuery.ajax({
+                    url: '<?php echo $this->getadminurl('*/*/ajaxopenid') ?>',
+                    type: 'POST',
+                    data:{form_key_scope:'oxd_openid_config_new_scope', new_value_scope:new_scope_field, form_key:'<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>'},
+                    success: function(result){
+                        if(result){
+                            return false;
+                        }
+                    }});
+                jQuery("#new_"+new_scope_field).change(
+                    function(){
+                        var form=jQuery("#scpe_update");
+                        if (jQuery(this).is(':checked')) {
+                            jQuery.ajax({
+                                url: '<?php echo $this->getadminurl('*/*/ajaxopenid') ?>',
+                                type: 'POST',
+                                data:form.serialize(),
+                                success: function(result){
+                                    if(result){
+                                        return false;
+                                    }
+                                }});
+                        }else{
+                            jQuery.ajax({
+                                url: '<?php echo $this->getadminurl('*/*/ajaxopenid') ?>',
+                                type: 'POST',
+                                data:form.serialize(),
+                                success: function(result){
+                                    if(result){
+                                        return false;
+                                    }
+                                }});
+                        }
+                    });
+
+                return false;
+            }
+            else{
+                alert('The scope named '+new_scope_field+' is exist!');
+                jQuery('#new_scope_field').val('');
+                return false;
+            }
+        }else{
+            alert('Please input scope name!');
+            jQuery('#new_scope_field').val('');
+            return false;
+        }
+    }
+</script>
+<style>
+    .tooltipLink { display: inline !important; }
+    .tooltipLink:hover { display: inline !important; }
+</style>
+<link href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/GluuOxd_Openid/css/gluu-oxd-css.css'; ?>"  rel="stylesheet"/>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<div class="heading"><h3>OpenID Connect Single Sign-On (SSO) Extension by Gluu</h3></div>
+<div class="container" style="width: 100%">
+    <div class="row">
+        <div class="col-md-12" style="padding: 0px !important;">
+            <div id="messages">
+                <ul class="mini-messages">
+                    <?php if (Mage::getSingleton('core/session')->getErrorMessage()) { ?>
+                        <li class="error-msg">
+                            <ul>
+                                <li>
+                                    <span><?php echo Mage::getSingleton('core/session')->getErrorMessage(); ?></span>
+                                    <a id="error-cancel" href="#">&times;</a>
+                                </li>
+                            </ul>
+                        </li>
+                    <?php } ?>
+                    <?php if (Mage::getSingleton('core/session')->getSuccessMessage()) { ?>
+                        <li class="success-msg">
+                            <ul>
+                                <li>
+                                    <span><?php echo Mage::getSingleton('core/session')->getSuccessMessage(); ?></span><a id="success-cancel" href="#">&times;</a>
+                                </li>
+                            </ul>
+                        </li>
+                    <?php } ?>
+                </ul>
+            </div>
+            <ul class="navbar navbar-tabs">
+                <li  id="account_setup"><a href="<?php echo $this->getadminurl('*/*/index') ?>">General</a></li>
+                <?php if ( !gluu_is_oxd_registered()) {?>
+                    <li id="social-sharing-setup"><a style="pointer-events: none; cursor: default;">OpenID Connect Configuration</a></li>
+                <?php }else {?>
+                    <li class="active" id="social-sharing-setup"><a href="<?php echo $this->getadminurl('*/*/openidconfigpage') ?>">OpenID Connect Configuration</a></li>
+                <?php }?>
+                <li id=""><a data-method="#configopenid" href="https://oxd.gluu.org/docs/plugin/magento/" target="_blank">Documentation</a></li>
+            </ul>
+            <div class="container-page" style="padding: 0px !important;">
+                <div id="configopenid" style="padding: 20px !important;">
+                    <form method="post" id="scpe_update" name="f"
+                          action="<?php echo $this->getadminurl('*/*/generalFunction') ?>">
+                        <input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
+                        <input type="hidden" name="form_key_value" value="openid_config_page"/>
+                        <fieldset style="border: 2px solid #53cc6b; padding: 20px">
+                            <legend style="border-bottom:none; width: 110px !important; visibility: visible !important; overflow: visible; height: inherit !important;">
+                                <img style=" height: 45px;" src="<?php echo $this->getIconImage('gl'); ?>"/>
+                            </legend>
+                            <h3 style="margin-left: 30px;padding-bottom: 20px; border-bottom: 2px solid black; ">User Scopes</h3>
+                            <div >
+                                <table style="margin-left: 30px" class="form-table">
+                                    <tr style="border-bottom: 1px solid green !important;">
+                                        <th style="width: 200px; padding: 0px">
+                                            <p style="text-align: left;" id="scop_section">
+                                                Requested scopes
+                                                <a  data-toggle="tooltip" class="tooltipLink" data-original-title="Scopes are bundles of attributes that the OP stores about each user. It is recommended that you request the minimum set of scopes required">
+                                                    <span class="glyphicon glyphicon-info-sign"></span>
+                                                </a>
+                                            </p>
+                                        </th>
+                                        <td style="width: 200px; padding-left: 25px !important">
+                                            <table id="table-striped" class="form-table" >
+                                                <tbody style="width: inherit !important;">
+                                                <tr style="padding: 0px">
+                                                    <td style="padding: 0px !important; width: 10%">
+                                                        <p >
+                                                            <input checked type="checkbox" name=""  id="openid" value="openid"  disabled />
+
+                                                        </p>
+                                                    </td>
+                                                    <td style="padding: 0px !important; width: 70%">
+                                                        <p >
+                                                            <input type="hidden"  name="scope[]"  value="openid" />openid
+                                                        </p>
+                                                    </td>
+                                                    <td style="padding: 0px !important;  width: 20%">
+                                                        <a class="btn btn-danger btn-xs" style="margin: 5px; float: right" disabled><span class="glyphicon glyphicon-trash"></span></a>
+                                                    </td>
+                                                </tr>
+                                                <tr style="padding: 0px">
+                                                    <td style="padding: 0px !important; width: 10%">
+                                                        <p >
+                                                            <input checked type="checkbox" name=""  id="email" value="email"  disabled />
+
+                                                        </p>
+                                                    </td>
+                                                    <td style="padding: 0px !important; width: 70%">
+                                                        <p >
+                                                            <input type="hidden"  name="scope[]"  value="email" />email
+                                                        </p>
+                                                    </td>
+                                                    <td style="padding: 0px !important;  width: 20%">
+                                                        <a class="btn btn-danger btn-xs" style="margin: 5px; float: right" disabled><span class="glyphicon glyphicon-trash"></span></a>
+                                                    </td>
+                                                </tr>
+                                                <tr style="padding: 0px">
+                                                    <td style="padding: 0px !important; width: 10%">
+                                                        <p >
+                                                            <input checked type="checkbox" name=""  id="profile" value="profile"  disabled />
+
+                                                        </p>
+                                                    </td>
+                                                    <td style="padding: 0px !important; width: 70%">
+                                                        <p >
+                                                            <input type="hidden"  name="scope[]"  value="profile" />profile
+                                                        </p>
+                                                    </td>
+                                                    <td style="padding: 0px !important;  width: 20%">
+                                                        <a class="btn btn-danger btn-xs" style="margin: 5px; float: right" disabled><span class="glyphicon glyphicon-trash"></span></a>
+                                                    </td>
+                                                </tr>
+                                                <?php foreach($get_scopes as $scop) :?>
+                                                    <?php if ($scop == 'openid' or $scop == 'email' or $scop == 'profile'){?>
+                                                    <?php } else{?>
+                                                        <tr style="padding: 0px">
+                                                            <td style="padding: 0px !important;">
+                                                                <p id="<?php echo $scop;?>1">
+                                                                    <input <?php if($gluu_config && in_array($scop, $gluu_config['config_scopes'])){ echo "checked";} ?> type="checkbox" name="scope[]"  id="<?php echo $scop;?>1" value="<?php echo $scop;?>" <?php if (!gluu_is_oxd_registered() || $scop=='openid') echo ' disabled '; ?> />
+                                                                </p>
+                                                            </td>
+                                                            <td style="padding: 0px !important;">
+                                                                <p id="<?php echo $scop;?>1">
+                                                                    <?php echo $scop;?>
+                                                                </p>
+                                                            </td>
+                                                            <td  style="padding: 0px !important;">
+                                                                <button type="button" class="btn btn-danger btn-xs" style="margin: 5px; float: right" onclick="delete_scopes('<?php echo $scop;?>')" ><span class="glyphicon glyphicon-trash"></span></button>
+                                                            </td>
+                                                        </tr>
+                                                    <?php } endforeach;?>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table style="margin-left: 30px" class="form-table">
+                                    <tr style="border-bottom: 1px solid green !important;">
+                                        <th style="width: 200px; padding: 0px">
+                                            <p style="text-align: left;" >
+                                                Add scopes
+                                            </p>
+                                        </th>
+                                        <td >
+                                            <div style="margin-left: 25px">
+                                                <p>
+                                                    <input style="width: 80% !important;" class="form-control" <?php if(!gluu_is_oxd_registered()) echo 'disabled'?> type="text" id="new_scope_field" name="new_scope[]" placeholder="Input scope name" />
+                                                </p>
+                                                <br/>
+                                                <input type="button" class="btn btn-primary btn-md" style="width: 100px" onclick="add_scope_for_delete()" value="Add" id="add_new_scope"/>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <h3 style="margin-left: 30px;padding-bottom: 20px; border-bottom: 2px solid black; ">Authentication</h3>
+                            <div>
+
+                                <br/>
+                                <p style=" margin-left: 20px; font-weight:bold "><label style="display: inline !important; "><input type="checkbox" name="send_user_check" id="send_user" value="1" <?php if(!gluu_is_oxd_registered()) echo 'disabled'?> <?php if( $gluu_send_user_check) echo 'checked';?> /> <span>Bypass the local Magento customer login page and send users straight to the OP for authentication</span></label>
+                                </p>
+                                <br/>
+                                <p style=" margin-left: 20px; font-weight:bold "><label style="display: inline !important; "><input type="checkbox" name="send_admin_check" id="send_user" value="1" <?php if(!gluu_is_oxd_registered()) echo 'disabled'?> <?php if( $gluu_send_admin_check) echo 'checked';?> /> <span>Bypass the local Magento administrator login page and send users straight to the OP for authentication</span></label>
+                                </p>
+                                <br/>
+                            </div>
+                            <div>
+                                <table style="margin-left: 30px" class="form-table">
+                                    <tbody>
+                                    <tr>
+                                        <th style="width: 200px; padding: 0px">
+                                            <p style="text-align: left;" >
+                                                Select ACR: <a data-toggle="tooltip" class="tooltipLink" data-original-title="The OpenID Provider may make available multiple authentication mechanisms. To signal which type of authentication should be used for access to this site you can request a specific ACR. To accept the OP's default authentication, set this field to none.">
+                                                    <span class="glyphicon glyphicon-info-sign"></span>
+                                                </a>
+                                            </p>
+                                        </th>
+                                        <td>
+                                            <?php
+                                            $custom_scripts = $gluu_acr;
+                                            if(!empty($custom_scripts)){
+                                                ?>
+                                                <select  style="width: 80% !important;" class="form-control" name="send_user_type" id="send_user_type" <?php if(!gluu_is_oxd_registered()) echo 'disabled'?>>
+                                                    <option value="default">none</option>
+                                                    <?php
+                                                    if($custom_scripts){
+                                                        foreach($custom_scripts as $custom_script){
+                                                            if($custom_script != "default" and $custom_script != "none"){
+                                                                ?>
+                                                                <option <?php if($gluu_auth_type == $custom_script) echo 'selected'; ?> value="<?php echo $custom_script;?>"><?php echo $custom_script;?></option>
+                                                                <?php
+                                                            }
+                                                        }
+                                                    }
+                                                    ?>
+                                                </select>
+                                            <?php } ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th >
+                                            <input type="submit" class="btn btn-primary btn-md" <?php if(!gluu_is_oxd_registered()) echo 'disabled'?> value="Save Authentication Settings" name="set_oxd_config" />
+                                        </th>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <h3 style="margin-left: 30px;padding-top: 20px; border-top: 2px solid black; width: 75%"></h3>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

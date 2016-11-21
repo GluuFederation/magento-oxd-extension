@@ -1,0 +1,387 @@
+<?php
+function getBaseUrl()
+{
+// output: /myproject/index.php
+    $currentPath = $_SERVER['PHP_SELF'];
+
+// output: Array ( [dirname] => /myproject [basename] => index.php [extension] => php [filename] => index )
+    $pathInfo = pathinfo($currentPath);
+
+// output: localhost
+    $hostName = $_SERVER['HTTP_HOST'];
+
+// output: http://
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+
+// return: http://localhost/myproject/
+    return $protocol.$hostName.$pathInfo['dirname'];
+}
+$base_url  = getBaseUrl();
+
+function select_query($action){
+    $result = Mage::getStoreConfig($action);
+    return $result;
+}
+function insert_query($action, $value){
+    $storeConfig = new Mage_Core_Model_Config();
+    $storeConfig ->saveConfig($action,$value, 'default', 0);
+    $result = Mage::getStoreConfig($action);
+    return $result;
+}
+
+$get_scopes                 = json_decode(select_query('gluu/oxd/gluu_scopes'),true);
+$gluu_config                = json_decode(select_query('gluu/oxd/gluu_config'),true);
+$gluu_acr                   = json_decode(select_query('gluu/oxd/gluu_acr'),true);
+$gluu_auth_type             = select_query('gluu/oxd/gluu_auth_type');
+$gluu_send_user_check       = select_query('gluu/oxd/gluu_send_user_check');
+$gluu_provider              = select_query('gluu/oxd/gluu_provider');
+$gluu_custom_logout         = select_query('gluu/oxd/gluu_custom_logout');
+$gluu_new_roles              = json_decode(select_query('gluu/oxd/gluu_new_role'));
+$gluu_users_can_register    = select_query('gluu/oxd/gluu_users_can_register');
+$gluu_user_role    = select_query('gluu/oxd/gluu_user_role');
+if(empty($gluu_config)){
+    header("Refresh:0");
+    exit;
+}
+function gluu_is_oxd_registered(){
+    if(select_query('gluu/oxd/gluu_oxd_id')){
+        $oxd_id = select_query('gluu/oxd/gluu_oxd_id');
+        if(!$oxd_id ) {
+            return 0;
+        } else {
+            return $oxd_id;
+        }
+    }
+}
+?>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/GluuOxd_Openid/css/gluu-oxd-css.css'; ?>"  rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script type="application/javascript">
+    var jQuery = $.noConflict();
+    jQuery(document ).ready(function() {
+        jQuery(document).ready(function() {
+
+            jQuery('[data-toggle="tooltip"]').tooltip();
+            jQuery('#p_role').on('click', '.remrole', function() {
+                jQuery(this).parents('.role_p').remove();
+            });
+
+        });
+        <?php
+        if($gluu_users_can_register == 2){
+        ?>
+        jQuery("#p_role").children().prop('disabled',false);
+        jQuery("#p_role *").prop('disabled',false);
+        <?php
+        }
+        else if($gluu_users_can_register == 3){
+        ?>
+        jQuery("#p_role").children().prop('disabled',true);
+        jQuery("#p_role *").prop('disabled',true);
+        jQuery("input[name='gluu_new_role[]']").each(function(){
+            var striped = jQuery('#p_role');
+            var value =  jQuery(this).attr("value");
+            jQuery('<p><input type="hidden" name="gluu_new_role[]"  value= "'+value+'"/></p>').appendTo(striped);
+        });
+        jQuery("#UserType").prop('disabled',true);
+        <?php
+        }
+        else{
+        ?>
+        jQuery("#p_role").children().prop('disabled',true);
+        jQuery("#p_role *").prop('disabled',true);
+        jQuery("input[name='gluu_new_role[]']").each(function(){
+            var striped = jQuery('#p_role');
+            var value =  jQuery(this).attr("value");
+            jQuery('<p><input type="hidden" name="gluu_new_role[]"  value= "'+value+'"/></p>').appendTo(striped);
+        });
+        <?php
+        }
+        ?>
+        jQuery('input:radio[name="gluu_users_can_register"]').change(function(){
+            if(jQuery(this).is(':checked') && jQuery(this).val() == '2'){
+                jQuery("#p_role").children().prop('disabled',false);
+                jQuery("#p_role *").prop('disabled',false);
+                jQuery("input[type='hidden'][name='gluu_new_role[]']").remove();
+                jQuery("#UserType").prop('disabled',false);
+            }else if(jQuery(this).is(':checked') && jQuery(this).val() == '3'){
+                jQuery("#p_role").children().prop('disabled',true);
+                jQuery("#p_role *").prop('disabled',true);
+                jQuery("input[type='hidden'][name='gluu_new_role[]']").remove();
+                jQuery("input[name='gluu_new_role[]']").each(function(){
+                    var striped = jQuery('#p_role');
+                    var value =  jQuery(this).attr("value");
+                    jQuery('<p><input type="hidden" name="gluu_new_role[]"  value= "'+value+'"/></p>').appendTo(striped);
+                });
+                jQuery("#UserType").prop('disabled',true);
+            }else{
+                jQuery("#p_role").children().prop('disabled',true);
+                jQuery("#p_role *").prop('disabled',true);
+                jQuery("input[type='hidden'][name='gluu_new_role[]']").remove();
+                jQuery("input[name='gluu_new_role[]']").each(function(){
+                    var striped = jQuery('#p_role');
+                    var value =  jQuery(this).attr("value");
+                    jQuery('<p><input type="hidden" name="gluu_new_role[]"  value= "'+value+'"/></p>').appendTo(striped);
+                });
+                jQuery("#UserType").prop('disabled',false);
+            }
+        });
+        jQuery("input[name='scope[]']").change(function(){
+            var form=$("#scpe_update");
+            if (jQuery(this).is(':checked')) {
+                jQuery.ajax({
+                    url: window.location,
+                    type: 'POST',
+                    data:form.serialize(),
+                    success: function(result){
+                        if(result){
+                            return false;
+                        }
+                    }});
+            }else{
+                jQuery.ajax({
+                    url: window.location,
+                    type: 'POST',
+                    data:form.serialize(),
+                    success: function(result){
+                        if(result){
+                            return false;
+                        }
+                    }});
+            }
+        });
+        jQuery('#p_role').on('click', '.remrole', function() {
+            jQuery(this).parents('.role_p').remove();
+        });
+    });
+    var formSubmitting = false;
+    var setFormSubmitting = function() { formSubmitting = true; };
+    var edit_cancel_function = function() { formSubmitting = true; };
+    window.onload = function() {
+        window.addEventListener("beforeunload", function (e) {
+            if (formSubmitting ) {
+                return undefined;
+            }
+
+            var confirmationMessage = "You may have unsaved changes. Are you sure you want to leave this page?";
+
+            (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+            return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+        });
+    };
+</script>
+
+
+<script src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/GluuOxd_Openid/js/scope-custom-script.js'; ?>"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<style>
+    .tooltipLink { display: inline !important; }
+    .tooltipLink:hover { display: inline !important; }
+    td{ border-top:none !important; }
+</style>
+<div class="heading"><h3>OpenID Connect Single Sign-On (SSO) Extension by Gluu</h3></div>
+<div class="container" style="width: 100%">
+    <div class="row">
+        <div class="col-md-12"  style="padding: 0px !important;">
+            <div id="messages">
+                <ul class="mini-messages">
+                    <?php if (Mage::getSingleton('core/session')->getErrorMessage()) { ?>
+                        <li class="error-msg">
+                            <ul>
+                                <li>
+                                    <span><?php echo Mage::getSingleton('core/session')->getErrorMessage(); ?></span>
+                                    <a id="error-cancel" href="#">&times;</a>
+                                </li>
+                            </ul>
+                        </li>
+                    <?php } ?>
+                    <?php if (Mage::getSingleton('core/session')->getSuccessMessage()) { ?>
+                        <li class="success-msg">
+                            <ul>
+                                <li>
+                                    <span><?php echo Mage::getSingleton('core/session')->getSuccessMessage(); ?></span><a id="success-cancel" href="#">&times;</a>
+                                </li>
+                            </ul>
+                        </li>
+                    <?php } ?>
+                </ul>
+            </div>
+            <ul class="navbar navbar-tabs">
+                <li class="active" id="account_setup"><a data-method="#accountsetup">General</a></li>
+                <?php if ( !gluu_is_oxd_registered()) {?>
+                    <li id="social-sharing-setup"><a style="pointer-events: none; cursor: default;">OpenID Connect Configuration</a></li>
+                <?php }else {?>
+                    <li id="social-sharing-setup"><a href="<?php echo $this->getadminurl('*/*/openidconfigpage') ?>">OpenID Connect Configuration</a></li>
+                <?php }?>
+                <li id=""><a data-method="#configopenid" href="https://oxd.gluu.org/docs/plugin/magento/" target="_blank">Documentation</a></li>
+            </ul>
+            <div class="container-page"  style="padding: 0px !important;">
+                <!-- General edit tab without client_id and client_secret -->
+                <div style="padding: 20px !important;" id="accountsetup">
+                    <form id="register_GluuOxd" name="f" method="post" onsubmit="setFormSubmitting()"
+                          action="<?php echo $this->getadminurl('*/*/generalFunction') ?>">
+                        <input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>"/>
+                        <input type="hidden" name="form_key_value" value="general_oxd_edit"/>
+                        <fieldset style="border: 2px solid #53cc6b; padding: 20px">
+                            <legend style="border-bottom:none; width: 110px !important; visibility: visible !important; overflow: visible; height: inherit !important;">
+                                <img style=" height: 45px;" src="<?php echo $this->getIconImage('gl'); ?>"/>
+                            </legend>
+                            <div style="margin-left: 20px">
+                                <h3 style="padding-left: 10px;padding-bottom: 20px; border-bottom: 2px solid black; width: 60% ">Server Settings</h3>
+                                <div style="padding-left: 10px;">
+                                    <table class="table">
+                                        <tr>
+                                            <td  style=" width: 40%"><b>URI of the OpenID Connect Provider:</b></td>
+                                            <td><input class="" type="url" name="gluu_provider" id="gluu_provider"
+                                                       autofocus="true" disabled placeholder="Enter URI of the OpenID Connect Provider."
+                                                       style="width:400px;"
+                                                       value="<?php echo $gluu_provider; ?>"/>
+                                            </td>
+                                        </tr>
+                                        <?php if(!empty($gluu_config['gluu_client_id']) and !empty($gluu_config['gluu_client_secret'])){?>
+                                            <tr>
+                                                <td><b>Redirect URL for customer page:</b></td>
+                                                <td><?php echo Mage::getBaseUrl().'customer/account/login?option=getOxdSocialLogin';?>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Redirect URL for administrator page:</b></td>
+                                                <td><?php echo Mage::getBaseUrl().'admin?option=getOxdAdminLogin';?>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><b><font color="#FF0000">*</font>Client ID:</b></td>
+                                                <td><input class="" type="text" name="gluu_client_id" id="gluu_client_id"
+                                                           autofocus="true" placeholder="Enter OpenID Provider client ID."
+                                                           style="width:400px; "
+                                                           value="<?php if(!empty($gluu_config['gluu_client_id'])) echo $gluu_config['gluu_client_id']; ?>"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><b><font color="#FF0000">*</font>Client Secret:</b></td>
+                                                <td>
+                                                    <input class="" type="text" name="gluu_client_secret" id="gluu_client_secret"
+                                                           autofocus="true" placeholder="Enter OpenID Provider client secret."  style="width:400px; " value="<?php if(!empty($gluu_config['gluu_client_secret'])) echo $gluu_config['gluu_client_secret']; ?>"/>
+                                                </td>
+                                            </tr>
+                                        <?php }?>
+                                        <tr>
+                                            <td><b>Custom URI after logout:</b></td>
+                                            <td><input class="" type="url" name="gluu_custom_logout" id="gluu_custom_logout"
+                                                       autofocus="true"  placeholder="Enter custom URI after logout"
+                                                       style="width:400px;"
+                                                       value="<?php echo $gluu_custom_logout;?>"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>oxd port:</b></td>
+                                            <td>
+                                                <input class="" type="number"  name="gluu_oxd_port" min="0" max="65535"
+                                                       value="<?php echo $gluu_config['gluu_oxd_port']; ?>"
+                                                       style="width:400px;" placeholder="Please enter free port (for example 8099). (Min. number 0, Max. number 65535)."/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>oxd ID:</b></td>
+                                            <td>
+                                                <input class="" type="text" disabled name="oxd_id"
+                                                       value="<?php echo gluu_is_oxd_registered(); ?>"
+                                                       style="width:400px;background-color: rgb(235, 235, 228);" placeholder="Your oxd ID"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div style="margin-left: 20px">
+                                <h3 style="padding-left: 10px;padding-bottom: 20px; border-bottom: 2px solid black; width: 60% ">Enrollment
+                                    <a data-toggle="tooltip" class="tooltipLink" data-original-title="Choose whether to register new users when they login at an external identity provider. If you disable automatic registration, new users will need to be manually created">
+                                        <span class="glyphicon glyphicon-info-sign"></span>
+                                    </a>
+                                </h3>
+                                <div style="padding-left: 10px;">
+                                    <p><label><input name="gluu_users_can_register" type="radio" id="gluu_users_can_register" <?php if($gluu_users_can_register==1){ echo "checked";} ?> value="1" style="margin-right: 3px"> Automatically register any user with an account in the OpenID Provider</label></p>
+                                </div>
+                                <div style="padding-left: 10px;">
+                                    <p><label ><input name="gluu_users_can_register" type="radio" id="gluu_users_can_register" <?php if($gluu_users_can_register==2){ echo "checked";} ?> value="2" style="margin-right: 3px"> Only register users with the following role(s) in the OpenID Provider</label></p>
+                                    <div style="margin-left: 20px;">
+                                        <div id="p_role">
+                                            <?php $k=0;
+                                            if(!empty($gluu_new_roles)) {
+                                                foreach ($gluu_new_roles as $gluu_new_role) {
+                                                    if (!$k) {
+                                                        $k++;
+                                                        ?>
+                                                        <p class="role_p" style="padding-top: 10px">
+                                                            <input  type="text" name="gluu_new_role[]"  class="form-control" style="display: inline; width: 200px !important;"
+                                                                    placeholder="Input role name"
+                                                                    value="<?php echo $gluu_new_role; ?>"/>
+                                                            <button type="button" class="btn btn-primary btn-xs btn-xs add_new_role" onclick="test_add()"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </p>
+                                                        <?php
+                                                    } else {
+                                                        ?>
+                                                        <p class="role_p" style="padding-top: 10px">
+                                                            <input type="text" name="gluu_new_role[]"
+                                                                   placeholder="Input role name"  class="form-control" style="display: inline; width: 200px !important;"
+                                                                   value="<?php echo $gluu_new_role; ?>"/>
+                                                            <button type="button" class="btn btn-primary btn-xs add_new_role" onclick="test_add()"><span class="glyphicon glyphicon-plus"></span></button>
+                                                            <button type="button" class="btn btn-primary btn-xs remrole"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </p>
+                                                    <?php }
+                                                }
+                                            }else{
+                                                ?>
+                                                <p class="role_p" style="padding-top: 10px">
+                                                    <input type="text" name="gluu_new_role[]" placeholder="Input role name"  class="form-control" style="display: inline; width: 200px !important;" value=""/>
+                                                    <button type="button" class="btn btn-primary btn-xs add_new_role" onclick="test_add()"><span class="glyphicon glyphicon-plus"></span></button>
+                                                </p>
+                                                <?php
+                                            }?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="padding-left: 10px;">
+                                    <p><label><input name="gluu_users_can_register" type="radio" id="gluu_users_can_register_2" <?php if($gluu_users_can_register==3){ echo "checked";} ?> value="3" style="margin-right: 3px">Disable automatic registration</label></p>
+                                </div>
+                                <div style="padding-left: 10px;">
+                                <?php
+                                    $user_types = $groups = Mage::helper('customer')->getGroups()->toOptionArray();
+                                ?>
+                                <table class="table">
+                                    <tr >
+                                        <td  style="width: 280px"><b>New Customer Default Group:</b></td>
+                                        <td>
+                                            <div class="form-group">
+                                                <select style="width: 400px" id="UserType" class="form-control" name="gluu_user_role" >
+                                                    <?php
+                                                    foreach($user_types as $user_type){
+                                                        ?>
+                                                        <option <?php if($user_type['value'] == $gluu_user_role) echo 'selected'; ?> value="<?php echo $user_type['value'];?>"><?php echo $user_type['label'];?></option>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div><input class="btn btn-primary btn-large" type="submit" name="saveButton" value="Save" style="float: right; width: 120px; background-color:#00AA00 !important;" class=""/></div>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-primary btn-large" onclick="edit_cancel_function()" style="text-align:center; float: left;margin-top: 25px; width: 120px" href="<?php echo $this->getadminurl('*/*/index') ?>">Cancel</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- END of Container Page -->
+    </div>
+    <!-- END of Container -->
+</div>

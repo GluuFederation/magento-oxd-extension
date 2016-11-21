@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<layout>
+
+    <gluuoxd_gluufolder_adminhtml_index_index>
+        <reference name="content">
+            <block type="GluuOxd_Gluufolder/GluuOxOpenidConfig" name="test" template="gluuoxd_openid/gluuOxOpenidConfig.phtml" />
+        </reference>
+    </gluuoxd_gluufolder_adminhtml_index_index>
+    <gluuoxd_gluufolder_adminhtml_index_general>
+        <reference name="content">
+            <block type="GluuOxd_Gluufolder/GluuOxOpenidConfig" name="test" template="gluuoxd_openid/generalEdit.phtml" />
+        </reference>
+    </gluuoxd_gluufolder_adminhtml_index_general>
+    <gluuoxd_gluufolder_adminhtml_index_openidconfigpage>
+        <reference name="content">
+            <block type="GluuOxd_Gluufolder/GluuOxOpenidConfig" name="test" template="gluuoxd_openid/openidconfigpage.phtml" />
+        </reference>
+    </gluuoxd_gluufolder_adminhtml_index_openidconfigpage>
+    <gluuoxd_gluufolder_adminhtml_index_logoutfromall>
+        <reference name="content">
+            <block type="GluuOxd_Gluufolder/GluuOxOpenidConfig" name="test" template="gluuoxd_openid/logout.phtml" />
+        </reference>
+    </gluuoxd_gluufolder_adminhtml_index_logoutfromall>
+    <adminhtml_index_login>
+        <reference name="form.additional.info">
+            <block type="GluuOxd_Gluufolder/GluuOxOpenidConfig"  name="test" template="gluuoxd_openid/login.phtml" />
+        </reference>
+    </adminhtml_index_login>
+</layout>
