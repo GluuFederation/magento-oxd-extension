@@ -2,7 +2,7 @@
 
 # OpenID Connect Single Sign-On (SSO) Magento Extension By Gluu
 
-![image](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/plugin.jpg)
+![image](https://raw.githubusercontent.com/GluuFederation/magento-oxd-extension/master/plugin.jpg)
 
 Gluu's OpenID Connect Single Sign-On (SSO) Magento Extension will enable you to authenticate users against any standard OpenID Connect Provider (OP). If you don't already have an OP you can use Google or [deploy the free open source Gluu Server](https://gluu.org/docs/deployment).
 
@@ -19,31 +19,31 @@ In order to use the Magento Extension you will need a standard OP (like Google o
 ### Disable cache
 
 1. Open menu tab System/Cache Management
-![Management](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/mag0.png)
+![Management](https://raw.githubusercontent.com/GluuFederation/magento-oxd-extension/master/docu/mag0.png)
 
 2. Check select all, set action on disable and click on submit button.
-![submit](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/mag1.png)
+![submit](https://raw.githubusercontent.com/GluuFederation/magento-oxd-extension/master/docu/mag1.png)
 
 ### Download
 
 [Link to Magento marketplace](https://www.magentocommerce.com/magento-connect/openid-connect-sso.html)
 
-[Github source](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/blob/master/Magento_gluu_SSO-2.4.4.tgz).
+[Github source](https://raw.githubusercontent.com/GluuFederation/magento-oxd-extension/blob/master/Magento_gluu_SSO-2.4.4.tgz).
 
 ### Install extension
 
 1. Open menu tab System/Magento Connect/Magento Connect Manager
-![Manager](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/mag2.png)
+![Manager](https://raw.githubusercontent.com/GluuFederation/magento-oxd-extension/master/docu/mag2.png)
 
 2. Choose downloaded file and click on upload button.
-![upload](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/mag3.png)
+![upload](https://raw.githubusercontent.com/GluuFederation/magento-oxd-extension/master/docu/mag3.png)
 
 3. See Auto-scroll console contents, if extension successfully installed return to admin panel.
 
 ####Extension will be automatically activated.
 
 3. Open menu tab OpenID Connect/ Open extension page
-![GluuSSO](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.mag4.png)
+![GluuSSO](https://raw.githubusercontent.com/GluuFederation/magento-oxd-extension/master/docu/44.mag4.png)
 
 
 ## Configuration
@@ -52,7 +52,7 @@ In order to use the Magento Extension you will need a standard OP (like Google o
 
 In your Magento admin menu panel you should now see the OpenID Connect menu tab. Click the link to navigate to the General configuration  page:
 
-![General](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m1.png)  
+![General](https://raw.githubusercontent.com/GluuFederation/magento-oxd-extension/master/docu/44.m1.png)  
 
 1. Automatically register any user with an account in the OpenID Provider: By setting registration to automatic, any user with an account in the OP will be able to register for an account in your Magento site. They will be assigned the new user default role specified below.
 2. Only register users with the following role(s) in the OP: Using this option you can limit registration to users who have a specified role in the OP, for instance `magento`. This is not configurable in all OP's. It is configurable if you are using a Gluu Server. [Follow the instructions below](#role-based-enrollment) to limit access based on an OP role.
@@ -66,7 +66,7 @@ If your OpenID Provider supports dynamic registration, no additional steps are r
 
 If your OpenID Connect Provider doesn't support dynamic registration, you will need to insert your OpenID Provider `client_id` and `client_secret` on the following page.
 
-![General](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/44.m1.1.png) 
+![General](https://raw.githubusercontent.com/GluuFederation/magento-oxd-extension/master/docu/44.m1.1.png) 
 
 To generate your `client_id` and `client_secret` use the `Redirect URL` for customer page: `https://{site-base-url}/index.php/customer/account/login/?option=getOxdSocialLogin` and `Redirect URL` for administrator  page: `https://{site-base-url}/index.php/admin/?option=getOxdAdminLogin`.
 
@@ -79,14 +79,14 @@ To generate your `client_id` and `client_secret` use the `Redirect URL` for cust
 3. Select `Manage People`.
 4. Find the person(s) who should have access.
 5. Click their user entry.
-6. Add the `User Permission` attribute to the person and specify the same value as in the extension. For instance, if in the extension you have limit enrollment to user(s) with role = `magento`, then you should also have `User Permission` = `magento` in the user entry. [See a screenshot example](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/permission.png).
+6. Add the `User Permission` attribute to the person and specify the same value as in the extension. For instance, if in the extension you have limit enrollment to user(s) with role = `magento`, then you should also have `User Permission` = `magento` in the user entry. [See a screenshot example](https://raw.githubusercontent.com/GluuFederation/magento-oxd-extension/master/docu/permission.png).
 7. Update the user record.
 8. Go back to the Magento extension and make sure the `permission` scope is requested (see below).
 9. Now they are ready for enrollment at your Magento site.
 
 ### OpenID Connect Configuration
 
-![General](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/config.png) 
+![General](https://raw.githubusercontent.com/GluuFederation/magento-oxd-extension/master/docu/config.png) 
 
 #### User Scopes
 
@@ -101,10 +101,10 @@ In the extension interface you can enable, disable and delete scopes.
 #### Authentication
 
  Bypass the local Magento customer login page and send users straight to the OP for authentication: Check this box so that when users attempt to login they are sent straight to the OP, bypassing the local Magento customer login screen. When it is not checked, users will see the following screen when trying to login:
-![General](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/customer_login.png) 
+![General](https://raw.githubusercontent.com/GluuFederation/magento-oxd-extension/master/docu/customer_login.png) 
 
  Bypass the local Magento administrator login page and send users straight to the OP for authentication: Check this box so that when users attempt to login they are sent straight to the OP, bypassing the local Magento administrator login screen. When it is not checked, users will see the following screen when trying to login:
-![General](https://raw.githubusercontent.com/GluuFederation/gluu-magento-sso-login-extension/master/docu/admin_login.png) 
+![General](https://raw.githubusercontent.com/GluuFederation/magento-oxd-extension/master/docu/admin_login.png) 
 
 Select ACR: To signal which type of authentication should be used, an OpenID Connect client may request a specific authentication context class reference value (a.k.a. "acr"). The authentication options available will depend on which types of mechanisms the OP has been configured to support. The Gluu Server supports the following authentication mechanisms out-of-the-box: username/password (basic), Duo Security, Super Gluu, and U2F tokens, like Yubikey.
 
