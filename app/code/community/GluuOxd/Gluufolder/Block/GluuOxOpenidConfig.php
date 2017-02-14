@@ -377,12 +377,31 @@ class GluuOxd_Gluufolder_Block_GluuOxOpenidConfig extends Mage_Core_Block_Templa
                 $world = str_replace("[","",$get_user_info_array->permission[0]);
                 $reg_user_permission = str_replace("]","",$world);
             }
-            
+	        $bool = false;
+	        $gluu_new_roles              = json_decode(select_query('gluu/oxd/gluu_new_role'));
+	        $gluu_users_can_register    = select_query('gluu/oxd/gluu_users_can_register');
+	        $gluu_user_role    = select_query('gluu/oxd/gluu_user_role');
+	        if($gluu_users_can_register == 2 and !empty($gluu_new_roles)){
+                foreach ($gluu_new_roles as $gluu_new_role) {
+                    if (strstr($reg_user_permission, $gluu_new_role)) {
+                        $bool = true;
+                    }
+                }
+                if(!$bool){
+                    echo "<script>
+                            alert('You are not authorized for an account on this application. If you think this is an error, please contact your OpenID Connect Provider (OP) admin.');
+                            location.href='".$this->getBaseUrl()."';
+                          </script>";
+                    exit;
+                }
+	        }
+	        
             if( $reg_email ) {
                 $customer = Mage::getModel('customer/customer');
                 $customer->setWebsiteId(Mage::app()->getWebsite()->getId());
                 $customer->loadByEmail($reg_email);
                 if($customer->getId()>=1){
+                    
                     $customer->setFirstname($reg_first_name);
                     $customer->setLastname ($reg_last_name);
                     $customer->setMiddleName($reg_middle_name);
@@ -416,24 +435,13 @@ class GluuOxd_Gluufolder_Block_GluuOxOpenidConfig extends Mage_Core_Block_Templa
                     header("Refresh:0");
                 }
                 else{
-                    $bool = true;
-                    $gluu_new_roles              = json_decode(select_query('gluu/oxd/gluu_new_role'));
-                    $gluu_users_can_register    = select_query('gluu/oxd/gluu_users_can_register');
-                    $gluu_user_role    = select_query('gluu/oxd/gluu_user_role');
-                    if($gluu_users_can_register == 2 and !empty($gluu_new_roles)){
-                        if (!in_array($reg_user_permission, $gluu_new_roles)) {
-                            $bool = false;
-                        }else{
-                            $bool = True;
-                        }
-                    }
-                    if(!$bool){
+	                if($gluu_users_can_register == 3){
                         echo "<script>
-                                alert('You are not authorized for an account on this application. If you think this is an error, please contact your OpenID Connect Provider (OP) admin.');
-                                location.href='".$this->getBaseUrl()."';
-				              </script>";
+                                    alert('You are not authorized for an account on this application. If you think this is an error, please contact your OpenID Connect Provider (OP) admin.');
+                                    location.href='".$this->getBaseUrl()."';
+                              </script>";
                         exit;
-                    }
+	                }
                     $websiteId = Mage::app()->getWebsite()->getId();
                     $store = Mage::app()->getStore();
                     $password = md5(Mage::helper('core')->getRandomString($length = 7));
@@ -656,7 +664,23 @@ class GluuOxd_Gluufolder_Block_GluuOxOpenidConfig extends Mage_Core_Block_Templa
             if (Mage::getSingleton('adminhtml/url')->useSecretKey()) {
                 Mage::getSingleton('adminhtml/url')->renewSecretUrls();
             }
-
+	        $bool = false;
+	        $gluu_new_roles              = json_decode(select_query('gluu/oxd/gluu_new_role'));
+	        $gluu_users_can_register    = select_query('gluu/oxd/gluu_users_can_register');
+	        if($gluu_users_can_register == 2 and !empty($gluu_new_roles)){
+		        foreach ($gluu_new_roles as $gluu_new_role) {
+			        if (strstr($reg_user_permission, $gluu_new_role)) {
+				        $bool = true;
+			        }
+		        }
+		        if(!$bool){
+			        echo "<script>
+                            alert('You are not authorized for an account on this application. If you think this is an error, please contact your OpenID Connect Provider (OP) admin.');
+                            location.href='".$this->getBaseUrl()."';
+                          </script>";
+			        exit;
+		        }
+	        }
             $session = Mage::getSingleton('admin/session');
             $session->setIsFirstVisit(true);
             $session->setUser($user);
