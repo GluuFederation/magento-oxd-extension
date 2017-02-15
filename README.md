@@ -55,7 +55,7 @@ In your Magento admin menu panel you should now see the OpenID Connect menu tab.
 ![General](https://raw.githubusercontent.com/GluuFederation/magento-oxd-extension/master/docu/44.m1.png)  
 
 1. Automatically register any user with an account in the OpenID Provider: By setting registration to automatic, any user with an account in the OP will be able to register for an account in your Magento site. They will be assigned the new user default role specified below.
-2. Only register users with the following role(s) in the OP: Using this option you can limit registration to users who have a specified role in the OP, for instance `magento`. This is not configurable in all OP's. It is configurable if you are using a Gluu Server. [Follow the instructions below](#role-based-enrollment) to limit access based on an OP role.
+2. Only register and allow ongoing access to users with one or more of the following roles in the OP: Using this option you can limit registration to users who have a specified role in the OP, for instance `magento`. This is not configurable in all OP's. It is configurable if you are using a Gluu Server. [Follow the instructions below](#role-based-enrollment) to limit access based on an OP role.
 3. New Customer Default Group: specify which group to give to new customer upon registration.
 4. URI of the OpenID Provider: insert the URI of the OpenID Connect Provider.
 5. Custom URI after logout: custom URI after logout (for example "Thank you" page).
@@ -72,7 +72,7 @@ To generate your `client_id` and `client_secret` use the `Redirect URL` for cust
 
 > If you are using a Gluu server as your OpenID Provider, you can make sure everything is configured properly by logging into to your Gluu Server, navigate to the OpenID Connect > Clients page. Search for your `oxd id`.
 
-#### Role based enrollment
+#### Enrollment and Access Management
 
 1. Navigate to your Gluu Server admin GUI.
 2. Click the `Users` tab in the left hand navigation menu.
