@@ -1,10 +1,44 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Vlad-Home
- * Date: 2/14/2016
- * Time: 1:44 PM
- */
+	/**
+	 * @copyright Copyright (c) 2017, Gluu Inc. (https://gluu.org/)
+	 * @license	  MIT   License            : <http://opensource.org/licenses/MIT>
+	 *
+	 * @package	  OpenID Connect SSO Extension by Gluu
+	 * @category  Extension for Magento 1.9.x
+	 * @version   3.0.0
+	 *
+	 * @author    Gluu Inc.          : <https://gluu.org>
+	 * @link      Oxd site           : <https://oxd.gluu.org>
+	 * @link      Documentation      : <https://oxd.gluu.org/docs/plugin/magento/>
+	 * @director  Mike Schwartz      : <mike@gluu.org>
+	 * @support   Support page       : <support@gluu.org>
+	 * @developer Volodya Karapetyan : <https://github.com/karapetyan88> <mr.karapetyan88@gmail.com>
+	 *
+	 *
+	 * This content is released under the MIT License (MIT)
+	 *
+	 * Copyright (c) 2017, Gluu inc, USA, Austin
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 *
+	 */
+
 $installer = $this;
 
 $installer->startSetup();
@@ -19,15 +53,5 @@ $setup->deleteConfig('gluu/oxd/oxd_openid_scops');
 $setup->deleteConfig('gluu/oxd/oxd_config');
 $setup->deleteConfig('gluu/oxd/oxd_openid_scops');
 $setup->deleteConfig('gluu/oxd/oxd_openid_custom_scripts');
-
-$setup->deleteConfig('GluuOxd/Openid/loginTheme');
-$setup->deleteConfig('GluuOxd/Openid/loginCustomTheme');
-$setup->deleteConfig('GluuOxd/Openid/iconSpace');
-$setup->deleteConfig('GluuOxd/Openid/iconCustomSize');
-$setup->deleteConfig('GluuOxd/Openid/iconCustomWidth');
-$setup->deleteConfig('GluuOxd/Openid/iconCustomHeight');
-$setup->deleteConfig('GluuOxd/Openid/iconCustomColor');
-
-
 
 $installer->endSetup();

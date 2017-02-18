@@ -1,5 +1,5 @@
 <_>
-   <form_key>FnZFv5TovBxlEzOf</form_key>
+   <form_key>yHH745zsS6x5J2QY</form_key>
    <name>Magento_gluu_SSO</name>
    <channel>community</channel>
    <version_ids>
@@ -9,18 +9,18 @@
    <description>Use OpenID Connect to login by leveraging the oxd client service demon.</description>
    <license>Gluu inc.</license>
    <license_uri>https://github.com/GluuFederation/gluu-sso-login-magento-extension/blob/master/LICENSE</license_uri>
-   <version>2.4.4</version>
+   <version>3.0.0</version>
    <stability>stable</stability>
    <notes>Use OpenID Connect to login by leveraging the oxd client service demon.</notes>
    <authors>
       <name>
-         <name>Vlad</name>
+         <name>Volodya</name>
       </name>
       <user>
          <user>MAG003268474</user>
       </user>
       <email>
-         <email>vlad.karapetyan.1988@mail.ru</email>
+         <email>mr.karapetyan88@gmail.com</email>
       </email>
    </authors>
    <depends_php_min>5.3.10</depends_php_min>
@@ -40,7 +40,7 @@
             <max/>
          </max>
          <files>
-            <files>                                                                                                               </files>
+            <files>                                                                                                                 </files>
          </files>
       </package>
       <extension>
