@@ -1,5 +1,5 @@
 <_>
-   <form_key>yHH745zsS6x5J2QY</form_key>
+   <form_key>0FeRtRZq2NMglZqO</form_key>
    <name>Magento_gluu_SSO</name>
    <channel>community</channel>
    <version_ids>
@@ -40,7 +40,7 @@
             <max/>
          </max>
          <files>
-            <files>                                                                                                                 </files>
+            <files>                                                                                                                  </files>
          </files>
       </package>
       <extension>

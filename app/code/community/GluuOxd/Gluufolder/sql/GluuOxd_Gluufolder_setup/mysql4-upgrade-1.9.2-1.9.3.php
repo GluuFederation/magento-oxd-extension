@@ -11,7 +11,7 @@
 	 * @link      Oxd site           : <https://oxd.gluu.org>
 	 * @link      Documentation      : <https://oxd.gluu.org/docs/plugin/magento/>
 	 * @director  Mike Schwartz      : <mike@gluu.org>
-	 * @support   Support page       : <support@gluu.org>
+	 * @support   Support email      : <support@gluu.org>
 	 * @developer Volodya Karapetyan : <https://github.com/karapetyan88> <mr.karapetyan88@gmail.com>
 	 *
 	 *
