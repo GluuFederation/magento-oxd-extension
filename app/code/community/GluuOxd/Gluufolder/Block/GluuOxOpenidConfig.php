@@ -5,11 +5,11 @@
 	 *
 	 * @package	  OpenID Connect SSO Extension by Gluu
 	 * @category  Extension for Magento 1.9.x
-	 * @version   3.0.0
+	 * @version   3.0.1
 	 *
 	 * @author    Gluu Inc.          : <https://gluu.org>
 	 * @link      Oxd site           : <https://oxd.gluu.org>
-	 * @link      Documentation      : <https://oxd.gluu.org/docs/plugin/magento/>
+	 * @link      Documentation      : <https://gluu.org/docs/oxd/3.0.1/plugin/magento/>
 	 * @director  Mike Schwartz      : <mike@gluu.org>
 	 * @support   Support email      : <support@gluu.org>
 	 * @developer Volodya Karapetyan : <https://github.com/karapetyan88> <mr.karapetyan88@gmail.com>
